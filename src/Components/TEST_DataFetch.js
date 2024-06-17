@@ -1,18 +1,3 @@
-// import React from 'react';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <h1>Welcome to React</h1>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -23,7 +8,7 @@ function MyComponent() {
     // 定義發送POST請求的函數
     const fetchData = async () => {
       try {
-        const response = await axios.post('http://192.168.123.240:9000/api/mr/', {
+        const response = await axios.post('http://192.168.123.240:9000/api/mr', {
           // 可以在這裡傳遞POST請求所需的資料
           'key01': 'values01',
           'key02': 'values02',
