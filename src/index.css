@@ -1,17 +1,6 @@
-/* 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-} */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   box-sizing: border-box;
@@ -23,10 +12,73 @@ code {
   margin: 0;
   height: 100vh;
   width: 100vw;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  border: 1px solid red;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
 }
 
 .nav-custom {
   background: linear-gradient(to bottom, #434343, #000000);
 }
+
+
+tbody>tr>td {
+  padding: 10px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+thead>tr>th {
+  text-align: center;
+  padding: 10px;
+  white-space: nowrap;
+}
+
+
+/* .table-container {
+  overflow: scroll;
+  max-height: 600px;
+  width: 1600px;
+  min-width: 1000px;
+}
+
+.table-header {
+  padding: 10px;
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+
+  &>tr {
+    border: 1px solid black;
+    position: sticky;
+    top: 0;
+
+    &>th {
+      color: white;
+      font-weight: bold;
+      border: 1px solid black;
+      background-color: #9c9c9c;
+      padding: 10px;
+      z-index: 10;
+      position: sticky;
+      top: 0;
+    }
+  } 
+
+  
+  &>tr>th {
+    color: white;
+    font-weight: bold;
+    border: 1px solid black;
+    background-color: #9c9c9c;
+    padding: 10px;
+    z-index: 10;
+  }
+
+} */
