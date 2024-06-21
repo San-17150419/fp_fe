@@ -1,43 +1,38 @@
-import Select from './Components/modd/Select';
-import Input from './Components/modd/Input';
-import Table from './Components/modd/Table';
-import SelectTestVersion from './SelectTestVersion';
-import BootStrapTable from './Components/modd/BootStrapTable';
-import Sidebar from './Components/modd/Sidebar';
+import Sidebar from "./Components/modd/Sidebar";
+import { Outlet } from "react-router-dom";
 function App() {
   return (
     <>
-      <div className='flex'>
-        <nav className='navbar navbar-expand-sm navbar-dark nav-custom nav px-3 py-2 position-sticky fixed-top w-full' style={{ minHeight: "78px" }}>
-          <div className="container-fluid">
-            <a className="navbar-brand" href="#">Navbar</a>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div className="flex">
+        <nav
+          className="navbar navbar-expand-sm navbar-dark nav-custom nav position-sticky fixed-top w-full px-3 py-2"
+          style={{ minHeight: "78px" }}
+        >
+          {/* TODO: Remove Bootstrap style */}
+          <div className="flex">
+            <a className="navbar-brand" href="#">
+              Navbar
+            </a>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
               <span className="navbar-toggler-icon"></span>
             </button>
           </div>
         </nav>
       </div>
-      <main className='flex w-full  overflow-hidden border-8 border-violet-800  '>
-        <Sidebar />
-        <div className='flex flex-col w-full border border-black ' >
-          <section className='border-bottom py-3 d-flex'>
-            <Select options={["資料庫檢索及更新", "新增模具"]} />
-          </section>
-          <section className='py-3 flex w-full gap-3 flex-wrap'>
-            <Select options={["全部系列", "P系列", "PA系列", "PC系列", "CE系列", "特殊系列", "雙色系列", "配件", "臨時模具"]} />
-            <Input placeholder="名版" />
-            <Input placeholder='模號' />
-            <Select options={["財產歸屬", "國登場", "斗六場", "金筆場"]} />
-            <Select options={["GD", "HP", "DL", "D08", "停用"]} />
-            {/* <SelectTestVersion /> */}
-          </section>
-          {/* <section className='table-container'> */}
-          <section className='overflow-hidden '>
-            <div className=' max-h-[600px] w-[1600px] overflow-scroll'>
-              <Table />
-            </div>
-            {/* <BootStrapTable /> */}
-          </section>
+      <main className="flex w-full overflow-hidden ">
+        <div className="w-1/6">
+          <Sidebar />
+        </div>
+        <div className="mx-10 my-5 w-5/6 ">
+          <Outlet />
         </div>
       </main>
     </>
