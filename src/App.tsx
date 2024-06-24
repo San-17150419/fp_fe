@@ -1,40 +1,26 @@
 import Sidebar from "./Components/modd/Sidebar";
 import { Outlet } from "react-router-dom";
+import logo from "./assets/logo_banner5.png";
+import Navbar from "./Components/modd/Navbar";
 function App() {
   return (
     <>
-      <div className="flex">
-        <nav
-          className="navbar navbar-expand-sm navbar-dark nav-custom nav position-sticky fixed-top w-full px-3 py-2"
-          style={{ minHeight: "78px" }}
-        >
-          {/* TODO: Remove Bootstrap style */}
-          <div className="flex">
-            <a className="navbar-brand" href="#">
-              Navbar
-            </a>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-          </div>
-        </nav>
-      </div>
-      <main className="flex w-full overflow-hidden ">
-        <div className="w-1/6">
+      <Navbar>
+        <Navbar.Logo src={logo} />
+        <Navbar.Items>
+          <Navbar.Item className="text-2xl">Home </Navbar.Item>
+          <Navbar.Item className="text-xl">About</Navbar.Item>
+          <Navbar.Item className="text-xl">??</Navbar.Item>
+        </Navbar.Items>
+      </Navbar>
+      <div className="flex flex-grow bg-gray-200">
+        <div className="w-1/6 min-w-[200px]">
           <Sidebar />
         </div>
-        <div className="mx-10 my-5 w-5/6 ">
+        <div className="mx-10 my-10 w-full">
           <Outlet />
         </div>
-      </main>
+      </div>
     </>
   );
 }
