@@ -25,8 +25,8 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="z-20 h-screen border border-black p-4">
-      <Menu as="div" className="relative inline-block text-left">
+    <aside className="z-20 h-full border-e border-gray-300 bg-white p-4 shadow-xl">
+      <Menu as="div" className="relative text-left">
         <MenuButton
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 font-semibold hover:font-bold hover:text-blue-500"
@@ -50,8 +50,9 @@ export default function Sidebar() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <MenuItems className="text-decoration-none absolute left-6 z-40 mt-2 w-32 origin-top-right bg-white">
-            <div className="py-1">
+          <MenuItems className="text-decoration-none z-40 mt-2 w-full origin-top-right bg-transparent">
+            {/* <MenuItems className="text-decoration-none absolute left-6 z-40 mt-2 w-32 origin-top-right bg-transparent"> */}
+            <div className="mx-6 py-1">
               {options.map((option) => (
                 <MenuItem key={option.id}>
                   {({ focus }) => (
