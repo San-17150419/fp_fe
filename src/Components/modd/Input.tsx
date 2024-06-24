@@ -2,12 +2,13 @@ import {
   FocusEventHandler,
   FormEvent,
   InputHTMLAttributes,
-  LabelHTMLAttributes,
   ReactNode,
   useState,
 } from "react";
-
+import { GoQuestion } from "react-icons/go";
+import MessageBox from "./MessageBox";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  type?: "email" | "password" | "text";
   children?: ReactNode;
   name: string;
 }
@@ -18,6 +19,7 @@ export default function Input({
   name,
   children,
   placeholder,
+  autoComplete = "off",
   ...props
 }: InputProps) {
   const [labelMessage, setLabelMessage] = useState(placeholder);
@@ -27,6 +29,13 @@ export default function Input({
   // TODO: Maybe I can create a custom hook for the display message.
   // TODO: The eye icon for toggle password visibility is not working properly. It will show up on first focus. But it will disappear after loosing focus and never show again. It is provided by the browser. I might need to make a custom one. (https://github.com/processing/p5.js-web-editor/issues/2533)
   //TODO: Create a tooltip of some sort for displaying details about the requirments of the input. I prefer to have a concise verification message. (So it won't disrrupt the layout and user experience)
+
+  const DISPLAYMESSAGE = {
+    text: "請輸入至少3個字",
+    email: "請輸入正確的email",
+    password:
+      "請輸入有效的密碼: 最少8個字符，至少1個大寫字母，1個小寫字母，1個數字和1個特殊字符",
+  };
 
   const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     const currentInput = e.currentTarget.value.trim();
@@ -61,7 +70,8 @@ export default function Input({
 
       if (!passwordRegex.test(currentInput)) {
         setDisplayMessage(
-          "請輸入有效的密碼: 最少8個字符，至少1個大寫字母，1個小寫字母，1個數字和1個特殊字符",
+          // "請輸入有效的密碼: 最少8個字符，至少1個大寫字母，1個小寫字母，1個數字和1個特殊字符",
+          "密碼格式錯誤",
         );
         setIsMessageLegal(false);
       } else {
@@ -80,7 +90,7 @@ export default function Input({
   };
 
   return (
-    <div className="relative m-1 flex h-[38px] w-[180px] flex-col gap-2">
+    <div className="relative mx-1 mb-4 mt-8 flex h-[38px] min-w-[180px] flex-col gap-2">
       <input
         type={type}
         name={name}
@@ -94,27 +104,22 @@ export default function Input({
       />
       <label
         htmlFor={name}
-        className={`absolute left-2 top-[5px] cursor-pointer text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-7 peer-focus:z-20 peer-focus:text-gray-500`}
+        className={`absolute left-2 top-[7px] cursor-pointer text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-7 peer-focus:z-20 peer-focus:text-gray-500`}
       >
         {labelMessage}
       </label>
-      <p
-        className={`${
-          isMessageLegal ? "text-green-500" : "text-red-500"
-        } relative bottom-1 text-wrap text-sm`}
-      >
-        {displayMessage}
-      </p>
+      <div className="flex items-center  gap-1">
+        {!isMessageLegal && (
+          <MessageBox displayMessage={DISPLAYMESSAGE[type]} />
+        )}
+        <p
+          className={`${
+            isMessageLegal ? "text-green-500" : "text-red-500"
+          } ml-1 text-wrap text-sm`}
+        >
+          {displayMessage}
+        </p>
+      </div>
     </div>
   );
-}
-
-Input.Label = InputLabel;
-
-interface InputLabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-  children?: ReactNode;
-}
-
-function InputLabel({ children, ...props }: InputLabelProps) {
-  return <label {...props}>{children}</label>;
 }
