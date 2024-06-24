@@ -23,20 +23,15 @@ export default function SelectTestVersion({ options }: SelectProps) {
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
   return (
-    <Listbox
-      value={selectedOption}
-      onChange={setSelectedOption}
-      as={"div"}
-      className={"m-1"}
-    >
+    <Listbox value={selectedOption} onChange={setSelectedOption} as={"div"}>
       {({ open }) => (
         <>
           <ListboxButton
             data-open={open}
-            className={`mb-1 flex min-w-[180px] items-center rounded border border-gray-300 py-1 font-bold focus-visible:outline-none focus-visible:ring-2 data-[focus]:border-gray-300 data-[active]:ring-2 data-[focus]:ring-2`}
+            className={`mx-1 mb-4 mt-8 flex h-[38px] w-full min-w-[180px] items-center rounded-md border border-gray-300 bg-white px-2 py-2 font-bold focus-visible:outline-none focus-visible:ring-2 data-[focus]:border-gray-300 data-[active]:ring-2 data-[focus]:ring-2`}
             //
           >
-            <span className="mx-1">
+            <span>
               {typeof selectedOption === "object"
                 ? selectedOption.value
                 : selectedOption}
@@ -55,7 +50,7 @@ export default function SelectTestVersion({ options }: SelectProps) {
               anchor="bottom"
               //To match the width of the dropdown with the width of the button, use the --button-width CSS variable that's exposed on the ListboxOptions element
               className={
-                "z-10 w-[var(--button-width)] rounded-md border border-gray-300 bg-white [--anchor-gap:2px]"
+                "z-[50] w-[var(--button-width)] rounded-md border border-gray-300 bg-white [--anchor-gap:2px]"
               }
             >
               {options.map((option) => (
