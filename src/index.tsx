@@ -10,6 +10,8 @@ import {
   SelectPage,
   DataTablePage,
   DefaultPage,
+  BFFPatternPage,
+  DataTableWithDialogModalPage,
 } from "./pages";
 
 const router = createBrowserRouter([
@@ -21,18 +23,21 @@ const router = createBrowserRouter([
       { index: true, element: <DefaultPage /> },
       { path: "input", element: <InputPage /> },
       { path: "select", element: <SelectPage /> },
-      { path: "table", element: <DataTablePage /> },
+      { path: "table-non-dialog", element: <DataTablePage /> },
+      { path: "table-dialog", element: <DataTablePage /> },
+      { path: "bff", element: <BFFPatternPage /> },
+      { path: "table-dialog-modal", element: <DataTableWithDialogModalPage /> },
     ],
   },
 ]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function
