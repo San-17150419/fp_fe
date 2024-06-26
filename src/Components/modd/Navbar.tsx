@@ -27,7 +27,10 @@ function NavbarLogo({ src }: NavbarLogoProps) {
 type NavbarItemsProps = LiHTMLAttributes<HTMLUListElement> & {
   children?: React.ReactNode;
 };
-function NavbarItems({ className = "", children }: NavbarItemsProps) {
+function NavbarItems({
+  className: className = "",
+  children,
+}: NavbarItemsProps) {
   return <ul className={"flex h-full gap-8" + className}>{children}</ul>;
 }
 
@@ -38,12 +41,12 @@ type NavbarItemProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 
 function NavbarItem({
   children,
-  className = "",
+  className: className = "",
   text,
   ...props
 }: NavbarItemProps) {
   return (
-    <li className="mt-auto mb-4">
+    <li className="mb-4 mt-auto">
       <a className={"font-bold text-white " + className} href="" {...props}>
         {text || children}
       </a>

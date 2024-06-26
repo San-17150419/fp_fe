@@ -24,7 +24,7 @@ export default function Modal({ children, onClose, title }: ModalProps) {
         </header>
         {/* TODO: */}
         <div className="flex-grow border-y-2 border-gray-300">
-          <form id="myForm" className="z-50 m-4 flex" action="">
+          <form id="myForm" className="m-4 flex" action="">
             {children}
           </form>
         </div>

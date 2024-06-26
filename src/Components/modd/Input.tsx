@@ -108,7 +108,7 @@ export default function Input({
       >
         {labelMessage}
       </label>
-      <div className="flex items-center  gap-1">
+      <div className="flex items-center gap-1">
         {!isMessageLegal && (
           <MessageBox displayMessage={DISPLAYMESSAGE[type]} />
         )}
