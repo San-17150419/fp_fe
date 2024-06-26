@@ -14,10 +14,10 @@ function App() {
         </Navbar.Items>
       </Navbar>
       <div className="flex flex-grow bg-gray-200">
-        <div className="w-1/6 min-w-[200px]">
+        <div className="h-full w-1/6 min-w-[200px]">
           <Sidebar />
         </div>
-        <div className="mx-10 my-10 w-full">
+        <div className="mx-10 my-10 w-5/6">
           <Outlet />
         </div>
       </div>
