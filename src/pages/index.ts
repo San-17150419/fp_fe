@@ -6,3 +6,4 @@ export { default as ErrorPage } from "./ErrorPage";
 export { default as BFFPatternPage } from "./BFFPatternPage";
 export { default as DataTableWithDialogModalPage } from "./DataTableWithDialogModalPage";
 export { default as Loading } from "./Loading";
+export { default as TestPage } from "./TestPage";

@@ -16,13 +16,15 @@ export default function Sidebar() {
     { id: 1, value: "Home Page", path: "/" },
     { id: 2, value: "Input", path: "/input" },
     { id: 3, value: "Select Page", path: "/select" },
-    { id: 4, value: "Data Table", path: "/table" },
+    {
+      id: 4,
+      value: "Data Table with non-dialog modal",
+      path: "/table-non-dialog",
+    },
+    // { id: 5, value: "Data Table with dialog modal", path: "/table-dialog" },
+    { id: 6, value: "Data Table with BFF pattern", path: "/bff" },
+    { id: 7, value: "Test Page", path: "/test" },
   ];
-
-  // Automatically open the menu when the component mounts
-  useEffect(() => {
-    setIsOpen(true);
-  }, []);
 
   return (
     <aside className="z-20 h-full border-e border-gray-300 bg-white p-4 shadow-xl">
