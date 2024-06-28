@@ -1,16 +1,16 @@
 import React from "react";
-import Select from "../Components/modd/Select";
 import Input from "../Components/modd/Input";
 import Table from "../Components/modd/Table";
-import SelectTestVersion from "../SelectTestVersion";
+import Select from "../Components/modd/Select/Select";
 export default function DefaultPage() {
   return (
     <>
       <section className="border-bottom d-flex py-3">
-        <SelectTestVersion options={["資料庫檢索及更新", "新增模具"]} />
+        <Select options={["資料庫檢索及更新", "新增模具"]} />
       </section>
       <section className="flex w-full flex-wrap gap-3 py-3">
-        <SelectTestVersion
+        <Select
+          width="180"
           options={[
             "全部系列",
             "P系列",
@@ -23,12 +23,13 @@ export default function DefaultPage() {
             "臨時模具",
           ]}
         />
-        <Input name="名版" placeholder="名版" />
-        <Input name="模號" placeholder="模號" />
-        <SelectTestVersion options={["財產歸屬", "國登場", "斗六場", "金筆場"]} />
-        <SelectTestVersion options={["GD", "HP", "DL", "D08", "停用"]} />
+        <Input name="名版" width="180" placeholder="名版" />
+        <Input name="模號" width="180" placeholder="模號" />
+        <Select
+          options={["財產歸屬", "國登場", "斗六場", "金筆場"]}
+        />
+        <Select options={["GD", "HP", "DL", "D08", "停用"]} />
       </section>
-      {/* <section className='table-container'> */}
       <section className="overflow-hidden">
         <Table />
       </section>
