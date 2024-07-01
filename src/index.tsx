@@ -13,7 +13,11 @@ import {
   DefaultPage,
   BFFPatternPage,
   DataTableWithDialogModalPage,
-  TestPage
+  HighStockType1Page,
+  HighStockType3Page,
+  ButtonPage,
+  HighStockType2Page,
+  HighChartsPage,
 } from "./pages";
 
 const router = createBrowserRouter([
@@ -29,7 +33,11 @@ const router = createBrowserRouter([
       { path: "table-dialog", element: <DataTablePage /> },
       { path: "bff", element: <BFFPatternPage /> },
       { path: "table-dialog-modal", element: <DataTableWithDialogModalPage /> },
-      { path: "test", element: <TestPage /> },
+      { path: "highchart-type-1", element: <HighStockType1Page /> },
+      { path: "highchart-type-2", element: <HighStockType2Page /> },
+      { path: "highchart-type-3", element: <HighStockType3Page /> },
+      { path: "button", element: <ButtonPage /> },
+      { path: "highcharts", element: <HighChartsPage /> },
     ],
   },
 ]);
