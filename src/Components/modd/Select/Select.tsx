@@ -1,33 +1,38 @@
-// SelectTestVersion.tsx
+// Select.tsx
+/** @jsxImportSource @emotion/react */
+
 import { Listbox, Transition } from "@headlessui/react";
 import ListboxButtonComponent from "./ListboxButtonComponent";
 import ListboxOptionsComponent from "./ListboxOptionsComponent";
 import { useSelect } from "./useSelect";
-
-type Option = string | { id: string | number; value: string | number };
+import { SelectOption, DetailOption } from "./selectType";
 
 type SelectProps = {
-  options: Option[];
+  options: SelectOption[];
   width?: string;
+  onSelect?: (option: SelectOption) => void;
 };
 
-export default function SelectTestVersion({ options, width }: SelectProps) {
-  const { selectedOption, setSelectedOption, getOptionValue, getOptionKey } = useSelect(options);
+export default function Select({ options, width, onSelect }: SelectProps) {
+  const { allOptions, selectedOption, setSelectedOption } = useSelect(options);
+
+  const handleSelect = (option: DetailOption) => {
+    setSelectedOption(option);
+    if (onSelect) {
+      onSelect(option.value);
+    }
+  };
 
   return (
     <Listbox
       value={selectedOption}
-      tw="min-w-[180px] pr-2"
-      onChange={setSelectedOption}
+      tw="min-w-[180px] pr-2 "
+      onChange={handleSelect}
       as={"div"}
     >
       {({ open }) => (
         <>
-          <ListboxButtonComponent
-            open={open}
-            selectedOption={selectedOption}
-            getOptionValue={getOptionValue}
-          />
+          <ListboxButtonComponent open={open} selectedOption={selectedOption} />
           <Transition
             enter="transition ease-out duration-200"
             enterFrom="transform opacity-0 scale-95"
@@ -37,10 +42,8 @@ export default function SelectTestVersion({ options, width }: SelectProps) {
             leaveTo="transform opacity-0 scale-95"
           >
             <ListboxOptionsComponent
-              options={options}
+              options={allOptions}
               selectedOption={selectedOption}
-              getOptionKey={getOptionKey}
-              getOptionValue={getOptionValue}
             />
           </Transition>
         </>
