@@ -18,14 +18,14 @@ const ListboxOptionsComponent = forwardRef<
   <ListboxOptions
     ref={ref}
     anchor="bottom"
-    tw="z-[1000] w-[var(--button-width)] rounded-md border border-gray-300 bg-white [--anchor-gap:2px]"
+    tw="z-[1000]  w-[var(--button-width)] rounded-md border border-gray-300 bg-white [--anchor-gap:2px]"
   >
     {options.map((option: DetailOption) => (
       <ListboxOption
         key={option.id}
         value={option}
         css={[
-          tw`z-[1000] cursor-pointer p-4 hover:bg-gray-400 data-[selected]:border-l-2 data-[active]:bg-gray-400`,
+          tw` z-[1000] cursor-pointer p-2 hover:bg-gray-400 data-[selected]:border-l-2 data-[active]:bg-gray-400`,
           option.id === selectedOption.id ? tw`border-zinc-500` : "",
         ]}
       >
