@@ -4,41 +4,30 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import options from "./util/SidebarLinkData";
 
-import {
-  ErrorPage,
-  InputPage,
-  SelectPage,
-  DataTablePage,
-  DefaultPage,
-  BFFPatternPage,
-  DataTableWithDialogModalPage,
-  HighStockType1Page,
-  HighStockType3Page,
-  ButtonPage,
-  HighStockType2Page,
-  HighChartsPage,
-} from "./pages";
+import { ErrorPage } from "./pages";
+
+const children = options.map((option) => {
+  if (option.index) {
+    return {
+      index: option.index,
+      path: option.path,
+      element: <option.element />,
+    };
+  }
+  return {
+    path: option.path,
+    element: <option.element />,
+  };
+});
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
-    children: [
-      { index: true, element: <DefaultPage /> },
-      { path: "input", element: <InputPage /> },
-      { path: "select", element: <SelectPage /> },
-      { path: "table-non-dialog", element: <DataTablePage /> },
-      { path: "table-dialog", element: <DataTablePage /> },
-      { path: "bff", element: <BFFPatternPage /> },
-      { path: "table-dialog-modal", element: <DataTableWithDialogModalPage /> },
-      { path: "highchart-type-1", element: <HighStockType1Page /> },
-      { path: "highchart-type-2", element: <HighStockType2Page /> },
-      { path: "highchart-type-3", element: <HighStockType3Page /> },
-      { path: "button", element: <ButtonPage /> },
-      { path: "highcharts", element: <HighChartsPage /> },
-    ],
+    children: children,
   },
 ]);
 
