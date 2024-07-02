@@ -4,7 +4,7 @@ import ModalButton from "./ModalButton";
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default ({ children, ...props }: ButtonProps) => (
-  <ModalButton hasHover varian="submit" {...props}>
+  <ModalButton  variant="submit" {...props}>
     {children}
   </ModalButton>
 );

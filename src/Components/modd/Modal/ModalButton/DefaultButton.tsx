@@ -3,7 +3,7 @@ import React, { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 export default ({ children, ...props }: ButtonProps) => (
-  <ModalButton hasHover varian="primary" {...props}>
+  <ModalButton variant="primary" {...props}>
     {children}
   </ModalButton>
 );
