@@ -136,6 +136,7 @@ const formatData2 = (rawData: Data3[]): SeriesData[] => {
 export default function TestPage() {
   const [data, setData] = useState<Data[]>([]);
   const [formattedData, setFormattedData] = useState<SeriesData[]>([]);
+  const [title, setTitle] = useState("");
 
   // Fetch data when the component mounts
   useEffect(() => {
@@ -181,9 +182,9 @@ export default function TestPage() {
         ))}
       </div>
       <div className="flex gap-3">
-        {formattedData.length > 0 && <HighStockType3 data={formattedData} />}
-        {/* {formattedData.length > 0 && <HighStockType3 data={formattedData} />} */}
-        {/* {formattedData.length > 0 && <HighStockType3 data={formattedData} />} */}
+        {formattedData.length > 0 && (
+          <HighStockType3  data={formattedData} />
+        )}
       </div>
       <img src={example} alt="Example" />
     </div>

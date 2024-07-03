@@ -72,6 +72,7 @@ const formatData = (rawData: Data2[]): SeriesData[] => {
 export default function TestPage() {
   const [data, setData] = useState<Data[]>([]);
   const [formattedData, setFormattedData] = useState<SeriesData[]>([]);
+  const [title, setTitle] = useState("");
 
   // Fetch data when the component mounts
   useEffect(() => {
@@ -100,6 +101,8 @@ export default function TestPage() {
       console.log(rawData);
       const formattedData = formatData(rawData);
       setFormattedData(formattedData);
+      setTitle(response.data.data[0].item);
+
       console.log(formattedData);
     } catch (error) {
       console.error("Failed to post data", error);
@@ -120,7 +123,9 @@ export default function TestPage() {
         ))}
       </div>
       <div className="flex flex-col gap-3">
-        {formattedData.length > 0 && <HighStockType2 data={formattedData} />}
+        {formattedData.length > 0 && (
+          <HighStockType2 title={title} data={formattedData} />
+        )}
       </div>
       <img src={example} alt="Example" />
     </div>
