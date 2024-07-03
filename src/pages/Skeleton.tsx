@@ -2,6 +2,8 @@ import { useState, useLayoutEffect, useRef } from "react";
 import TableFetcher from "../Components/modd/Table/TableFetcher";
 import { getTableData } from "../Components/modd/Table/api";
 import useWindowDimensions from "../hooks/useWindowDimensions";
+import Input from "../Components/modd/Input";
+import Select from "../Components/modd/Select/Select";
 
 export default function Skeleton() {
   const { width } = useWindowDimensions();
@@ -44,6 +46,15 @@ export default function Skeleton() {
   return (
     <div ref={containerRef} className="flex h-full flex-col gap-4 p-2 outline">
       <section className="grid min-h-[100px] grid-cols-3 gap-4 p-3 outline lg:grid-cols-4">
+        <Input placeholder="很長的" name="很長的input" />
+        <Input placeholder="很長的inputasvfsav2" name="很長的input2" />
+        <Input placeholder="很長的inputasvfsav3" name="很長的input3" />
+        <Input
+          placeholder="很長的inputatbwebtwetbwebtwebtwebtwetbwesvfsav4"
+          name="很長的input4"
+        />
+
+        {/* <Select options={[1, 2, 3]} /> */}
       </section>
       <section className="min-h-[100px] outline">2</section>
       <section

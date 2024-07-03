@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { GoQuestion } from "react-icons/go";
-import { css } from "twin.macro";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 
 interface MessageBoxProps {
@@ -14,9 +13,9 @@ export default function MessageBox({ displayMessage }: MessageBoxProps) {
       </PopoverButton>
       <PopoverPanel
         anchor="bottom start"
-        className="flex w-[180px] flex-col rounded-md bg-gray-400 px-4 py-4 text-gray-200"
+        className="flex flex-col rounded-md bg-gray-400 px-2 py-2 text-gray-200"
       >
-        <p className="text-sm">{displayMessage}</p>
+        <p className="px-1 text-xs">{displayMessage}</p>
       </PopoverPanel>
     </Popover>
   );

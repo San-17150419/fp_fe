@@ -4,8 +4,9 @@ import {
   InputHTMLAttributes,
   ReactNode,
   useState,
+  useRef,
+  useEffect,
 } from "react";
-import { GoQuestion } from "react-icons/go";
 import MessageBox from "./MessageBox";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   type?: "email" | "password" | "text";
@@ -26,6 +27,7 @@ export default function Input({
   const [inputValue, setInputValue] = useState("");
   const [displayMessage, setDisplayMessage] = useState("");
   const [isMessageLegal, setIsMessageLegal] = useState(false);
+  const [labelWidth, setLabelWidth] = useState<string>("");
   // TODO: Maybe I can create a custom hook for the display message.
   // TODO: The eye icon for toggle password visibility is not working properly. It will show up on first focus. But it will disappear after loosing focus and never show again. It is provided by the browser. I might need to make a custom one. (https://github.com/processing/p5.js-web-editor/issues/2533)
   //TODO: Create a tooltip of some sort for displaying details about the requirments of the input. I prefer to have a concise verification message. (So it won't disrrupt the layout and user experience)
@@ -37,6 +39,18 @@ export default function Input({
       "請輸入有效的密碼: 最少8個字符，至少1個大寫字母，1個小寫字母，1個數字和1個特殊字符",
   };
 
+  // Get input width so that the label can be positioned correctly.
+  // When input element is not focused or clicked, the width of the label is the same as the input. Set text overflow to ellipsis so that the text message in label won't overflow. When the input is focused or clicked, the label won't have max width.
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    console.log("When the input mount");
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      const inputWidth = rect.width;
+      setLabelWidth(`${inputWidth}px`);
+    }
+  }, []);
   const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     const currentInput = e.currentTarget.value.trim();
     setInputValue(currentInput);
@@ -90,12 +104,13 @@ export default function Input({
   };
 
   return (
-    <div className="relative mx-1 mb-4 mt-8 flex h-[38px] min-w-[180px] flex-col gap-2">
+    <div className="relative mx-1 mb-4 mt-5 flex h-[38px] flex-col gap-2">
       <input
         type={type}
         name={name}
-        id={props.id ? props.id : name}
-        className="peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-2 text-slate-600 focus:border-blue-500 focus:outline-none"
+        id={name}
+        ref={inputRef}
+        className="tabletP:p-2 peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none"
         value={inputValue}
         onChange={handleOnChange}
         onBlur={handleOnBlur}
@@ -104,7 +119,8 @@ export default function Input({
       />
       <label
         htmlFor={name}
-        className={`absolute left-2 top-[7px] cursor-pointer text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-7 peer-focus:z-20 peer-focus:text-gray-500`}
+        className="tabletP:top-[7px] tabletP:peer-focus:-top-7 absolute top-[4px] w-max cursor-pointer overflow-clip overflow-ellipsis text-nowrap px-1 text-sm text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-5 peer-focus:z-20 peer-focus:text-gray-500"
+        style={{ maxWidth: labelWidth }}
       >
         {labelMessage}
       </label>
@@ -113,9 +129,7 @@ export default function Input({
           <MessageBox displayMessage={DISPLAYMESSAGE[type]} />
         )}
         <p
-          className={`${
-            isMessageLegal ? "text-green-500" : "text-red-500"
-          } ml-1 text-wrap text-sm`}
+          className={`${isMessageLegal ? "text-green-500" : "text-red-500"} ml-1 text-wrap text-xs`}
         >
           {displayMessage}
         </p>
