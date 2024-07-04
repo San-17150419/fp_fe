@@ -12,8 +12,9 @@ export default function MessageBox({ displayMessage }: MessageBoxProps) {
         <GoQuestion />
       </PopoverButton>
       <PopoverPanel
-        anchor="bottom start"
-        className="flex flex-col rounded-md bg-gray-400 px-2 py-2 text-gray-200"
+        transition
+        anchor={{ to: "right", gap: "4px" }}
+        className="flex flex-col rounded-md bg-gray-400 p-1 text-gray-200 transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
       >
         <p className="px-1 text-xs">{displayMessage}</p>
       </PopoverPanel>
