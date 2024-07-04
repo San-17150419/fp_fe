@@ -117,7 +117,7 @@ export default function Input({
         name={name}
         id={name}
         ref={inputRef}
-        className="peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none tabletP:p-2"
+        className="peer h-full w-full hover:border-blue-300 cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none tabletP:p-2"
         value={inputValue}
         onChange={handleOnChange}
         onBlur={handleOnBlur}
@@ -126,12 +126,12 @@ export default function Input({
       />
       <label
         htmlFor={name}
-        className="absolute top-[4px] w-max cursor-pointer overflow-clip overflow-ellipsis text-nowrap px-1 text-sm text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-5 peer-focus:z-20 peer-focus:text-gray-500 tabletP:top-[7px] tabletP:peer-focus:-top-7 lg:px-2 lg:text-base"
+        className="absolute top-[7px] w-max cursor-pointer overflow-clip overflow-ellipsis text-nowrap px-1 text-sm text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-5 peer-focus:z-20 peer-focus:text-gray-500 tabletP:top-[7px] tabletP:peer-focus:-top-7 lg:px-2 lg:text-base"
         style={{ maxWidth: labelWidth }}
       >
         {labelMessage}
       </label>
-      <div className="flex items-center gap-1">
+      <div className="absolute top-11 flex items-center gap-1">
         {!isMessageLegal && (
           <MessageBox displayMessage={DISPLAYMESSAGE[type]} />
         )}

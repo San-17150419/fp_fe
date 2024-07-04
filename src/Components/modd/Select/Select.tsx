@@ -1,11 +1,13 @@
-// Select.tsx
-/** @jsxImportSource @emotion/react */
-
-import { Listbox, Transition } from "@headlessui/react";
-import ListboxButtonComponent from "./ListboxButtonComponent";
-import ListboxOptionsComponent from "./ListboxOptionsComponent";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+} from "@headlessui/react";
+import { PiCaretDownBold } from "react-icons/pi";
 import { useSelect } from "./useSelect";
 import { SelectOption, DetailOption } from "./selectType";
+import "twin.macro";
 
 type SelectProps = {
   options: SelectOption[];
@@ -26,28 +28,29 @@ export default function Select({ options, width, onSelect }: SelectProps) {
   return (
     <Listbox
       value={selectedOption}
-      tw="min-w-[180px] pr-2 "
       onChange={handleSelect}
-      as={"div"}
+      as="div"
+      className="mx-1 my-5 flex h-[38px] w-full pr-2"
     >
-      {({ open }) => (
-        <>
-          <ListboxButtonComponent open={open} selectedOption={selectedOption} />
-          <Transition
-            enter="transition ease-out duration-200"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-100"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+      <ListboxButton className="flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white p-2 text-left text-sm data-[active]:border-blue-400 data-[focus]:border-blue-300 data-[hover]:border-blue-300">
+        <p className="max-w-4/5 truncate">{selectedOption.text}</p>
+        <PiCaretDownBold className="font-semiboldbold ml-auto text-sm transition-all" />
+      </ListboxButton>
+      <ListboxOptions
+        anchor="bottom"
+        transition
+        className="w-[var(--button-width)] origin-top rounded-md bg-white transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0"
+      >
+        {allOptions.map((option) => (
+          <ListboxOption
+            key={option.id}
+            value={option}
+            className="border-sky-400 p-1 text-left data-[selected]:border-l-4 data-[focus]:bg-sky-200"
           >
-            <ListboxOptionsComponent
-              options={allOptions}
-              selectedOption={selectedOption}
-            />
-          </Transition>
-        </>
-      )}
+            <p>{option.text}</p>
+          </ListboxOption>
+        ))}
+      </ListboxOptions>
     </Listbox>
   );
 }
