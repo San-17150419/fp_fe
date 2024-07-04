@@ -45,7 +45,7 @@ export default function Select({ options, width, onSelect }: SelectProps) {
           <ListboxOption
             key={option.id}
             value={option}
-            className="border-sky-400 p-1 text-left data-[selected]:border-l-4 data-[focus]:bg-sky-200"
+            className="border-l-4 border-transparent p-1 text-left data-[selected]:border-sky-400 data-[focus]:bg-sky-200"
           >
             <p>{option.text}</p>
           </ListboxOption>
