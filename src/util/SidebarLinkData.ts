@@ -4,8 +4,6 @@ import {
   InputPage,
   SelectPage,
   DataTablePage,
-  BFFPatternPage,
-  DataTableWithDialogModalPage,
   HighStockType1Page,
   HighStockType3Page,
   ButtonPage,
@@ -27,17 +25,12 @@ const options: LinkData[] = [
   { index: true, text: "Home", path: "/", element: DefaultPage },
   { text: "Input", path: "/input", element: InputPage },
   { text: "Select", path: "/select", element: SelectPage },
-  {
-    text: "Table Non-Dialog",
-    path: "/table-non-dialog",
-    element: DataTablePage,
-  },
+
   {
     text: "Table Dialog",
     path: "/table-dialog",
-    element: DataTableWithDialogModalPage,
+    element: DataTablePage,
   },
-  { text: "BFF Pattern", path: "/bff", element: BFFPatternPage },
   {
     text: "Highstock Type 1",
     path: "/highchart-type-1",
