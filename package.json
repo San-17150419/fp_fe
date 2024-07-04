@@ -16,6 +16,8 @@
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "babel-plugin-emotion": "^11.0.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.2.12",
     "highcharts": "^11.4.3",
     "highcharts-react-official": "^3.2.1",
     "jdate": "^0.0.2",
