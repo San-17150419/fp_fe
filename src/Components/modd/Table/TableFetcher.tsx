@@ -2,7 +2,6 @@ import { useState, useEffect, Suspense } from "react";
 import { TableData } from "./type";
 import translateHeader from "../../../util/translateHeader";
 import Table from "./Table";
-import Loading from "../../../pages/Loading";
 
 type TableFetcherProps = {
   fetchData: () => Promise<{ data: TableData | null; error: string | null }>;
@@ -38,11 +37,6 @@ export default function TableFetcher({
   }
 
   return (
-    <Table
-      data={tableData as TableData}
-      header={translateHeader()}
-      height="300px"
-      width="100%"
-    />
+    <Table data={tableData as TableData} header={translateHeader()} />
   );
 }
