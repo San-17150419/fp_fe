@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import example from "../assets/highStockType2Demo.png";
 import HighStockType2 from "../Components/modd/HighChart/HighStockType2";
-import HighStockTest2 from "../Components/modd/HighChart/HightStockTest2";
 
 // Define the API URL
 const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";

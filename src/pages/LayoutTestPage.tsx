@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import TableFetcher from "../Components/modd/Table/TableFetcher";
 import { getTableData } from "../Components/modd/Table/api";
-import Input from "../Components/modd/Input";
+import Input from "../Components/modd/Input/Input";
 import Select from "../Components/modd/Select/Select";
-import Modal from "../Components/modd/NonDialogModal";
-import ModalAnimationTest from "../Components/modd/Modal/ModalAnimationTest";
+import Modal from "../Components/modd/Modal/NonDialogModal";
 
 export default function Skeleton() {
   const [isModal1Open, setIsModal1Open] = useState(false);
@@ -75,7 +74,6 @@ export default function Skeleton() {
           enter="leftMiddle"
           openModal={isModal2Open}
         />
-        <ModalAnimationTest />
       </section>
 
       <section

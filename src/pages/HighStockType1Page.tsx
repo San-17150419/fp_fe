@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import HighStockTest from "../Components/modd/HighChart/HighStockTest";
-import HighStockTest2 from "../Components/modd/HighChart/HightStockTest2";
-import HighChartTest from "../Components/modd/HighChart/HighChartTest";
 import example from "../assets/highStockExample.png";
-import HighStockWithDynamicComputation from "../Components/modd/HighChart/HighStockWithDynamicComputation";
-import BasicHighStock from "../Components/modd/HighChart/BasicHighStock";
 // Define the API URL
 const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";
 

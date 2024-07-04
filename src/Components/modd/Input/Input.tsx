@@ -117,7 +117,7 @@ export default function Input({
         name={name}
         id={name}
         ref={inputRef}
-        className="peer h-full w-full hover:border-blue-300 cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none tabletP:p-2"
+        className="peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 hover:border-blue-300 focus:border-blue-500 focus:outline-none tabletP:p-2"
         value={inputValue}
         onChange={handleOnChange}
         onBlur={handleOnBlur}

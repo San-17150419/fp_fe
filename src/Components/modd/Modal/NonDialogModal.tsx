@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import useCloseAndEscape from "../../hooks/useCloseAndEscape";
+import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
 type ModalProps = {
   children?: React.ReactNode;
