@@ -11,6 +11,9 @@ import {
   ButtonPage,
   HighStockType2Page,
   HighChartsPage,
+  Skeleton,
+  TabPage,
+  LayoutTestPage,
 } from "../pages";
 
 type LinkData = {
@@ -52,6 +55,9 @@ const options: LinkData[] = [
   },
   { text: "Button", path: "/button", element: ButtonPage },
   { text: "Highcharts", path: "/highcharts", element: HighChartsPage },
+  { text: "Skeleton", path: "/skeleton", element: Skeleton },
+  { text: "Tab", path: "/tab", element: TabPage },
+  { text: "Layout Test", path: "/layout-test", element: LayoutTestPage },
 ];
 
 export default options;
