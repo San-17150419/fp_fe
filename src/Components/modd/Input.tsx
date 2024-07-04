@@ -30,7 +30,6 @@ export default function Input({
   const [labelWidth, setLabelWidth] = useState<string>("");
   // TODO: Maybe I can create a custom hook for the display message.
   // TODO: The eye icon for toggle password visibility is not working properly. It will show up on first focus. But it will disappear after loosing focus and never show again. It is provided by the browser. I might need to make a custom one. (https://github.com/processing/p5.js-web-editor/issues/2533)
-  //TODO: Create a tooltip of some sort for displaying details about the requirments of the input. I prefer to have a concise verification message. (So it won't disrrupt the layout and user experience)
 
   const DISPLAYMESSAGE = {
     text: "請輸入至少3個字",
@@ -44,12 +43,20 @@ export default function Input({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log("When the input mount");
-    if (inputRef.current) {
-      const rect = inputRef.current.getBoundingClientRect();
-      const inputWidth = rect.width;
-      setLabelWidth(`${inputWidth}px`);
-    }
+    const updateLabelWidth = () => {
+      if (inputRef.current) {
+        const rect = inputRef.current.getBoundingClientRect();
+        const inputWidth = rect.width;
+        setLabelWidth(`${inputWidth}px`);
+      }
+    };
+
+    // Initial call to set the label width
+    updateLabelWidth();
+
+    // Event listener for window resize
+    window.addEventListener("resize", updateLabelWidth);
+    return () => window.removeEventListener("resize", updateLabelWidth);
   }, []);
   const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     const currentInput = e.currentTarget.value.trim();
@@ -104,13 +111,13 @@ export default function Input({
   };
 
   return (
-    <div className="relative mx-1 mb-4 mt-5 flex h-[38px] flex-col gap-2">
+    <div className="relative mx-1 my-5 flex h-[38px] flex-col gap-2">
       <input
         type={type}
         name={name}
         id={name}
         ref={inputRef}
-        className="tabletP:p-2 peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none"
+        className="peer h-full w-full cursor-pointer rounded-md border border-gray-300 p-1 text-sm text-slate-600 focus:border-blue-500 focus:outline-none tabletP:p-2"
         value={inputValue}
         onChange={handleOnChange}
         onBlur={handleOnBlur}
@@ -119,7 +126,7 @@ export default function Input({
       />
       <label
         htmlFor={name}
-        className="tabletP:top-[7px] tabletP:peer-focus:-top-7 absolute top-[4px] w-max cursor-pointer overflow-clip overflow-ellipsis text-nowrap px-1 text-sm text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-5 peer-focus:z-20 peer-focus:text-gray-500"
+        className="absolute top-[4px] w-max cursor-pointer overflow-clip overflow-ellipsis text-nowrap px-1 text-sm text-slate-400 transition-all peer-placeholder-shown:text-gray-500 peer-focus:-top-5 peer-focus:z-20 peer-focus:text-gray-500 tabletP:top-[7px] tabletP:peer-focus:-top-7 lg:px-2 lg:text-base"
         style={{ maxWidth: labelWidth }}
       >
         {labelMessage}
