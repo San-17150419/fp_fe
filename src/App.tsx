@@ -1,23 +1,21 @@
-import Sidebar from "./Components/modd/Sidebar";
+import Sidebar from "./Components/modd/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import logo from "./assets/logo_banner5.png";
-import Navbar from "./Components/modd/Navbar";
+import Navbar from "./Components/modd/Navbar/Navbar";
 function App() {
   return (
     <>
       <Navbar>
         <Navbar.Logo src={logo} />
         <Navbar.Items>
-          <Navbar.Item className="text-2xl">Home </Navbar.Item>
-          <Navbar.Item className="text-xl">About</Navbar.Item>
-          <Navbar.Item className="text-xl">??</Navbar.Item>
+          <Navbar.Item className="text-xl">Home </Navbar.Item>
+          <Navbar.Item className="text-lg">About</Navbar.Item>
+          <Navbar.Item className="text-lg">??</Navbar.Item>
         </Navbar.Items>
       </Navbar>
-      <div className="flex flex-grow bg-gray-200">
-        <div className="h-full w-1/6 min-w-[200px]">
-          <Sidebar />
-        </div>
-        <div className="mx-10 my-10 w-5/6">
+      <div className="flex flex-grow border border-black bg-gray-200">
+        <Sidebar />
+        <div className="flex grow flex-wrap border-4 border-red-300 px-5 py-5 tabletP:px-20 tabletP:py-10">
           <Outlet />
         </div>
       </div>
