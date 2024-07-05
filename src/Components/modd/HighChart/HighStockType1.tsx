@@ -1,12 +1,17 @@
+import React, { useEffect, useRef } from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
-
-type HighStockTestProps = {
+type HighStockType1Props = {
   processedData: [number, number][];
+  title: string;
 };
 
-const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
+const HighStockType1: React.FC<HighStockType1Props> = ({
+  processedData,
+  title,
+}) => {
   // Set HighCharts global options
+
   Highcharts.setOptions({
     time: {
       timezone: "Asia/Taipei",
@@ -18,7 +23,7 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
         },
         states: {
           hover: {
-            fill: "blue",
+            fill: "#9ca3af",
           },
           select: {
             fill: "#cccccc",
@@ -73,8 +78,18 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
   });
 
   const options: Highcharts.Options = {
+    legend: {
+      enabled: true,
+      layout: "vertical",
+      align: "right",
+      verticalAlign: "middle",
+      itemStyle: {
+        fontWeight: "bolder",
+      },
+    },
     chart: {
       backgroundColor: "#ededeb",
+      type: "stock",
     },
     data: {},
     time: {
@@ -82,6 +97,11 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
     },
     rangeSelector: {
       selected: 1,
+      buttonTheme: {
+        style: {
+          color: "black",
+        },
+      },
       buttons: [
         { type: "month", count: 6, text: "半年" },
         { type: "year", count: 1, text: "一年" },
@@ -89,18 +109,22 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
         { type: "year", count: 3, text: "三年" },
         { type: "all", text: "全部" },
       ],
-      inputDateFormat: "%b%e, %Y",
-      inputEditDateFormat: "%b%e, %Y",
+      inputDateFormat: "%B %e, %Y",
+      inputEditDateFormat: "%B %e, %Y",
       inputStyle: {
         color: "#2f56a3",
         fontWeight: "bolder",
+        fontSize: "10px",
       },
     },
     title: {
-      text: "PP Price History",
+      text: title,
+      style: {
+        fontWeight: "900",
+      },
+      y: 40,
     },
     xAxis: {
-      //   units: [],
       dateTimeLabelFormats: {
         millisecond: "%y 年 %b ",
         second: "%y 年 %b ",
@@ -110,6 +134,12 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
         week: "%y 年 %b ",
         month: "%y 年 %b ",
         year: "%y 年 %b ",
+      },
+      width: "100%",
+      labels: {
+        style: {
+          fontSize: "10px",
+        },
       },
     },
     yAxis: [
@@ -149,7 +179,7 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
     series: [
       {
         type: "line",
-        name: "PP Price",
+        name: `${title}`,
         color: "#e67784",
         data: processedData,
         tooltip: {
@@ -157,6 +187,70 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
         },
       },
     ],
+    navigator: {
+      xAxis: {
+        dateTimeLabelFormats: {
+          millisecond: "%b %e, %Y",
+          second: "%b %e, %Y",
+          minute: "%b %e, %Y",
+          hour: "%b %e, %Y",
+          day: "%b %e, %Y",
+          week: "%b %e, %Y",
+          month: "%Y",
+          year: "%Y",
+        },
+      },
+    },
+    annotations: [
+      {
+        labels: [
+          {
+            point: {
+              x: 3,
+              y: 129.2,
+              xAxis: 3,
+              yAxis: 129.2,
+            },
+            text: "x: {x}<br/>y: {y}",
+          },
+          {
+            point: {
+              x: 0,
+              y: 0,
+              xAxis: 0,
+              yAxis: 0,
+            },
+            text: "x: {point.plotX} px<br/>y: {point.plotY} px",
+          },
+          {
+            point: {
+              x: 5,
+              y: 100,
+              xAxis: 0,
+              yAxis: 0,
+            },
+            text: "x: {x}<br/>y: {point.plotY} px",
+          },
+        ],
+      },
+    ],
+    responsive: {
+      rules: [
+        {
+          condition: {
+            maxWidth: 500,
+          },
+          chartOptions: {
+            legend: {
+              enabled: true,
+              layout: "horizontal",
+              align: "center",
+              verticalAlign: "bottom",
+            },
+          },
+        },
+      ],
+    },
   };
 
   return (
@@ -170,4 +264,4 @@ const HighStockTest: React.FC<HighStockTestProps> = ({ processedData }) => {
   );
 };
 
-export default HighStockTest;
+export default HighStockType1;

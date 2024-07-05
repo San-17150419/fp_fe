@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import HighStockTest from "../Components/modd/HighChart/HighStockTest";
-import example from "../assets/highStockExample.png";
+import HighStockType1 from "../Components/modd/HighChart/HighStockType1";
+import example from "../assets/highStockType1Demo.png";
+import { format, startOfMonth } from "date-fns";
 // Define the API URL
 const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";
 
@@ -52,9 +53,6 @@ export default function TestPage() {
           type: "01",
         },
       );
-      console.dir(response);
-      console.dir(response.data);
-      console.dir(response.data.data);
       setTitle(response.data.data[0].item);
       setPostResponse(response.data.data);
     } catch (error) {
@@ -62,15 +60,31 @@ export default function TestPage() {
     }
   }
 
-  const processedData = useMemo(
-    () =>
-      postResponse
-        ? postResponse.map(
-            (item) => [item.unix_stamp, item.price / 1000] as [number, number],
-          )
-        : [],
-    [postResponse],
-  );
+  const processedData = useMemo(() => {
+    if (!postResponse) return [];
+
+    // Group data by month
+    const groupedData: { [key: string]: { priceSum: number; count: number } } =
+      {};
+    postResponse.forEach((item) => {
+      const month = format(new Date(item.unix_stamp), "yyyy-MM");
+      if (!groupedData[month]) {
+        groupedData[month] = { priceSum: 0, count: 0 };
+      }
+      groupedData[month].priceSum += item.price;
+      groupedData[month].count += 1;
+    });
+
+    // Calculate average price for each month
+    const aggregatedData = Object.keys(groupedData).map((month) => {
+      const { priceSum, count } = groupedData[month];
+      const averagePrice = priceSum / count;
+      const startOfMonthTimestamp = startOfMonth(new Date(month)).getTime();
+      return [startOfMonthTimestamp, averagePrice] as [number, number];
+    });
+
+    return aggregatedData;
+  }, [postResponse]);
 
   return (
     <div>
@@ -90,7 +104,7 @@ export default function TestPage() {
 
         {/* <HighStockTest2 /> */}
         {processedData.length > 0 && (
-          <HighStockTest processedData={processedData} title={title} />
+          <HighStockType1 processedData={processedData} title={title} />
         )}
         {/* {processedData.length > 0 && (
           <HighStockWithDynamicComputation processedData={processedData} />
