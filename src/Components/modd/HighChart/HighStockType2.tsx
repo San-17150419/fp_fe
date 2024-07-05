@@ -16,163 +16,48 @@ type SeriesData = {
   color: string;
 };
 
-const HighStockTest = ({ data }: { data: SeriesData[] }) => {
+const getEvenWeekTicks = () => {
+  const ticks = [];
+  const startDate = new Date(Date.UTC(2000, 0, 1)); // start from January 1, 2000
+  for (let i = 1; i <= 52; i += 2) {
+    ticks.push(Date.UTC(startDate.getUTCFullYear(), 0, i * 7));
+  }
+  return ticks;
+};
+
+function getWeekNumber(d: Date) {
+  // Get the first day of the year
+  const start = new Date(d.getFullYear(), 0, 1);
+  const diff = d.getTime() - start.getTime();
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  return Math.floor(diff / oneWeek) + 1;
+}
+const HighStockTest = ({
+  data,
+  title,
+}: {
+  data: SeriesData[];
+  title: string;
+}) => {
   const chartRef = useRef<HighchartsReact.RefObject>(null);
-  console.log(data);
-  // useEffect(() => {
-  //   const chart = chartRef.current?.chart;
-  //   if (!chart) return;
-
-  //   // Find highest, lowest, and current points
-  //   const allPoints = data.flatMap((series) => series.data);
-  //   console.log(allPoints);
-  //   const highestPoint = allPoints.reduce((prev, curr) =>
-  //     prev.y > curr.y ? prev : curr,
-  //   );
-  //   const lowestPoint = allPoints.reduce((prev, curr) =>
-  //     prev.y < curr.y ? prev : curr,
-  //   );
-  //   const currentPoint = allPoints[allPoints.length - 1];
-
-  //   // Add annotations for highest, lowest, and current points
-  //   chart.addAnnotation({
-  //     labels: [
-  //       {
-  //         point: {
-  //           xAxis: 0,
-  //           yAxis: 0,
-  //           x: highestPoint.x,
-  //           y: highestPoint.y,
-  //         },
-  //         text: `最高價格: ¥${highestPoint.y}`,
-  //         backgroundColor: "red",
-  //         borderColor: "red",
-  //         style: {
-  //           color: "white",
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   chart.addAnnotation({
-  //     labels: [
-  //       {
-  //         point: {
-  //           xAxis: 0,
-  //           yAxis: 0,
-  //           x: lowestPoint.x,
-  //           y: lowestPoint.y,
-  //         },
-  //         text: `最低價格: ¥${lowestPoint.y}`,
-  //         backgroundColor: "green",
-  //         borderColor: "green",
-  //         style: {
-  //           color: "white",
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   chart.addAnnotation({
-  //     labels: [
-  //       {
-  //         point: {
-  //           xAxis: 0,
-  //           yAxis: 0,
-  //           x: currentPoint.x,
-  //           y: currentPoint.y,
-  //         },
-  //         text: `目前價格: ¥${currentPoint.y}`,
-  //         backgroundColor: "blue",
-  //         borderColor: "blue",
-  //         style: {
-  //           color: "white",
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   // Update annotations when the chart is updated
-  //   const updateAnnotations = () => {
-  //     chart.addAnnotation({
-  //       labels: [
-  //         {
-  //           point: {
-  //             xAxis: 0,
-  //             yAxis: 0,
-  //             x: highestPoint.x,
-  //             y: highestPoint.y,
-  //           },
-  //           text: `最高價格: ¥${highestPoint.y}`,
-  //           backgroundColor: "red",
-  //           borderColor: "red",
-  //           style: {
-  //             color: "white",
-  //           },
-  //         },
-  //       ],
-  //     });
-
-  //     chart.addAnnotation({
-  //       labels: [
-  //         {
-  //           point: {
-  //             xAxis: 0,
-  //             yAxis: 0,
-  //             x: lowestPoint.x,
-  //             y: lowestPoint.y,
-  //           },
-  //           text: `最低價格: ¥${lowestPoint.y}`,
-  //           backgroundColor: "green",
-  //           borderColor: "green",
-  //           style: {
-  //             color: "white",
-  //           },
-  //         },
-  //       ],
-  //     });
-
-  //     chart.addAnnotation({
-  //       labels: [
-  //         {
-  //           point: {
-  //             xAxis: 0,
-  //             yAxis: 0,
-  //             x: currentPoint.x,
-  //             y: currentPoint.y,
-  //           },
-  //           text: `目前價格: ¥${currentPoint.y}`,
-  //           backgroundColor: "blue",
-  //           borderColor: "blue",
-  //           style: {
-  //             color: "white",
-  //           },
-  //         },
-  //       ],
-  //     });
-  //   };
-
-  //   chart.update(
-  //     {
-  //       xAxis: {
-  //         events: {
-  //           afterSetExtremes: updateAnnotations,
-  //         },
-  //       },
-  //     },
-  //     false,
-  //     false,
-  //     false,
-  //   );
-  // }, [data]);
 
   const options: Highcharts.Options = {
+    legend: {
+      enabled: true,
+
+      layout: "vertical",
+      align: "right",
+      verticalAlign: "middle",
+      itemStyle: {
+        fontWeight: "bolder",
+      },
+    },
     chart: {
       type: "line",
       height: 600,
     },
     title: {
-      text: "螺絲線材",
+      text: title,
     },
     yAxis: {
       title: {
@@ -183,18 +68,20 @@ const HighStockTest = ({ data }: { data: SeriesData[] }) => {
     },
     xAxis: {
       type: "category",
-      min: 0,
-      // minPadding: 0.2,
-      // maxPadding: 0.2,
+
+      tickPositions: [
+        0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+        38, 40, 42, 44, 46, 48, 50, 52,
+      ],
+      // min: 0,
       title: {
         text: "週數",
       },
-      labels: {
-        allowOverlap: true,
-      },
-      tickInterval: 2,
-      tickmarkPlacement: "between",
-      tickPosition: "outside",
+      // labels: {
+      //   allowOverlap: true,
+      // },
+      // tickAmount: 20,
+      tickInterval: 1000 * 60 * 60 * 24 * 14,
     },
     series: data.map((item) => ({
       name: item.name,
@@ -202,6 +89,9 @@ const HighStockTest = ({ data }: { data: SeriesData[] }) => {
       type: "line",
       color: item.color,
     })),
+    time: {
+      useUTC: true,
+    },
   };
 
   return (

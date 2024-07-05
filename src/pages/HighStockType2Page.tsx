@@ -2,28 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import example from "../assets/highStockType2Demo.png";
 import HighStockType2 from "../Components/modd/HighChart/HighStockType2";
-
+import { ItemPreData, Type2RawData } from "../Components/modd/HighChart/highChartTypes";
 // Define the API URL
 const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";
 
-type Data = {
-  currency: string;
-  id_item: number;
-  item: string;
-  item_tag: string;
-  unit: string;
-};
 
-type Data2 = {
-  currency: string;
-  date: string;
-  id: number;
-  id_item: number;
-  item: string;
-  price: number;
-  unit: string;
-  unix_stamp: number;
-};
 
 function getWeekNumber(d: Date) {
   // Get the first day of the year
@@ -33,21 +16,28 @@ function getWeekNumber(d: Date) {
   return Math.floor(diff / oneWeek) + 1;
 }
 
-const formatData = (rawData: Data2[]): SeriesData[] => {
-  const groupedData = rawData.reduce<{ [year: number]: DataPoint[] }>(
-    (acc, item) => {
-      const date = new Date(item.unix_stamp);
-      const year = date.getFullYear();
-      const weekNumber = getWeekNumber(date);
+const formatData = (rawData: Type2RawData[]): SeriesData[] => {
+  // Group data by year and week
+  const groupedData = rawData.reduce<{
+    [year: number]: { [week: number]: DataPoint[] };
+  }>((acc, item) => {
+    const date = new Date(item.unix_stamp);
+    const year = date.getFullYear();
+    // const weekNumber = getWeek(date);
+    const weekNumber = getWeekNumber(date);
 
-      if (!acc[year]) {
-        acc[year] = [];
-      }
-      acc[year].push({ x: weekNumber, y: item.price });
-      return acc;
-    },
-    {},
-  );
+    if (!acc[year]) {
+      acc[year] = {};
+    }
+    if (!acc[year][weekNumber]) {
+      acc[year][weekNumber] = [];
+    }
+    acc[year][weekNumber].push({
+      x: weekNumber,
+      y: item.price,
+    });
+    return acc;
+  }, {});
 
   const colors = [
     "green",
@@ -62,14 +52,20 @@ const formatData = (rawData: Data2[]): SeriesData[] => {
   ];
   return Object.keys(groupedData).map((year, index) => ({
     name: year,
-    data: groupedData[parseInt(year)],
+    // Some weeks may have multiple data points, so we need to average them
+    data: Object.keys(groupedData[parseInt(year)]).map((week) => {
+      const weekData = groupedData[parseInt(year)][parseInt(week)];
+      const averagePrice =
+        weekData.reduce((sum, point) => sum + point.y, 0) / weekData.length;
+      return { x: parseInt(week), y: averagePrice };
+    }),
     type: "line",
     color: colors[index % colors.length],
   }));
 };
 
 export default function TestPage() {
-  const [data, setData] = useState<Data[]>([]);
+  const [data, setData] = useState<ItemPreData []>([]);
   const [formattedData, setFormattedData] = useState<SeriesData[]>([]);
   const [title, setTitle] = useState("");
 
@@ -96,13 +92,10 @@ export default function TestPage() {
           type: "02",
         },
       );
-      const rawData: Data2[] = response.data.data;
-      console.log(rawData);
+      const rawData: Type2RawData[] = response.data.data;
       const formattedData = formatData(rawData);
       setFormattedData(formattedData);
       setTitle(response.data.data[0].item);
-
-      console.log(formattedData);
     } catch (error) {
       console.error("Failed to post data", error);
     }
