@@ -7,9 +7,7 @@ import {
   addWeeks,
   getWeek,
 } from "date-fns";
-
-type DataWithDefaultKey = { unix_stamp?: number } & Record<string, any>;
-type DataWithUnixStamp = DataWithDefaultKey & { unix_stamp: number };
+import { DataWithDefaultKey, DataWithUnixStamp } from "../highChartTypes";
 
 // Group the data by year and ensure that each item has a unix_stamp property
 export const groupByYear = <T extends DataWithDefaultKey>(
