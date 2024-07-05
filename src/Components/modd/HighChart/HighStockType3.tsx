@@ -1,22 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import Annotations from "highcharts/modules/annotations";
+import { Type3ChartData } from "./highChartTypes"; // Ensure correct path
 
 Annotations(Highcharts);
 
-type DataPoint = {
-  x: number;
-  y: number;
-};
-
-type SeriesData = {
-  name: string;
-  data: DataPoint[];
-  color: string;
-};
-
-// Calculate tick positions for even months
 const getEvenMonthTicks = () => {
   const ticks = [];
   const startDate = new Date(Date.UTC(2000, 0, 1)); // start from January 1, 2000
@@ -26,7 +15,11 @@ const getEvenMonthTicks = () => {
   return ticks;
 };
 
-const HighStockTest = ({ data }: { data: SeriesData[] }) => {
+type HighStockTestProps = {
+  data: Type3ChartData[];
+};
+
+const HighStockType3: React.FC<HighStockTestProps> = ({ data }) => {
   const chartRef = useRef<HighchartsReact.RefObject>(null);
   Highcharts.setOptions({
     lang: {
@@ -69,19 +62,23 @@ const HighStockTest = ({ data }: { data: SeriesData[] }) => {
       ],
     },
   });
+
   const options: Highcharts.Options = {
     chart: {
-      type: "line",
-      height: 400,
-      //   width: 600,
+      type: "spline",
+      height: 500,
+      width: 1600,
+      plotBorderWidth: 1,
+      plotBorderColor: "black",
     },
     title: {
-      text: "螺絲線材",
+      text: "",
     },
     yAxis: {
       title: {
-        text: "RMB/MT",
+        text: "",
       },
+      gridLineWidth: 0,
     },
     xAxis: {
       type: "datetime",
@@ -98,18 +95,14 @@ const HighStockTest = ({ data }: { data: SeriesData[] }) => {
       },
       tickAmount: 12,
       tickInterval: 1000 * 60 * 60 * 24 * 30,
-
       title: {
         text: "月份",
       },
-      //   range: {
-
-      //   },
     },
     series: data.map((item) => ({
       name: item.name,
       data: item.data,
-      type: "line",
+      type: "spline",
       color: item.color,
     })),
     time: {
@@ -127,4 +120,4 @@ const HighStockTest = ({ data }: { data: SeriesData[] }) => {
   );
 };
 
-export default HighStockTest;
+export default HighStockType3;
