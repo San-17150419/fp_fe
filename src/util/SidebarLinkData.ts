@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 import {
-  DefaultPage,
   InputPage,
   SelectPage,
   DataTablePage,
@@ -9,7 +8,6 @@ import {
   ButtonPage,
   HighStockType2Page,
   HighChartsPage,
-  Skeleton,
   TabPage,
   LayoutTestPage,
 } from "../pages";
@@ -22,7 +20,7 @@ type LinkData = {
 };
 
 const options: LinkData[] = [
-  { index: true, text: "Home", path: "/", element: DefaultPage },
+  { index: true, text: "Home", path: "/", element: LayoutTestPage },
   { text: "Input", path: "/input", element: InputPage },
   { text: "Select", path: "/select", element: SelectPage },
 
@@ -48,9 +46,7 @@ const options: LinkData[] = [
   },
   { text: "Button", path: "/button", element: ButtonPage },
   { text: "Highcharts", path: "/highcharts", element: HighChartsPage },
-  { text: "Skeleton", path: "/skeleton", element: Skeleton },
   { text: "Tab", path: "/tab", element: TabPage },
-  { text: "Layout Test", path: "/layout-test", element: LayoutTestPage },
 ];
 
 export default options;
