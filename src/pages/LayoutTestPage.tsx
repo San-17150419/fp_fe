@@ -11,12 +11,12 @@ export default function Skeleton() {
   return (
     <div className="flex grow flex-col flex-wrap gap-4 p-2 outline">
       <section className="grid min-h-[100px] grid-cols-4 gap-4 p-3 outline">
-        <Input placeholder="很長的" name="很長的input" />
+        <Input placeholder="文字" name="文字" />
 
         <Select options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]} />
         <Input
-          placeholder="很長的inputatbwebtwetbwebtwebtwebtwetbwesvfsav4"
-          name="很長的input7"
+          placeholder="文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字"
+          name="文字文字文字"
         />
       </section>
       <section className="flex min-h-[100px] outline">

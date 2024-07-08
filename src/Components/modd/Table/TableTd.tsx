@@ -1,5 +1,3 @@
-import tw, { styled } from "twin.macro";
-
 type TdProps = {
   key?: string;
   children?: React.ReactNode;
@@ -12,9 +10,10 @@ type TdProps = {
 //   </td>
 // );
 
-const Td = styled.td`
-  ${tw`border border-gray-400 p-2`}
-  ${({ hasHover }: TdProps) => hasHover && tw`hover:bg-gray-500`}
-`;
-
-export default ({ children }: TdProps) => <Td hasHover> {children}</Td>;
+export default function Td({ children }: TdProps) {
+  return (
+    <td className="text-nowrap border border-gray-400 p-2 text-center hover:bg-gray-500">
+      {children}
+    </td>
+  );
+}

@@ -1,9 +1,14 @@
-import Input from "../Components/modd/Input";
+import Input from "../Components/modd/Input/Input";
 export default function InputPage() {
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <Input type="email" autoComplete="off" name="email" placeholder="email" />
+        <Input
+          type="email"
+          autoComplete="off"
+          name="email"
+          placeholder="email"
+        />
         <Input
           type="password"
           required
