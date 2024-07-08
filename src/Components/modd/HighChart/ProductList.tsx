@@ -53,9 +53,9 @@ export default function ProductList({ data }: ProductListProps) {
 
   return (
     <div className="w-full">
-        <div>
-            <Select options={options}></Select>
-        </div>
+      <div>
+        <Select name="product" options={options}></Select>
+      </div>
       <div className="grid grid-cols-6 place-content-center content-center">
         {data.map((item) => (
           <p

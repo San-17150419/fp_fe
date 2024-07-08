@@ -33,7 +33,6 @@ export const useSelect = (options: SelectOption[]) => {
   }
 
 
-
   const [allOptions, setAllOptions] = useState<DetailOption[]>(
     convertSelectOptionToDetailOption(options),
   );

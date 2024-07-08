@@ -13,7 +13,10 @@ export default function Skeleton() {
       <section className="grid min-h-[100px] grid-cols-4 gap-4 p-3 outline">
         <Input placeholder="文字" name="文字" />
 
-        <Select options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]} />
+        <Select
+          name="number"
+          options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+        />
         <Input
           placeholder="文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字"
           name="文字文字文字"

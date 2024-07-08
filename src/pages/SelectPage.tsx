@@ -4,8 +4,9 @@ export default function SelectPage() {
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <Select options={["1", "2", "3"]} />
+        <Select name="number" options={["1", "2", "3"]} />
         <Select
+          name="name"
           options={[
             { id: 1, value: "Durward Reynolds" },
             { id: 2, value: "Kenton Towne" },
@@ -15,17 +16,9 @@ export default function SelectPage() {
           ]}
         />
       </div>
-      <div className="flex flex-wrap gap-4">
+      <div>
         <Select
-          options={[
-            { id: 5, value: "Durward Reynolds" },
-            { id: 6, value: "Kenton Towne" },
-            { id: 7, value: "Therese Wunsch" },
-            { id: 8, value: "Benedict Kessler" },
-            { id: 9, value: "Katelyn Rohan" },
-          ]}
-        />
-        <Select
+          name="sys"
           options={[
             "全部系列",
             "P系列",

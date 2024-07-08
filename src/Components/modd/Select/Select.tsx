@@ -11,17 +11,23 @@ import "twin.macro";
 
 type SelectProps = {
   options: SelectOption[];
+  name: string;
   width?: string;
-  onSelect?: (option: SelectOption) => void;
+  onSelect?: (option: string) => void;
 };
 
-export default function Select({ options, width, onSelect }: SelectProps) {
+export default function Select({
+  options,
+  width,
+  onSelect,
+  name,
+}: SelectProps) {
   const { allOptions, selectedOption, setSelectedOption } = useSelect(options);
 
   const handleSelect = (option: DetailOption) => {
     setSelectedOption(option);
     if (onSelect) {
-      onSelect(option.value);
+      onSelect(selectedOption.value as string);
     }
   };
 
@@ -29,6 +35,8 @@ export default function Select({ options, width, onSelect }: SelectProps) {
     <Listbox
       value={selectedOption}
       onChange={handleSelect}
+      name={name}
+      defaultValue={selectedOption}
       as="div"
       className="mx-1 my-5 flex h-[38px] w-full pr-2"
     >

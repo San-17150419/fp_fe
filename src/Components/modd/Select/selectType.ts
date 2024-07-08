@@ -8,10 +8,10 @@
 export type SimpleSelectOption = string | number;
 
 export interface ObjectSelectOption {
-  value: any; // You can specify the type of `value` if it's known, e.g., `string`, `number`, etc.
+  value: any; 
   text?: string;
   id?: string | number;
-  [key: string]: any; // This allows for additional properties of any type
+  [key: string]: any; 
 }
 
 export type SelectOption = SimpleSelectOption | ObjectSelectOption;
