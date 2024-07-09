@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import options from "./util/SidebarLinkData";
 
 import { ErrorPage } from "./pages";
+import i18n from "./i18n";
 
 const children = options.map((option) => {
   if (option.index) {
