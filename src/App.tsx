@@ -2,7 +2,6 @@ import Sidebar from "./Components/modd/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
 import logo from "./assets/logo_banner5.png";
 import Navbar from "./Components/modd/Navbar/Navbar";
-import { FactoryLogDataContextProvider } from "./Components/modd/FactoryLog/FactoryLogContext";
 import { useTranslation } from "react-i18next";
 
 function App() {
@@ -12,7 +11,7 @@ function App() {
   };
 
   return (
-    <FactoryLogDataContextProvider>
+    <>
       <Navbar>
         <Navbar.Logo src={logo} />
         <Navbar.Items>
@@ -47,7 +46,7 @@ function App() {
           <Outlet />
         </div>
       </div>
-    </FactoryLogDataContextProvider>
+    </>
   );
 }
 
