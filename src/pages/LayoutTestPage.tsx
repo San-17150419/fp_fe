@@ -3,7 +3,8 @@ import Input from "../Components/modd/Input/Input";
 import Select from "../Components/modd/Select/Select";
 import Modal from "../Components/modd/Modal/NonDialogModal";
 import TableContainer from "../Components/modd/Table/TableContainer";
-
+import TableFetcher from "../Components/modd/Table/TableFetcher";
+import { getTableData } from "../Components/modd/Table/api";
 export default function Skeleton() {
   const [isModal1Open, setIsModal1Open] = useState(false);
   const [isModal2Open, setIsModal2Open] = useState(false);
@@ -50,7 +51,9 @@ export default function Skeleton() {
         />
       </section>
 
-      <TableContainer />
+      <TableContainer>
+        <TableFetcher fetchData={getTableData} />
+      </TableContainer>
     </div>
   );
 }
