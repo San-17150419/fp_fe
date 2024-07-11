@@ -36,7 +36,5 @@ export default function TableFetcher({
     return <div>Error: {error}</div>;
   }
 
-  return (
-    <Table data={tableData as TableData} header={translateHeader()} />
-  );
+  return <Table data={tableData as TableData} header={translateHeader()} />;
 }
