@@ -15,7 +15,7 @@ type TableProps = {
   onRowDoubleClick?: (data: TableData) => void;
 };
 
-function DataTable({ data, header }: TableProps) {
+function Table({ data, header }: TableProps) {
   const [tableData, setTableData] = useState<TableData>(data);
   const target = useRef(null);
 
@@ -61,4 +61,4 @@ function DataTable({ data, header }: TableProps) {
   );
 }
 
-export default DataTable;
+export default Table;
