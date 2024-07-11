@@ -10,3 +10,4 @@ export { default as HighStockType2Page } from "./HighStockType2Page";
 export { default as HighChartsPage } from "./HighChartsPage";
 export { default as TabPage } from "./TabPage";
 export { default as LayoutTestPage } from "./LayoutTestPage";
+export { default as FactoryLogPage } from "./FactoryLog";
