@@ -3,7 +3,14 @@ import { Outlet } from "react-router-dom";
 import logo from "./assets/logo_banner5.png";
 import Navbar from "./Components/modd/Navbar/Navbar";
 import { FactoryLogDataContextProvider } from "./Components/modd/FactoryLog/FactoryLogContext";
+import { useTranslation } from "react-i18next";
+
 function App() {
+  const { t, i18n } = useTranslation();
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
     <FactoryLogDataContextProvider>
       <Navbar>
@@ -16,7 +23,27 @@ function App() {
       </Navbar>
       <div className="flex flex-grow border border-black bg-gray-200">
         <Sidebar />
-        <div className="flex grow flex-wrap border-4 border-red-300 px-5 py-5 tabletP:px-20 tabletP:py-10">
+        <div className="relative flex grow flex-wrap border-4 px-5 py-5 tabletP:px-20 tabletP:py-10">
+          <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
+            <button
+              className="rounded border border-gray-400 p-2"
+              onClick={() => changeLanguage("zh-TW")}
+            >
+              {t("繁體")}
+            </button>
+            <button
+              className="rounded border border-gray-400 p-2"
+              onClick={() => changeLanguage("en")}
+            >
+              {t("英文")}
+            </button>
+            <button
+              className="rounded border border-gray-400 p-2"
+              onClick={() => changeLanguage("zh-CN")}
+            >
+              {t("簡體")}
+            </button>
+          </div>
           <Outlet />
         </div>
       </div>
