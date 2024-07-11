@@ -1,7 +1,12 @@
 import { useRef, useState, useEffect } from "react";
-import TableFetcher from "./TableFetcher";
-import { getTableData } from "./api";
-export default function TableContainer() {
+import cn from "../../../util/cn";
+export default function TableContainer({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [tableContainerWidth, setTableContainerWidth] = useState<number>();
   const [tableContainerHeight, setTableContainerHeight] = useState<number>();
@@ -25,16 +30,19 @@ export default function TableContainer() {
     };
   }, []);
   return (
-    <section className="relative flex-grow" ref={tableContainerRef}>
+    <section
+      className={cn("border-3 relative flex-grow border-2 border-black p-4", className)}
+      ref={tableContainerRef}
+    >
       {isTableReady && (
         <div
-          className="absolute inset-0 overflow-auto"
+          className="absolute inset-0 m-2 scroll-m-2 overflow-auto scroll-smooth px-2"
           style={{
             maxWidth: `${tableContainerWidth}px`,
             maxHeight: `${tableContainerHeight}px`,
           }}
         >
-          <TableFetcher fetchData={getTableData}></TableFetcher>
+          {children}
         </div>
       )}
     </section>
