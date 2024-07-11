@@ -1,79 +1,109 @@
-import React from "react";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import StatusComponent from "./StatusComponent";
 import TableTest from "../TableTest/TableTest";
-import { TableComponent } from "../TableTest/TableTest";
-import { formatFactoryLogData } from "../../../../util/formatDataForTable";
 
 export default function FactoryLogTable() {
-  const { rawData, isRawDataReady, currentDepartment } = useFactoryLogContext();
+  const {
+    postData,
+    currentDepartment,
+    rawData,
+    isPreDataReady,
+    isRawDataReady,
+    isPostDataReady,
+    isProcessedDataReady,
+  } = useFactoryLogContext();
+
   const { t } = useTranslation();
-  const columns = [
-    "sys",
-    "2023-01-01",
-    "2023-07-01",
-    "2024-01-01",
-    "2024-07-01",
-  ];
-  type TableComponentProps = {
-    columns: string[];
-    data: DataRow[];
-  };
-  
-  type DataRow = {
-    sys: string;
-    [key: string]: any; // Use an index signature to allow dynamic keys
-  };
-  
-  const results = formatFactoryLogData(dummyData);
-  const data: DataRow[] = results[0]["INJ"];
+  const point = "ar";
+
+  // Check if rawData and necessary values are available
+  if (
+    !rawData ||
+    !currentDepartment ||
+    !postData ||
+    !isPreDataReady ||
+    !isRawDataReady ||
+    !isPostDataReady ||
+    !isProcessedDataReady
+  ) {
+    console.log("Missing necessary data");
+    return <div>{t("Loading...")}</div>;
+  }
+
+  function formatDateToQuarter(date: Date): string {
+    const year = date.getFullYear();
+    const month = date.getMonth(); // getMonth() returns 0-11
+    const quarter = Math.floor(month / 3) + 1; // Calculate the quarter
+    return `${year}-Q${quarter}`;
+  }
+
+  function getHeaders() {
+    const header = ["系統"];
+    if (rawData) {
+      console.dir(rawData);
+      rawData.duration.map(({ date_start }) => {
+        header.push(formatDateToQuarter(new Date(date_start)));
+      });
+      header.push("比較其他季度");
+    }
+
+    return header;
+  }
+
+  // Example usage:
+  const headers = getHeaders();
+  const data = postData[currentDepartment][point];
+
   return (
-    <div>
-      <div>{t(currentDepartment)}</div>
-      <>
-        <TableTest>
-          <TableTest.TableHeader>
-            <TableTest.TableRow>
-              {columns.map((col) => (
-                <TableTest.TableCell key={col}>{t(col)}</TableTest.TableCell>
-              ))}
-              <TableTest.TableCell>{t("Status")}</TableTest.TableCell>
-            </TableTest.TableRow>
-          </TableTest.TableHeader>
-          <TableTest.TableBody>
-            {data.map((row, rowIndex) => (
-              // row is key/value pair. Such as sys: "CE系統"
-              <TableTest.TableRow key={rowIndex}>
-                <TableTest.TableCell>
-                  <div className="cursor-pointer underline underline-offset-[5px] hover:text-cyan-700">
-                    {t(row.sys)}
+    <TableTest>
+      <TableTest.TableHeader className="border-b border-gray-600 bg-gray-200">
+        <TableTest.TableRow>
+          {headers &&
+            headers.map((header) => (
+              <TableTest.TableCell
+                className="border-none border-gray-600 bg-gray-400"
+                key={header}
+              >
+                {t(header)}
+              </TableTest.TableCell>
+            ))}
+        </TableTest.TableRow>
+      </TableTest.TableHeader>
+      <TableTest.TableBody>
+        {Object.entries(data).map(([key, valueArray], rowIndex) => {
+          if (!Array.isArray(valueArray)) return null;
+
+          // Fill the valueArray with empty strings to match the number of columns
+          const filledValues = [...valueArray];
+          while (filledValues.length < 4) {
+            filledValues.push(null);
+          }
+
+          return (
+            <TableTest.TableRow
+              key={key}
+              className={` ${rowIndex % 2 === 0 ? "" : "bg-gray-300"}`}
+            >
+              <TableTest.TableCell className="border-none">
+                <div className="cursor-pointer underline underline-offset-[5px] hover:text-cyan-700">
+                  {t(key)}
+                </div>
+              </TableTest.TableCell>
+              {filledValues.map((value, index) => (
+                <TableTest.TableCell className="border-none" key={index}>
+                  <div className={`${value < 0.85 ? "text-red-500" : ""}`}>
+                    {value !== null ? `${(value * 100).toFixed(2)}%` : ""}
                   </div>
                 </TableTest.TableCell>
-                {columns.slice(1).map((col) => (
-                  <TableTest.TableCell key={col}>
-                    <div
-                      className={`text-center ${typeof row[col] === "number" ? (row[col] < 0.85 ? "text-red-500" : "") : "underline"} `}
-                    >
-                      {typeof row[col] === "number"
-                        ? `${(row[col] * 100).toFixed(2)}%`
-                        : row[col]}
-                    </div>
-                  </TableTest.TableCell>
-                ))}
-
-                <TableTest.TableCell>
-                  {/* <StatusComponent value={[0.85, 0.83, 0.8, 0.75]} /> */}
-                  <StatusComponent
-                    // The first value is 系列名稱, not the number we want
-                    value={Object.values(row).slice(1) as number[]}
-                  />
-                </TableTest.TableCell>
-              </TableTest.TableRow>
-            ))}
-          </TableTest.TableBody>
-        </TableTest>
-      </>
-    </div>
+              ))}
+              <TableTest.TableCell className="border-none">
+                <StatusComponent value={valueArray} />
+              </TableTest.TableCell>
+            </TableTest.TableRow>
+          );
+        })}
+      </TableTest.TableBody>
+    </TableTest>
   );
 }
