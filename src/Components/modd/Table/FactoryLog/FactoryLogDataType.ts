@@ -1,7 +1,3 @@
-import { AxiosResponse } from "axios";
-
-export type int = number;
-
 type GenericObject = Record<string, any>;
 
 export type FactoryLogPreData = {
@@ -26,7 +22,7 @@ export type LogData = {
   data: Array<{
     date_start: string;
     date_end: string;
-    raw: Array<{ [key: string]: int }>;
+    raw: Array<{ [key: string]: number }>;
   }>;
 };
 
@@ -57,4 +53,11 @@ export type FactoryLogContextType = {
   setIsRequestMade: React.Dispatch<React.SetStateAction<boolean>>;
   currentDepartment: string;
   setCurrentDepartment: React.Dispatch<React.SetStateAction<string>>;
+  processedData: FormattedData | null;
+  isProcessedDataReady: boolean;
+  postData: Record<string, any>;
+};
+
+export type FormattedData = {
+  [key: string]: any;
 };

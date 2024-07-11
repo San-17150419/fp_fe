@@ -3,7 +3,6 @@ import {
   useContext,
   useEffect,
   useState,
-  useReducer,
   ReactNode,
 } from "react";
 import axios from "axios";
@@ -12,7 +11,9 @@ import {
   PostDataParams,
   FactoryLogRawData,
   FactoryLogContextType,
+  FormattedData,
 } from "./FactoryLogDataType";
+import { formatFactoryLogData, transformData } from "./formatFactoryData";
 
 const FactoryLogContext = createContext<FactoryLogContextType | null>(null);
 
@@ -46,20 +47,27 @@ export const FactoryLogContextProvider: React.FC<{
   const [isPreDataReady, setIsPreDataReady] = useState(false);
   // After request is made, the FactoryLogPostFilter will be rendered
   const [isRequestMade, setIsRequestMade] = useState(false);
+
   // I have not decided where to process the raw data
   // Two questions. First is whether I need the raw data for the chart.
   const [isRawDataReady, setIsRawDataReady] = useState(false);
   const [isPostDataReady, setIsPostDataReady] = useState(false);
+  const [processedData, setProcessedData] = useState<FormattedData | null>(
+    null,
+  );
   const [departmentList, setDepartmentList] = useState<string[]>([]);
   const [currentDepartment, setCurrentDepartment] = useState<string>(
     departmentList[0],
   );
+  const [isProcessedDataReady, setIsProcessedDataReady] = useState(false);
+  const [postData, setPostData] = useState<Record<string, any>>({});
   useEffect(() => {
     const fetchPreData = async () => {
       try {
         const response = await axios.get<FactoryLogPreData>(preDataUrl);
         const data = response.data;
         const { factory, point, date_type, dep } = data.preData;
+        console.log("fetching preData");
         setPreData({ factory, point, date_type, dep });
         setIsPreDataReady(true);
       } catch (error) {
@@ -84,11 +92,17 @@ export const FactoryLogContextProvider: React.FC<{
       });
       const data = response.data;
       setRawData(data);
-      setIsRawDataReady(true);
-      console.log(data.dep);
       setDepartmentList(data.dep);
+      const processedData = formatFactoryLogData(data);
+      const postData = transformData(response.data.data);
+      setPostData(postData);
+      console.log(processedData);
+      setProcessedData(formatFactoryLogData(data));
+      
+      setIsProcessedDataReady(true);
       setIsPostDataReady(true);
-      console.log(data);
+      setIsRawDataReady(true);
+
       return data;
     } catch (error) {
       console.error(error);
@@ -109,6 +123,9 @@ export const FactoryLogContextProvider: React.FC<{
         setIsRequestMade,
         currentDepartment,
         setCurrentDepartment,
+        isProcessedDataReady,
+        processedData,
+        postData,
       }}
     >
       {children}
