@@ -12,6 +12,8 @@ import {
   FactoryLogRawData,
   FactoryLogContextType,
   FormattedData,
+  PreData,
+  RawData,
 } from "./FactoryLogDataType";
 import { formatFactoryLogData, transformData } from "./formatFactoryData";
 
@@ -37,12 +39,9 @@ export const FactoryLogContextProvider: React.FC<{
   rawDataUrl = "http://192.168.123.240:9000/api/fj/raw-data/",
 }) => {
   const [rawData, setRawData] = useState<FactoryLogRawData | null>(null);
-  const [preData, setPreData] = useState<FactoryLogPreData["preData"]>({
-    factory: [],
-    point: [],
-    date_type: [],
-    dep: {},
-  });
+  const [preData, setPreData] = useState<FactoryLogPreData["preData"] | null>(
+    null,
+  );
 
   const [isPreDataReady, setIsPreDataReady] = useState(false);
   // After request is made, the FactoryLogPostFilter will be rendered
@@ -50,16 +49,13 @@ export const FactoryLogContextProvider: React.FC<{
 
   // I have not decided where to process the raw data
   // Two questions. First is whether I need the raw data for the chart.
-  const [isRawDataReady, setIsRawDataReady] = useState(false);
   const [isPostDataReady, setIsPostDataReady] = useState(false);
-  const [processedData, setProcessedData] = useState<FormattedData | null>(
-    null,
-  );
-  const [departmentList, setDepartmentList] = useState<string[]>([]);
-  const [currentDepartment, setCurrentDepartment] = useState<string>(
-    departmentList[0],
-  );
-  const [isProcessedDataReady, setIsProcessedDataReady] = useState(false);
+  const [tableData, setTableData] = useState<FormattedData | null>(null);
+  const [duration, setDuration] = useState<
+    Array<{ date_start: string; date_end: string }>
+  >([]);
+  const [isTableDataReady, setIsTableDataReady] = useState(false);
+
   const [postData, setPostData] = useState<Record<string, any>>({});
   useEffect(() => {
     const fetchPreData = async () => {
@@ -84,6 +80,9 @@ export const FactoryLogContextProvider: React.FC<{
     date_type,
     date_start,
   }) => {
+    setIsRequestMade(true);
+    setIsPostDataReady(false);
+    setIsTableDataReady(false);
     try {
       const response = await axios.post<FactoryLogRawData>(rawDataUrl, {
         factory,
@@ -91,17 +90,13 @@ export const FactoryLogContextProvider: React.FC<{
         date_start,
       });
       const data = response.data;
+      setDuration(data.duration);
       setRawData(data);
-      setDepartmentList(data.dep);
-      const processedData = formatFactoryLogData(data);
       const postData = transformData(response.data.data);
       setPostData(postData);
-      console.log(processedData);
-      setProcessedData(formatFactoryLogData(data));
-      
-      setIsProcessedDataReady(true);
       setIsPostDataReady(true);
-      setIsRawDataReady(true);
+      setTableData(formatFactoryLogData(data));
+      setIsTableDataReady(true);
 
       return data;
     } catch (error) {
@@ -115,17 +110,12 @@ export const FactoryLogContextProvider: React.FC<{
         preData,
         fetchRawData,
         isPreDataReady,
-        rawData,
-        isRawDataReady,
-        isPostDataReady,
-        departmentList,
         isRequestMade,
         setIsRequestMade,
-        currentDepartment,
-        setCurrentDepartment,
-        isProcessedDataReady,
-        processedData,
         postData,
+        tableData,
+        isTableDataReady,
+        duration,
       }}
     >
       {children}
