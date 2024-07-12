@@ -3,6 +3,7 @@ import { useFactoryLogContext } from "./FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import Select from "../../Select/Select";
 import { PostDataParams } from "./FactoryLogDataType";
+import InputBase from "../../Input/InputBase";
 
 export default function FactoryLogPreFilter() {
   const { preData, isPreDataReady, fetchRawData, setIsRequestMade } =
@@ -51,61 +52,59 @@ export default function FactoryLogPreFilter() {
   };
   if (!isPreDataReady) return <div>{t("Loading...")}</div>;
   return (
-    <section className="min-h-[100px] pr-10 outline">
-      <form
-        id="form"
-        onSubmit={handleSubmit}
-        className="grid grid-cols-2 place-items-center gap-2 desktop:grid-cols-3"
-      >
-        {Object.entries(preData).map(([key, value]) => {
-          if (key === "dep") {
-            return null;
-          }
-          return (
-            <div
-              key={key}
-              className="flex w-full items-center justify-end gap-4"
-            >
-              <label className="text-sm" htmlFor={key}>
-                {t(key)}
-              </label>
-              <div className="w-3/4">
-                <Select
-                  key={`key-${key}`}
-                  name={key}
-                  onSelect={(value) => handleSelectChange(key, value)}
-                  options={Object.entries(value).map(([key, value]) => ({
-                    value: key,
-                    text: value,
-                  }))}
-                />
-              </div>
-            </div>
-          );
-        })}
-        <div className="flex w-full items-center justify-end gap-4 text-nowrap">
-          <label htmlFor="date">{t("當期開始")}</label>
-          <div className="w-3/4 px-1">
-            <input
+    <>
+      <section className="min-h-[100px] p-2 outline">
+        <form
+          id="form"
+          onSubmit={handleSubmit}
+          className="grid grid-cols-4 place-items-center gap-2"
+        >
+          {preData &&
+            Object.entries(preData).map(([key, value]) => {
+              if (key === "dep") {
+                return null;
+              }
+              return (
+                <div key={key} className="flex w-full flex-col">
+                  <label className="ml-3 mt-2 text-xs" htmlFor={key}>
+                    {t(key)}
+                  </label>
+                  <Select
+                    key={`key-${key}`}
+                    name={key}
+                    className="my-1"
+                    onSelect={(value) => handleSelectChange(key, value)}
+                    options={Object.entries(value).map(([key, value]) => ({
+                      value: key,
+                      text: value,
+                    }))}
+                  />
+                </div>
+              );
+            })}
+          <div className="flex w-full flex-col">
+            <label className="ml-2 mt-2 text-xs" htmlFor="date">
+              {t("當期開始")}
+            </label>
+            <InputBase
               type="date"
               defaultValue={dateStart}
-              className="h-[38px] w-full rounded border px-4 hover:border-blue-400"
               name="date"
               id="date"
               onChange={(e) => setDateStart(e.target.value)}
             />
           </div>
+        </form>
+        <div className="m-2 block">
+          <button
+            className="ml-auto block rounded border border-gray-700 bg-gray-400 p-2 text-xs hover:bg-gray-500 hover:text-white"
+            type="submit"
+            form="form"
+          >
+            {t("Search")}
+          </button>
         </div>
-      </form>
-      <div className="m-2 block">
-        <button
-          className="ml-auto block rounded border border-gray-700 bg-gray-400 p-1 text-xs hover:bg-gray-500 hover:text-white"
-          type="submit"
-          form="form"
-        >
-          {t("Search")}
-        </button>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
