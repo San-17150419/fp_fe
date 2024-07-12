@@ -8,7 +8,6 @@ export const formatFactoryLogData = (
   rawData: FactoryLogRawData,
 ): FormattedData[] => {
   const tableData: FormattedData[] = [];
-
   rawData.data.forEach((item) => {
     const { dep, data } = item;
     const departmentData: FormattedData[] = [];
@@ -56,9 +55,8 @@ export const formatFactoryLogData = (
 
 //       return header;
 //     }
-export const transformData = (data: LogData[]) => {
-  const finalDataFormat: { [key: string]: any } = {};
-
+export const transformData = (data: LogData[]): FormattedData => {
+  const finalDataFormat: FormattedData = {};
   data.forEach((item) => {
     const { dep, data: dateRanges } = item;
 
@@ -78,18 +76,21 @@ export const transformData = (data: LogData[]) => {
       raw.forEach((entry) => {
         const { sys, pl, ...points } = entry;
 
-        Object.keys(points).forEach((point) => {
-          if (!finalDataFormat[dep][point]) {
-            finalDataFormat[dep][point] = {};
-          }
-          if (!finalDataFormat[dep][point][sys]) {
-            finalDataFormat[dep][point][sys] = [];
-          }
+        if (!finalDataFormat[dep][sys]) {
+          finalDataFormat[dep][sys] = {};
+        }
 
-          finalDataFormat[dep][point][sys].push(points[point]);
+        Object.keys(points).forEach((point) => {
+          if (!finalDataFormat[dep][sys][point]) {
+            finalDataFormat[dep][sys][point] = [];
+          }
+          finalDataFormat[dep][sys][point].push(
+            points[point as keyof typeof points] as number,
+          );
         });
       });
     });
   });
+  console.log(finalDataFormat);
   return finalDataFormat;
 };
