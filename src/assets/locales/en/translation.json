@@ -69,5 +69,9 @@
   "A89厂": "A89",
   "F99厂": "F99",
   "D09厂": "D09",
-  "OEM厂": "OEM"
+  "OEM厂": "OEM",
+  "department": "department",
+  "Department": "Department",
+  "部門": "Department",
+  "部门": "部门"
 }
