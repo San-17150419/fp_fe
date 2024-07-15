@@ -7,6 +7,7 @@ import { isToday } from "date-fns";
 import Loading from "../../../Loading";
 import ProductChart from "../FactoryLog/Chart/ProductChart";
 import Modal from "../../Modal/NonDialogModal";
+import * as XLSX from "xlsx";
 
 export default function FactoryLogTable() {
   const { postData, duration, isRequestMade, isTableDataReady } =
@@ -50,6 +51,12 @@ export default function FactoryLogTable() {
 
     return dateRanges;
   };
+  const downloadExcel = (id: string) => {
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.table_to_sheet(document.getElementById(id));
+    XLSX.utils.book_append_sheet(workbook, sheet, "Sheet1");
+    XLSX.writeFile(workbook, `${id}.xlsx`);
+  };
 
   const dateRangeHeaders = getDateRangeHeaders();
   if (!isRequestMade) return null;
@@ -62,6 +69,14 @@ export default function FactoryLogTable() {
       {postData &&
         Object.keys(postData).map((department) => (
           <>
+            <button
+              type="button"
+              key={`download-${department}`}
+              onClick={() => downloadExcel(department)}
+              className="m-2 rounded-md border border-sky-300 p-2 hover:bg-gray-500 hover:text-gray-100"
+            >
+              Download
+            </button>
             <Table
               id={department}
               key={`${department}-table`}
