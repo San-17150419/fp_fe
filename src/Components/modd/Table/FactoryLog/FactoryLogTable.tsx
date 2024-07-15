@@ -1,18 +1,19 @@
+import React, { useState } from "react";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import StatusComponent from "./StatusComponent";
 import Table from "../TableTest/Table";
 import { isToday } from "date-fns";
 import Loading from "../../../Loading";
+import ProductChart from "../FactoryLog/Chart/ProductChart";
+import Modal from "../../Modal/NonDialogModal";
 
 export default function FactoryLogTable() {
   const { postData, duration, isRequestMade, isTableDataReady } =
     useFactoryLogContext();
   const { t } = useTranslation();
-
+  const [isOpen, setIsOpen] = useState(false);
   if (!postData) return null;
-
-  console.dir(postData);
 
   const fillValues = (values: number[], maxLength: number) => {
     const filledValues = [...values];
@@ -31,7 +32,6 @@ export default function FactoryLogTable() {
 
   const getDateRangeHeaders = () => {
     const dateRanges = [];
-    // Replace this with your actual date range logic
     const startDate = new Date("2023-01-01");
     const endDate = new Date("2023-12-31");
     const intervals = 4; // Example: 4 intervals
@@ -56,84 +56,107 @@ export default function FactoryLogTable() {
   if (!isTableDataReady) return <Loading />;
   return (
     <div>
+      <Modal onClose={() => setIsOpen(false)} openModal={isOpen}>
+        123
+      </Modal>
       {postData &&
         Object.keys(postData).map((department) => (
-          <Table key={department} className="mt-10 table-fixed">
-            <Table.TableCaption className="my-2 text-center text-lg">
-              {t(department)} {t("達成率")}
-            </Table.TableCaption>
-            <Table.TableHeader className="border-gray-600">
-              <Table.TableRow>
-                <Table.TableCell className="w-1/12 border-y border-gray-600">
-                  {t("部門")}
-                </Table.TableCell>
-                <Table.TableCell className="w-2/12 border-y border-gray-600">
-                  {t("系列")}
-                </Table.TableCell>
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <Table.TableCell
-                    className="border-y border-gray-600"
-                    key={index}
-                  >
-                    <div className="flex flex-col gap-3">
-                      {t("區間") + " " + (index + 1)}
-                      <span className="text-xs">
-                        {(duration[3 - index].date_start || "") +
-                          "  到  " +
-                          (duration[3 - index].date_end || "")}
+          <>
+            <Table
+              id={department}
+              key={`${department}-table`}
+              className="mt-10 table-fixed"
+            >
+              <Table.TableCaption className="my-2 text-center text-lg">
+                {t(department)} {t("達成率")}
+              </Table.TableCaption>
+              <Table.TableHeader className="border-gray-600">
+                <Table.TableRow className="hover:bg-gray-300">
+                  <Table.TableCell className="w-1/12 border-y border-gray-600">
+                    {t("部門")}
+                  </Table.TableCell>
+                  <Table.TableCell className="w-2/12 border-y border-gray-600">
+                    {t("系列")}
+                  </Table.TableCell>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Table.TableCell
+                      className="border-y border-gray-600"
+                      key={index}
+                    >
+                      {/* I think I need to extract this into a function */}
+                      <div className="flex flex-col gap-3 text-wrap">
+                        {t("區間") + " " + (index + 1)}
+
+                        <span className="text-xs text-gray-600">
+                          {(duration[3 - index].date_start || "") +
+                            "  到  " +
+                            (duration[3 - index].date_end || "")}
+                        </span>
+                      </div>
+                    </Table.TableCell>
+                  ))}
+                  <Table.TableCell className="border-y border-gray-600">
+                    <div className="flex flex-col gap-3 text-nowrap">
+                      {t("區間") + " " + 4}
+                      <span className="text-xs text-gray-600">
+                        {isToday(duration[0].date_start)
+                          ? t("至今")
+                          : (duration[0].date_start || "") + "  到  " + "至今"}
                       </span>
                     </div>
                   </Table.TableCell>
-                ))}
-                <Table.TableCell className="border-y border-gray-600">
-                  <div className="flex flex-col gap-3">
-                    {t("區間") + " " + 4}
-                    <span className="text-xs">
-                      {isToday(duration[0].date_start)
-                        ? t("至今")
-                        : (duration[0].date_start || "") + "  到  " + "至今"}
-                    </span>
-                  </div>
-                </Table.TableCell>
-                <Table.TableCell className="border-y border-gray-600">
-                  {t("比較其他季度")}
-                </Table.TableCell>
-              </Table.TableRow>
-            </Table.TableHeader>
-            <Table.TableBody>
-              {Object.keys(postData[department]).map((sys, sysIndex) => (
-                <Table.TableRow
-                  className={`${sysIndex % 2 !== 0 ? "bg-gray-300" : "bg-gray-100"}`}
-                  key={sysIndex}
-                >
-                  {sysIndex === 0 && (
-                    <Table.TableCell
-                      className="bg-lime-300"
-                      rowspan={Object.keys(postData[department]).length}
-                    >
-                      {t(department)}
-                    </Table.TableCell>
-                  )}
-                  <Table.TableCell>
-                    <span className="cursor-pointer underline">{t(sys)}</span>
-                  </Table.TableCell>
-                  {fillValues(
-                    postData[department][sys]["ar"],
-                    dateRangeHeaders.length,
-                  ).map((ar, arIndex) => (
-                    <Table.TableCell className="" key={arIndex}>
-                      <span className={` ${ar < 0.85 ? "text-red-500" : ""}`}>
-                        {ar !== 0 ? `${(ar * 100).toFixed(2)}%` : ""}
-                      </span>
-                    </Table.TableCell>
-                  ))}
-                  <Table.TableCell>
-                    <StatusComponent value={postData[department][sys]["ar"]} />
+                  <Table.TableCell
+                    colspan={2}
+                    className="border-y border-gray-600"
+                  >
+                    {t("比較其他季度")}
                   </Table.TableCell>
                 </Table.TableRow>
-              ))}
-            </Table.TableBody>
-          </Table>
+              </Table.TableHeader>
+              {/* This is the table body */}
+              <Table.TableBody>
+                {Object.keys(postData[department]).map((sys, sysIndex) => (
+                  <Table.TableRow
+                    className={`${sysIndex % 2 !== 0 ? "bg-gray-300" : "bg-gray-100"}`}
+                    key={sysIndex}
+                  >
+                    {sysIndex === 0 && (
+                      <Table.TableCell
+                        className="bg-lime-300"
+                        rowspan={Object.keys(postData[department]).length}
+                      >
+                        <button
+                          onClick={() => setIsOpen(true)}
+                          className="hover:shadow-lg"
+                        >
+                          {t(department)}
+                        </button>
+                      </Table.TableCell>
+                    )}
+                    {/* 系列名稱 */}
+                    <Table.TableCell>
+                      <ProductChart title={sys} department={department} />
+                    </Table.TableCell>
+                    {fillValues(
+                      postData[department][sys]["ar"],
+                      dateRangeHeaders.length,
+                    ).map((ar, arIndex) => (
+                      <Table.TableCell className="" key={arIndex}>
+                        <span className={` ${ar < 0.85 ? "text-red-500" : ""}`}>
+                          {ar !== 0 ? `${(ar * 100).toFixed(2)}%` : ""}
+                        </span>
+                      </Table.TableCell>
+                    ))}
+                    <Table.TableCell colspan={2}>
+                      <StatusComponent
+                        value={postData[department][sys]["ar"]}
+                      />
+                    </Table.TableCell>
+                  </Table.TableRow>
+                ))}
+              </Table.TableBody>
+            </Table>
+          </>
         ))}
     </div>
   );
