@@ -6,6 +6,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@headlessui/react": "^2.0.4",
+    "@json2csv/plainjs": "^7.0.6",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.13",
     "@testing-library/jest-dom": "^5.17.0",
@@ -18,6 +19,7 @@
     "babel-plugin-emotion": "^11.0.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.2.12",
     "highcharts": "^11.4.3",
     "highcharts-react-official": "^3.2.1",
@@ -34,7 +36,8 @@
     "twin.macro": "^3.4.1",
     "typescript": "^4.9.5",
     "uuid": "^10.0.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
