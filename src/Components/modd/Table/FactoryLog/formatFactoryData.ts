@@ -53,10 +53,16 @@ export const formatFactoryLogData = (
 //         header.push("比較其他季度");
 //       }
 
-//       return header;
-//     }
+/**
+ * Transforms the input data into a formatted data structure.
+ *
+ * @param {LogData[]} data - The array of LogData to be transformed
+ * @return {FormattedData} The formatted data structure
+ */
 export const transformData = (data: LogData[]): FormattedData => {
   const finalDataFormat: FormattedData = {};
+  const totalIntervals = 4; // Assuming there are always 4 intervals
+
   data.forEach((item) => {
     const { dep, data: dateRanges } = item;
 
@@ -70,7 +76,7 @@ export const transformData = (data: LogData[]): FormattedData => {
       );
     });
 
-    sortedData.forEach((dateRange) => {
+    sortedData.forEach((dateRange, index) => {
       const { raw } = dateRange;
 
       raw.forEach((entry) => {
@@ -82,15 +88,19 @@ export const transformData = (data: LogData[]): FormattedData => {
 
         Object.keys(points).forEach((point) => {
           if (!finalDataFormat[dep][sys][point]) {
-            finalDataFormat[dep][sys][point] = [];
+            finalDataFormat[dep][sys][point] = new Array(totalIntervals).fill(
+              0,
+            );
           }
-          finalDataFormat[dep][sys][point].push(
-            points[point as keyof typeof points] as number,
-          );
+
+          // Place the value at the correct interval index
+          finalDataFormat[dep][sys][point][index] = points[
+            point as keyof typeof points
+          ] as number;
         });
       });
     });
   });
-  console.log(finalDataFormat);
+
   return finalDataFormat;
 };
