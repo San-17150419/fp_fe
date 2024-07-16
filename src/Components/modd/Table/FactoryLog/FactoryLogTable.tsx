@@ -8,12 +8,15 @@ import Loading from "../../../Loading";
 import ProductChart from "../FactoryLog/Chart/ProductChart";
 import Modal from "../../Modal/NonDialogModal";
 import * as XLSX from "xlsx";
+import ColumnChart from "./Chart/ColumnChart";
+import { GrDownload } from "react-icons/gr";
 
 export default function FactoryLogTable() {
   const { postData, duration, isRequestMade, isTableDataReady } =
     useFactoryLogContext();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [currentDepartment, setCurrentDepartment] = useState("");
   if (!postData) return null;
 
   const fillValues = (values: number[], maxLength: number) => {
@@ -34,8 +37,7 @@ export default function FactoryLogTable() {
   const getDateRangeHeaders = () => {
     const dateRanges = [];
     const startDate = new Date("2023-01-01");
-    const endDate = new Date("2023-12-31");
-    const intervals = 4; // Example: 4 intervals
+    const intervals = 4;
 
     for (let i = 0; i < intervals; i++) {
       const intervalStart = new Date(startDate);
@@ -58,32 +60,39 @@ export default function FactoryLogTable() {
     XLSX.writeFile(workbook, `${id}.xlsx`);
   };
 
+  // TODO: Add key to table. React is complaining. I need to check where did I forget to add key
   const dateRangeHeaders = getDateRangeHeaders();
   if (!isRequestMade) return null;
   if (!isTableDataReady) return <Loading />;
   return (
     <div>
       <Modal onClose={() => setIsOpen(false)} openModal={isOpen}>
-        123
+        {/* TODO: The animation is a bit disjoint. There is a weird jump when the chart is fully rendered. My guess is since the width of the column chart is calculated on the fly, so before the chart is rendered, the modal does not know the width of the chart. So the initial size of the modal is 50% of the window width and height. After the chart is rendered, the modal is resized, which causes the jump. */}
+        <ColumnChart department={currentDepartment} />
+        <hr />
+        {/* <ColumnChart department={currentDepartment} />
+        <hr />
+        <ColumnChart department={currentDepartment} /> */}
       </Modal>
       {postData &&
         Object.keys(postData).map((department) => (
           <>
-            <button
-              type="button"
-              key={`download-${department}`}
-              onClick={() => downloadExcel(department)}
-              className="m-2 rounded-md border border-sky-300 p-2 hover:bg-gray-500 hover:text-gray-100"
-            >
-              Download
-            </button>
             <Table
               id={department}
               key={`${department}-table`}
-              className="mt-10 table-fixed"
+              className="mt-10 table-auto"
             >
               <Table.TableCaption className="my-2 text-center text-lg">
                 {t(department)} {t("達成率")}
+                <button
+                  type="button"
+                  title="Download Excel"
+                  key={`download-${department}`}
+                  onClick={() => downloadExcel(department)}
+                  className="m-2 rounded-md border p-2 hover:border-sky-300 hover:bg-gray-500 hover:text-gray-100"
+                >
+                  <GrDownload />
+                </button>
               </Table.TableCaption>
               <Table.TableHeader className="border-gray-600">
                 <Table.TableRow className="hover:bg-gray-300">
@@ -145,6 +154,12 @@ export default function FactoryLogTable() {
                         rowspan={Object.keys(postData[department]).length}
                       >
                         <button
+                          onClick={() => {
+                            setIsOpen(true);
+                            setCurrentDepartment(department);
+                          }}
+                          type="button"
+                          key={`sys-${sys}`}
                           className="text-base hover:shadow-lg desktop:text-xl"
                         >
                           {t(department)}
