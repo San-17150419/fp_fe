@@ -90,7 +90,7 @@ export default function ProductChart({ title, department }: ProductChartProps) {
   return (
     <span>
       <button
-        className="cursor-pointer underline shadow-sm hover:shadow-md"
+        className="cursor-pointer underline shadow-sm hover:shadow-md desktop:text-base"
         onClick={() => setIsOpen(true)}
       >
         {t(title)}

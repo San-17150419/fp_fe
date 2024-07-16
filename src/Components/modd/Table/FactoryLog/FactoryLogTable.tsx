@@ -87,15 +87,18 @@ export default function FactoryLogTable() {
               </Table.TableCaption>
               <Table.TableHeader className="border-gray-600">
                 <Table.TableRow className="hover:bg-gray-300">
-                  <Table.TableCell className="w-1/12 border-y border-gray-600">
+                  <Table.TableCell
+                    key="department"
+                    className="tablet:text-lg w-1/12 border-y border-gray-600 text-base desktop:text-xl"
+                  >
                     {t("部門")}
                   </Table.TableCell>
-                  <Table.TableCell className="w-2/12 border-y border-gray-600">
+                  <Table.TableCell className="tablet:text-lg w-2/12 border-y border-gray-600 text-xs desktop:text-xl">
                     {t("系列")}
                   </Table.TableCell>
                   {Array.from({ length: 3 }).map((_, index) => (
                     <Table.TableCell
-                      className="border-y border-gray-600"
+                      className="tablet:text-lg border-y border-gray-600 text-xs desktop:text-xl"
                       key={index}
                     >
                       {/* I think I need to extract this into a function */}
@@ -111,7 +114,7 @@ export default function FactoryLogTable() {
                     </Table.TableCell>
                   ))}
                   <Table.TableCell className="border-y border-gray-600">
-                    <div className="flex flex-col gap-3 text-nowrap">
+                    <div className="tablet:text-base flex flex-col gap-3 text-nowrap text-xs desktop:text-lg">
                       {t("區間") + " " + 4}
                       <span className="text-xs text-gray-600">
                         {isToday(duration[0].date_start)
@@ -122,7 +125,7 @@ export default function FactoryLogTable() {
                   </Table.TableCell>
                   <Table.TableCell
                     colspan={2}
-                    className="border-y border-gray-600"
+                    className="tablet:text-base border-y border-gray-600 text-xs desktop:text-lg"
                   >
                     {t("比較其他季度")}
                   </Table.TableCell>
@@ -135,14 +138,14 @@ export default function FactoryLogTable() {
                     className={`${sysIndex % 2 !== 0 ? "bg-gray-300" : "bg-gray-100"}`}
                     key={sysIndex}
                   >
+                    {/* 部門名稱 multiple rows */}
                     {sysIndex === 0 && (
                       <Table.TableCell
                         className="bg-lime-300"
                         rowspan={Object.keys(postData[department]).length}
                       >
                         <button
-                          onClick={() => setIsOpen(true)}
-                          className="hover:shadow-lg"
+                          className="text-base hover:shadow-lg desktop:text-xl"
                         >
                           {t(department)}
                         </button>
@@ -157,7 +160,9 @@ export default function FactoryLogTable() {
                       dateRangeHeaders.length,
                     ).map((ar, arIndex) => (
                       <Table.TableCell className="" key={arIndex}>
-                        <span className={` ${ar < 0.85 ? "text-red-500" : ""}`}>
+                        <span
+                          className={`text-xs desktop:text-base ${ar < 0.85 ? "text-red-500" : ""}`}
+                        >
                           {ar !== 0 ? `${(ar * 100).toFixed(2)}%` : ""}
                         </span>
                       </Table.TableCell>

@@ -53,7 +53,7 @@ export default function FactoryLogPreFilter() {
   if (!isPreDataReady) return <div>{t("Loading...")}</div>;
   return (
     <>
-      <section className="min-h-[100px] p-2 outline">
+      <section className="min-h-[100px] p-2">
         <form
           id="form"
           onSubmit={handleSubmit}
