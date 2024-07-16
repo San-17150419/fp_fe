@@ -63,7 +63,6 @@ export const FactoryLogContextProvider: React.FC<{
         const response = await axios.get<FactoryLogPreData>(preDataUrl);
         const data = response.data;
         const { factory, point, date_type, dep } = data.preData;
-        console.log("fetching preData");
         setPreData({ factory, point, date_type, dep });
         setIsPreDataReady(true);
       } catch (error) {
@@ -92,6 +91,7 @@ export const FactoryLogContextProvider: React.FC<{
       const data = response.data;
       setDuration(data.duration);
       setRawData(data);
+      console.log(data);
       const postData = transformData(response.data.data);
       setPostData(postData);
       setIsPostDataReady(true);

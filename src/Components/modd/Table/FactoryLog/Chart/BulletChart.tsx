@@ -16,8 +16,6 @@ export default function BulletChart({ title, department }: BulletChartProps) {
   const cpamt = data["cpamt"];
   const pamt = data["pamt"];
   const allSys = Object.keys(postData[department]);
-  console.log("from BulletChart");
-  console.log(allSys);
   const option2: Highcharts.Options = {
     chart: {
       type: "bullet",

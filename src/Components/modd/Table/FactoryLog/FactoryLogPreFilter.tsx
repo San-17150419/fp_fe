@@ -39,7 +39,6 @@ export default function FactoryLogPreFilter() {
       ...selectedValues,
     };
 
-    console.log(params);
     fetchRawData(params);
     setIsRequestMade(true);
   }

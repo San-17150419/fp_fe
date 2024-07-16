@@ -11,7 +11,6 @@ type ProductChartProps = {
 };
 
 export default function ProductChart({ title, department }: ProductChartProps) {
-  //   console.log(title, department);
   const { postData } = useFactoryLogContext();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +18,6 @@ export default function ProductChart({ title, department }: ProductChartProps) {
   const ar = data["ar"];
   const cpamt = data["cpamt"];
   const pamt = data["pamt"];
-  const dataForSecondChart = console.log(ar, cpamt, pamt);
 
   const options: Highcharts.Options = {
     xAxis: {
@@ -90,6 +88,7 @@ export default function ProductChart({ title, department }: ProductChartProps) {
   return (
     <span>
       <button
+        type="button"
         className="cursor-pointer underline shadow-sm hover:shadow-md desktop:text-base"
         onClick={() => setIsOpen(true)}
       >
@@ -97,20 +96,16 @@ export default function ProductChart({ title, department }: ProductChartProps) {
       </button>
 
       <Modal onClose={() => setIsOpen(false)} openModal={isOpen}>
-        <div className="w-full border border-black bg-gray-300">
-          <HighchartsReact
-            highcharts={Highcharts}
-            constructorType={"chart"}
-            options={options}
-          />
-        </div>
-        <div>
-          <HighchartsReact
-            highcharts={Highcharts}
-            constructorType={"chart"}
-            options={options}
-          />
-        </div>
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType={"chart"}
+          options={options}
+        />
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType={"chart"}
+          options={options}
+        />
 
         <div>
           <BulletChart title={title} department={department} />
