@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
 type ModalProps = {
@@ -30,6 +30,14 @@ export default function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (openModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [openModal]);
+
   // useClose(modalRef, onClose);
   // useEscape(modalRef, onClose);
   useCloseAndEscape(modalRef, onClose);
@@ -55,16 +63,17 @@ export default function Modal({
               transition={
                 enter === "leftTop" ? leftTop.transition : leftMiddle.transition
               }
-              className="relative left-1/2 top-1/2 aspect-square h-3/5 rounded-md bg-white px-4 py-6"
+              className="relative left-1/2 top-1/2 max-h-[80%] min-h-[50%] min-w-[50%] max-w-[90%] rounded-md bg-white px-4 py-6"
               ref={modalRef}
             >
               <button
+                type="button"
                 onClick={onClose}
-                className="absolute right-0 top-0 h-8 w-8 rounded-full hover:bg-gray-300"
+                className="absolute right-0 top-0 z-10 h-8 w-8 rounded-full hover:bg-gray-300"
               >
                 X
               </button>
-              <div className="h-full rounded-md border hover:border-black">
+              <div className="relative max-h-full overflow-auto rounded-md border hover:border-black">
                 {children}
               </div>
             </motion.div>
