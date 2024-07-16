@@ -42,16 +42,17 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
   }, [value]);
 
   return (
-    <div className="flex justify-center gap-2">
+    <div className="flex flex-wrap justify-center gap-2">
+      {/* TODO: Extract this to a separate component */}
       {isLowest && (
         <p
-          className={`${value[value.length - 1] < 0.85 ? "bg-amber-500" : "bg-green-500"} rounded-full p-1 text-xs font-normal text-white`}
+          className={`${value[value.length - 1] < 0.85 ? "bg-amber-500" : "bg-green-500"} rounded-full px-2 py-1 text-xs font-normal text-white desktop:text-sm`}
         >
           {t("最低達成率")}
         </p>
       )}
       {isLowerThanStandardConsecutively && (
-        <p className="rounded-full bg-red-500 p-1 text-xs font-normal text-white">
+        <p className="rounded-full bg-red-500 px-2 py-1 text-xs font-normal text-white desktop:text-sm">
           {t("連續低於標準")}
           {numberOfConsecutiveLowerThanStandard > 1 &&
             ` (${numberOfConsecutiveLowerThanStandard})`}
