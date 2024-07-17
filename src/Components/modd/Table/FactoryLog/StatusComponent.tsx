@@ -7,6 +7,7 @@ type StatusComponentProps = {
 const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
   const { t } = useTranslation();
   const [isLowest, setIsLowest] = useState(false);
+  const [isLowerThanStandard, setIsLowerThanStandard] = useState(false);
   const [
     isLowerThanStandardConsecutively,
     setIsLowerThanStandardConsecutively,
@@ -17,12 +18,21 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
   ] = useState(0);
 
   useEffect(() => {
+    function findLastNonZeroValue(data: number[]) {
+      for (let i = data.length - 1; i >= 0; i--) {
+        if (data[i] !== 0) {
+          return { value: data[i], index: i };
+        }
+      }
+      return { value: 0, index: -1 };
+    }
     const calculateStatus = (data: number[]) => {
-      const current = data[data.length - 1];
+      const { value: current, index: startIndex } = findLastNonZeroValue(data);
       let consecutiveCount = 0;
 
       // Check for consecutive values lower than standard (85)
-      for (let i = data.length - 1; i >= 0; i--) {
+      for (let i = startIndex; i >= 0; i--) {
+        //
         if (data[i] < 0.85) {
           consecutiveCount++;
         } else {
@@ -33,9 +43,15 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       setNumberOfConsecutiveLowerThanStandard(consecutiveCount);
       setIsLowerThanStandardConsecutively(consecutiveCount > 1);
 
-      // Check if the current value is the lowest
-      const lowest = Math.min(...data);
-      setIsLowest(current === lowest);
+      // Filter out 0 values (0 means no data) and find the lowest number
+      const nonZeroNumbers = data.filter((v) => v !== 0);
+      const lowest = Math.min(...nonZeroNumbers);
+      if (current === lowest) {
+        if (current < 0.85) {
+          setIsLowerThanStandard(true);
+        }
+        setIsLowest(current === lowest);
+      }
     };
 
     calculateStatus(value);
@@ -46,7 +62,7 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       {/* TODO: Extract this to a separate component */}
       {isLowest && (
         <p
-          className={`${value[value.length - 1] < 0.85 ? "bg-amber-500" : "bg-green-500"} rounded-full px-2 py-1 text-xs font-normal text-white desktop:text-sm`}
+          className={`${isLowerThanStandard ? "bg-amber-500" : "bg-green-500"} rounded-full px-2 py-1 text-xs font-normal text-white desktop:text-sm`}
         >
           {t("最低達成率")}
         </p>
