@@ -65,7 +65,7 @@ export default function Select({
           </ListboxButton>
           <ListboxOptions
             anchor="bottom"
-            className="absolute z-10 w-[var(--button-width)] origin-top rounded-md bg-white text-xs transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0 desktop:text-base"
+            className="absolute z-[100] w-[var(--button-width)] origin-top rounded-md bg-white text-xs transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0 desktop:text-base"
           >
             {allOptions.map((option) => (
               <ListboxOption
