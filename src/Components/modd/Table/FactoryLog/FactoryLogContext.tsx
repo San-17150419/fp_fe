@@ -116,6 +116,7 @@ export const FactoryLogContextProvider: React.FC<{
         tableData,
         isTableDataReady,
         duration,
+        rawData
       }}
     >
       {children}

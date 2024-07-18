@@ -69,6 +69,7 @@ export type FactoryLogContextType = {
   tableData: FormattedData | null;
   isTableDataReady: boolean;
   duration: Array<{ date_start: string; date_end: string }>;
+  rawData: FactoryLogRawData | null;
 };
 
 export type FormattedData = {
