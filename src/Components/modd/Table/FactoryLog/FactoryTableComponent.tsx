@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Table from "../TableTest/Table";
 import StatusComponent from "./StatusComponent";
 import * as XLSX from "xlsx";
-import { transformData, exportToExcel, findLastNonZero } from "./util/utils";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import Modal from "../../Modal/NonDialogModal";
 import ColumnChart from "./Chart/ColumnChart";
@@ -11,13 +10,11 @@ import ProductChart from "./Chart/ProductChart";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 import { GrDownload } from "react-icons/gr";
 import { isToday } from "date-fns";
-import TempChart from "./Chart/TempChart";
 
 export default function FactoryTableComponent({
   department,
   sysData,
   dateRanges,
-  // The default point is set to ar.
   point = "ar",
 }: {
   department: string;
@@ -25,12 +22,13 @@ export default function FactoryTableComponent({
   dateRanges: { date_start: string; date_end: string }[];
   point?: "ar" | "pamt_p";
 }) {
-  console.log(sysData);
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [visibleRows, setVisibleRows] = useState<string[]>([]);
+  const [rows, setRows] = useState<{ label: string; visible: boolean }[]>([]);
+  const [allHiddenToggled, setAllHiddenToggled] = useState(false);
+  const { duration } = useFactoryLogContext();
 
-  const { postData, duration } = useFactoryLogContext();
   const downloadExcel = (id: string) => {
     const workbook = XLSX.utils.book_new();
     const sheet = XLSX.utils.table_to_sheet(document.getElementById(id));
@@ -38,33 +36,52 @@ export default function FactoryTableComponent({
     XLSX.writeFile(workbook, `${id}.xlsx`);
   };
 
-  const filteredData2 = () => {
-    const currentVisibleRows: string[] = [];
-    const currentHiddenRows: string[] = [];
-    Object.keys(sysData).forEach((system) => {
-      if (!sysData[system][point].includes(0)) {
-        currentVisibleRows.push(system);
-      } else {
-        currentHiddenRows.push(system);
-      }
-    });
-    return { currentVisibleRows, currentHiddenRows };
-  };
+  useEffect(() => {
+    const updatedVisibleRows = rows
+      .filter((row) => row.visible)
+      .map((row) => row.label);
+    setVisibleRows(updatedVisibleRows);
+  }, [rows]);
+
+  useEffect(() => {
+    const allRows = Object.keys(sysData);
+    const generatedHiddenRows = () => {
+      const currentHiddenRows: { label: string; visible: boolean }[] = [];
+      Object.keys(sysData).forEach((system) => {
+        if (sysData[system][point].includes(0)) {
+          currentHiddenRows.push({
+            label: system,
+            visible: false,
+          });
+        } else {
+          currentHiddenRows.push({
+            label: system,
+            visible: true,
+          });
+        }
+      });
+      return currentHiddenRows;
+    };
+    const hiddenRows = generatedHiddenRows();
+    const visibleRows = allRows.filter(
+      (row) => !hiddenRows.some((hiddenRow) => hiddenRow.label === row),
+    );
+    setVisibleRows(visibleRows);
+    setRows(hiddenRows);
+  }, [sysData, point]);
+
   const filteredData = () => {
     const filteredData = {} as { [key: string]: any };
-    const currenTvisibleRows: string[] = [];
-    const currenThiddenRows: string[] = [];
     Object.keys(sysData).forEach((system) => {
-      const arArray: number[] = sysData[system][point];
       if (!sysData[system][point].includes(0)) {
         filteredData[system] = sysData[system];
       }
     });
-
     return filteredData;
   };
+
   const data = filteredData();
-  const { currentVisibleRows, currentHiddenRows } = filteredData2();
+
   return (
     <>
       <Modal onClose={() => setIsOpen(false)} openModal={isOpen}>
@@ -75,7 +92,15 @@ export default function FactoryTableComponent({
         <Table.TableCaption className="my-2 text-center text-2xl font-semibold">
           {t(department)} {t("達成率")}
           <div className="flex items-end justify-end">
-            <HiddenRowsToggle hiddenRows={currentHiddenRows} />
+            <HiddenRowsToggle
+              hiddenRows={rows.filter(({ label }) =>
+                !Object.keys(data).includes(label),
+              )}
+              setHiddenRows={setVisibleRows}
+              setRows={setRows}
+              allHiddenToggled={allHiddenToggled}
+              setAllHiddenToggled={setAllHiddenToggled}
+            />
             <button
               type="button"
               title="Download Excel"
@@ -100,10 +125,8 @@ export default function FactoryTableComponent({
                 className="tablet:text-base border-y border-gray-600 text-xs desktop:text-lg"
                 key={`${department}-table-header-cell-${index}`}
               >
-                {/* I think I need to extract this into a function */}
                 <div className="flex flex-col gap-3">
                   {t("區間") + " " + (index + 1)}
-
                   <div className="flex flex-wrap justify-center gap-1 text-xs text-gray-600">
                     <span> {duration[3 - index].date_start || ""}</span>
                     <span>到</span>
@@ -131,44 +154,45 @@ export default function FactoryTableComponent({
           </Table.TableRow>
         </Table.TableHeader>
         <Table.TableBody>
-          {Object.keys(data).map((sys, sysIndex) => (
+          {/* {Object.keys(sysData).map((sysName: string, index: number) => ( */}
+
+          {visibleRows.map((sysName: string, index: number) => (
             <Table.TableRow
-              className={`${sysIndex % 2 !== 0 ? "bg-gray-300" : "bg-gray-100"}`}
-              key={`${department}-${sys}table-row-${sysIndex}`}
+              className={`${index % 2 !== 0 ? "bg-gray-300" : "bg-gray-100"} `}
+              key={`row-${sysName}-${index}`}
             >
-              {/* 部門名稱 multiple rows */}
-              {sysIndex === 0 && (
+              {index === 0 && (
                 <Table.TableCell
                   className="bg-lime-100"
-                  rowspan={Object.keys(data).length}
+                  rowspan={visibleRows.length}
                 >
                   <button
-                    onClick={() => {
-                      setIsOpen(true);
-                    }}
+                    onClick={() => setIsOpen(true)}
                     type="button"
-                    key={`sys-${sys}`}
                     className="text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
                   </button>
                 </Table.TableCell>
               )}
-              {/* 系列名稱 */}
+
               <Table.TableCell>
-                <ProductChart title={sys} department={department} />
+                <ProductChart title={sysName} department={department} />
               </Table.TableCell>
-              {data[sys][point].map((ar: number, arIndex: number) => (
-                <Table.TableCell className="" key={arIndex}>
+              {sysData[sysName][point].map((arValue: number, index: number) => (
+                <Table.TableCell
+                  className="w-2/12 border-gray-600 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
+                  key={`${sysName}-${index}`}
+                >
                   <span
-                    className={`text-xs desktop:text-base ${ar < 0.85 ? "text-red-500" : ""}`}
+                    className={`text-xs desktop:text-base ${arValue < 0.85 ? "text-red-500" : ""}`}
                   >
-                    {ar !== 0 ? `${(ar * 100).toFixed(2)}%` : ""}
+                    {arValue !== 0 ? `${(arValue * 100).toFixed(2)}%` : ""}
                   </span>
                 </Table.TableCell>
               ))}
               <Table.TableCell colspan={2}>
-                <StatusComponent value={data[sys][point]} />
+                <StatusComponent value={sysData[sysName][point]} />
               </Table.TableCell>
             </Table.TableRow>
           ))}
