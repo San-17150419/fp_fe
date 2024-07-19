@@ -1,85 +1,96 @@
 import React, { useRef, useEffect } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
+
 type ModalProps = {
   children?: React.ReactNode;
   onClose: () => void;
-  openModal: boolean;
+  isOpen: boolean;
   enter?: "leftTop" | "leftMiddle";
 };
 
-const leftTop = {
-  initial: { x: "-100vw", y: "-100vh", scale: 0.2 },
-  animate: { x: "-50%", y: "-50%", scale: 1 },
-  exit: { x: "-100vw", y: "-100vh", scale: 0.2 },
-  transition: { ease: "easeOut", duration: 0.8 },
-};
-
-const leftMiddle = {
-  initial: { x: "-100vw", y: "-50%", scale: 0.2 },
-  animate: { x: "-50%", y: "-50%", scale: 1 },
-  exit: { x: "-100vw", y: "-50%", scale: 0.2 },
-  transition: { ease: "easeOut", duration: 0.8 },
+const animationVariants = {
+  leftTop: {
+    initial: {
+      x: "-100vw",
+      y: "-100vh",
+      width: "100vw",
+      height: "100vh",
+      scale: 0.2,
+    },
+    animate: { x: "-50%", y: "-50%", scale: 1 },
+    exit: { x: "-100vw", y: "-100vh", scale: 0.2 },
+    transition: { ease: "easeOut", duration: 0.8 },
+  },
+  leftMiddle: {
+    initial: {
+      x: "-100vw",
+      y: "-50%",
+      width: "100vw",
+      height: "100vh",
+      scale: 0.2,
+    },
+    animate: { x: "-50%", y: "-50%", scale: 1 },
+    exit: { x: "-100vw", y: "-50%", scale: 0.2 },
+    transition: { ease: "easeOut", duration: 0.8 },
+  },
 };
 
 export default function Modal({
   children,
   onClose,
   enter = "leftTop",
-  openModal,
+  isOpen,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (openModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [openModal]);
+  useCloseAndEscape(modalRef, onClose, isOpen);
 
-  // useClose(modalRef, onClose);
-  // useEscape(modalRef, onClose);
-  useCloseAndEscape(modalRef, onClose);
+  const currentVariant = animationVariants[enter];
+
   return (
-    <>
-      <AnimatePresence>
-        {openModal && (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed bottom-0 left-0 right-0 top-0 z-50 flex bg-black/50"
+          initial={{ opacity: 0 }}
+          // The overlay is not reachable by pressing tab
+          // tabIndex={-1}
+          aria-hidden="true"
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ ease: "easeOut", duration: 0.8 }}
+          onClick={() => {
+            if (modalRef.current) {
+              onClose();
+            }
+          }}
+        >
           <motion.div
-            className="fixed bottom-0 left-0 right-0 top-0 z-50 flex bg-black/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ ease: "easeOut", duration: 0.8 }}
+            initial={currentVariant.initial}
+            animate={currentVariant.animate}
+            exit={currentVariant.exit}
+            transition={currentVariant.transition}
+            className="relative left-1/2 top-1/2 max-h-[80%] min-h-[50%] min-w-[50%] max-w-[90%] rounded-md bg-white px-4 py-6"
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()} // Prevent clicks inside the modal from closing it
           >
-            <motion.div
-              initial={
-                enter === "leftTop" ? leftTop.initial : leftMiddle.initial
-              }
-              animate={
-                enter === "leftTop" ? leftTop.animate : leftMiddle.animate
-              }
-              exit={enter === "leftTop" ? leftTop.exit : leftMiddle.exit}
-              transition={
-                enter === "leftTop" ? leftTop.transition : leftMiddle.transition
-              }
-              className="relative left-1/2 top-1/2 max-h-[80%] min-h-[50%] min-w-[50%] max-w-[90%] rounded-md bg-white px-4 py-6"
-              ref={modalRef}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close modal"
+              className="absolute right-0 top-0 z-10 h-8 w-8 rounded-full hover:bg-gray-300"
             >
-              <button
-                type="button"
-                onClick={onClose}
-                className="absolute right-0 top-0 z-10 h-8 w-8 rounded-full hover:bg-gray-300"
-              >
-                X
-              </button>
-              <div className="relative max-h-full overflow-auto rounded-md border hover:border-black">
-                {children}
-              </div>
-            </motion.div>
+              X
+            </button>
+            <div className="relative max-h-full overflow-auto rounded-md border hover:border-black">
+              {children}
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
