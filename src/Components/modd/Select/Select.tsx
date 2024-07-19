@@ -30,7 +30,7 @@ export default function Select({
     if (onSelect) {
       onSelect(selectedOption.value as string);
     }
-  }, []);
+  }, [onSelect, selectedOption]);
 
   const handleSelect = (option: DetailOption) => {
     setSelectedOption(option);
