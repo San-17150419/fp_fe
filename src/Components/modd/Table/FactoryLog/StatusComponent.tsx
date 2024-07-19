@@ -62,13 +62,13 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       {/* TODO: Extract this to a separate component */}
       {isLowest && (
         <p
-          className={`${isLowerThanStandard ? "bg-amber-500" : "bg-green-500"} rounded-full px-2 py-1 text-xs font-normal text-white desktop:text-sm`}
+          className={`${isLowerThanStandard ? "bg-amber-500 shadow-amber-700" : "bg-green-500 shadow-green-700"} rounded-full px-2 py-1 text-xs font-normal text-white shadow desktop:text-sm`}
         >
           {t("最低達成率")}
         </p>
       )}
       {isLowerThanStandardConsecutively && (
-        <p className="rounded-full bg-red-500 px-2 py-1 text-xs font-normal text-white desktop:text-sm">
+        <p className="rounded-full bg-red-500 px-2 py-1 text-xs font-normal text-white shadow shadow-red-700 desktop:text-sm">
           {t("連續低於標準")}
           {numberOfConsecutiveLowerThanStandard > 1 &&
             ` (${numberOfConsecutiveLowerThanStandard})`}
