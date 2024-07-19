@@ -3,7 +3,6 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  Field,
 } from "@headlessui/react";
 import { PiCaretDownBold } from "react-icons/pi";
 import { useSelect } from "./useSelect";
@@ -56,7 +55,7 @@ export default function Select({
         <>
           <ListboxButton
             id={name}
-            className={`flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-0 text-left text-xs hover:border-sky-300 desktop:px-3 desktop:py-4 desktop:text-base ${
+            className={`flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-0 text-left text-xs shadow shadow-slate-300 hover:border-sky-300 focus:border-2 focus:border-sky-400 desktop:px-3 desktop:py-4 desktop:text-base ${
               open ? "border-blue-300" : "border-gray-300"
             }`}
           >
