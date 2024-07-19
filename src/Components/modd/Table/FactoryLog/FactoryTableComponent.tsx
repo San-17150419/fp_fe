@@ -37,10 +37,10 @@ export default function FactoryTableComponent({
 
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
-      sysData[system][point].includes(0)
+      sysData[system][point].includes(0),
     );
     const updatedVisibleRows = Object.keys(sysData).filter(
-      (system) => !sysData[system][point].includes(0)
+      (system) => !sysData[system][point].includes(0),
     );
 
     setIncompleteRows(updatedIncompleteRows);
@@ -51,7 +51,7 @@ export default function FactoryTableComponent({
     setVisibleRows((prevRows) =>
       prevRows.includes(label)
         ? prevRows.filter((row) => row !== label)
-        : [...prevRows, label]
+        : [...prevRows, label],
     );
   };
 
@@ -64,7 +64,7 @@ export default function FactoryTableComponent({
       ]);
     } else {
       setVisibleRows((prevRows) =>
-        prevRows.filter((row) => !incompleteRows.includes(row))
+        prevRows.filter((row) => !incompleteRows.includes(row)),
       );
     }
   };
@@ -72,7 +72,11 @@ export default function FactoryTableComponent({
   return (
     <>
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
-        <ColumnChart rawData={sysData} department={department} />
+        <ColumnChart
+          allData={sysData}
+          visibleRows={visibleRows}
+          title={department}
+        />
       </Modal>
 
       <Table
@@ -152,7 +156,9 @@ export default function FactoryTableComponent({
           {visibleRows.map((sysName: string, index: number) => (
             <Table.TableRow
               className={`${
-                index % 2 !== 0 ? "bg-gray-200 hover:bg-gray-300" : "bg-gray-100 hover:bg-gray-300"
+                index % 2 !== 0
+                  ? "bg-gray-200 hover:bg-gray-300"
+                  : "bg-gray-100 hover:bg-gray-300"
               }`}
               key={`row-${sysName}-${index}`}
             >

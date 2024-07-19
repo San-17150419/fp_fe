@@ -10,15 +10,18 @@ import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
 import Select from "../../../Select/Select";
 // TODO: I need to think about how to make this component more reusable. I don't think I should put data proccessing logic here.
 type ColumnChartProps = {
-  department: string;
-  rawData: {
-    [key: string]: any;
-  };
+  title: string;
+  allData: { [key: string]: any };
+  visibleRows?: string[];
 };
 
 HighchartsExporting(Highcharts);
 highcharts3d(Highcharts);
-export default function ColumnChart({ department, rawData }: ColumnChartProps) {
+export default function ColumnChart({
+  title,
+  allData,
+  visibleRows,
+}: ColumnChartProps) {
   const { postData } = useFactoryLogContext();
   const { t } = useTranslation();
   const chartRef = useRef<HighchartsReact.RefObject>(null);
@@ -26,8 +29,8 @@ export default function ColumnChart({ department, rawData }: ColumnChartProps) {
   const { width } = useWindowDimensions();
   function generateColumnData(rawData: { [key: string]: any }) {
     const data: [string, number][] = [];
-    // const departmentData = rawData[department];
-    Object.keys(rawData).forEach((system: string) => {
+    const keysToUse = visibleRows || Object.keys(rawData);
+    keysToUse.forEach((system: string) => {
       data.push([
         t(system),
         Number((rawData[system]["ar"][3] * 100).toFixed(2)),
@@ -39,16 +42,16 @@ export default function ColumnChart({ department, rawData }: ColumnChartProps) {
 
   useEffect(() => {
     function calculateChartWidth() {
-      const columnData = generateColumnData(rawData);
+      const columnData = generateColumnData(allData);
       const minColumnWidth = 50;
       const baseWidth = width / 3;
       return columnData.length * minColumnWidth + baseWidth;
     }
     const calculatedWidth = calculateChartWidth();
     setChartWidth(calculatedWidth);
-  }, [width, rawData]);
+  }, [width, allData]);
   // TODO: I need to make sure the datalabel is visible in the chart in every window size
-  const columnData = generateColumnData(rawData);
+  const columnData = generateColumnData(allData);
   const options: Highcharts.Options = {
     chart: {
       type: "column",
@@ -90,7 +93,7 @@ export default function ColumnChart({ department, rawData }: ColumnChartProps) {
     // TODO: Add responsive feature. I am not sure how would I approach this yet. The callback function has access to the chart object. But I don't know what data is in the chart. I might refactor the calculateChartWidth function to dynamicly calculate maxPointWidth, minPointWidth and baseWidth based on the window size(Maybe more). But I haven't figured out the correct fomula yet.
 
     title: {
-      text: `${t(department)} 產品達成率`,
+      text: `${t(title)} 產品達成率`,
       style: {
         fontSize: "1.5rem",
         fontFamily: "Verdana, sans-serif",
