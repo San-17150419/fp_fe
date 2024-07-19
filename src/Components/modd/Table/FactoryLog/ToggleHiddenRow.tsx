@@ -3,13 +3,11 @@ import useCloseAndEscape from "../../../../hooks/useCloseAndEscape";
 import clsx from "clsx";
 
 type HiddenRowsToggleProps = {
-  hiddenRows: { label: string; visible: boolean }[];
-  setHiddenRows: React.Dispatch<React.SetStateAction<string[]>>;
-  setRows: React.Dispatch<
-    React.SetStateAction<{ label: string; visible: boolean }[]>
-  >;
+  hiddenRows: string[];
+  visibleRows: string[];
+  toggleVisibility: (label: string) => void;
   allHiddenToggled: boolean;
-  setAllHiddenToggled: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleAllVisibility: () => void;
   position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
 };
 
@@ -17,30 +15,16 @@ type Position = "bottom-right" | "bottom-left" | "top-right" | "top-left";
 
 const HiddenRowsToggle = ({
   hiddenRows,
-  setHiddenRows,
-  setRows,
+  visibleRows,
+  toggleVisibility,
   allHiddenToggled,
-  setAllHiddenToggled,
+  toggleAllVisibility,
   position = "bottom-right",
 }: HiddenRowsToggleProps) => {
   const dropdownRef = useRef(null);
   const [open, setOpen] = useState(false);
 
   useCloseAndEscape(dropdownRef, () => setOpen(false), open);
-  const toggleVisibility = (label: string) => {
-    setRows((prevRows) =>
-      prevRows.map((row) =>
-        row.label === label ? { ...row, visible: !row.visible } : row,
-      ),
-    );
-  };
-
-  const toggleAllVisibility = () => {
-    setAllHiddenToggled((prev) => !prev);
-    setRows((prevRows) =>
-      prevRows.map((row) => ({ ...row, visible: !allHiddenToggled })),
-    );
-  };
 
   return (
     <div ref={dropdownRef} className="relative mt-2 w-full max-w-fit">
@@ -71,10 +55,6 @@ const HiddenRowsToggle = ({
               id="toggle-all"
               onChange={toggleAllVisibility}
             />
-            {/* This need to be full width. So the label occupies all the
-              remaining space. Otherwise, the label with shorter text will have
-              area on the right that looks like part of the label, but */}
-            {/* TODO: Add explanation */}
             <label
               className="w-full text-left text-xs desktop:text-sm"
               htmlFor="toggle-all"
@@ -89,15 +69,15 @@ const HiddenRowsToggle = ({
             >
               <input
                 type="checkbox"
-                id={`${row.label}-${index}`}
-                checked={row.visible}
-                onChange={() => toggleVisibility(row.label)}
+                id={`${row}-${index}`}
+                checked={visibleRows.includes(row)}
+                onChange={() => toggleVisibility(row)}
               />
               <label
                 className="w-full text-left text-xs desktop:text-sm"
-                htmlFor={`${row.label}-${index}`}
+                htmlFor={`${row}-${index}`}
               >
-                {row.label}
+                {row}
               </label>
             </li>
           ))}
