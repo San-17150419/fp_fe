@@ -128,3 +128,29 @@ export type PreData = {
 export type RawData = Partial<{ [key in Point]: number }> & { ar: number } & {
   pamt_p: number;
 } & { sys: string } & { pl: string };
+
+export type FactoryEventReponse = {
+  post: FactoryEventResponsePostData;
+  data: FactoryEventResponseData[];
+};
+
+export type FactoryEventResponsePostData = {
+  post: {
+    factory: Factory;
+    department: string;
+    sys: string;
+    date_start: string;
+    date_end: string;
+  };
+};
+
+export type FactoryEventResponseData = {
+  pl: string;
+  sys: string;
+  prod_name: string;
+  pamt: number;
+  wt: number;
+  cpamt: number;
+  pamt_h: number;
+  ar: number;
+};
