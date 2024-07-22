@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import  { useRef, useEffect, useState } from "react";
 import { useFactoryLogContext } from "../FactoryLogContext";
 import HighchartsReact from "highcharts-react-official";
 
@@ -7,18 +7,16 @@ import Highcharts from "highcharts";
 import HighchartsExporting from "highcharts/modules/exporting";
 import HighchartsFullScreen from "highcharts/modules/full-screen";
 import { useTranslation } from "react-i18next";
-import highcharts3d from "highcharts/highcharts-3d";
 import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
-import Select from "../../../Select/Select";
-import { testData } from "./testData";
+import { type FactoryEventReponse } from "../FactoryLogDataType";
 
 type ColumnChartProps = {
   department: string;
   //TODO: Add type for rawData
-  rawData: typeof testData;
+  rawData: FactoryEventReponse;
 };
 
-function formatData(d: typeof testData) {
+function formatData(d: FactoryEventReponse) {
   const data = d.data.map((item) => {
     if (item.ar)
       return [item.prod_name, Number((item.ar * 100).toFixed(2))] as [
@@ -37,13 +35,11 @@ function formatData(d: typeof testData) {
   return data;
 }
 
-
 HighchartsExporting(Highcharts);
 // highcharts3d(Highcharts);
 HighchartsFullScreen(Highcharts);
 export default function TempChart({ department, rawData }: ColumnChartProps) {
   const sampleData = formatData(rawData);
-  const { postData } = useFactoryLogContext();
   const { t } = useTranslation();
   const chartRef = useRef<HighchartsReact.RefObject>(null);
   const [chartWidth, setChartWidth] = useState(1500);
@@ -77,7 +73,7 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
       // width: 1500,
       // width: chartWidth,
       // When you set the height as percentage, it will be calculated based on the width.
-      width: width * 0.8,
+      width: 0.85 * width,
       plotBackgroundColor: "#EBEBEB",
       style: {
         color: "#000000",
@@ -94,7 +90,7 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
       // },
       scrollablePlotArea: {
         // This will make the chart scrollable. If the plot area is smaller than 500px,
-        minWidth: 800,
+        minWidth: 900,
         scrollPositionX: 1,
       },
       borderWidth: 2,
