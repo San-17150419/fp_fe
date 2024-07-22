@@ -7,17 +7,22 @@ import { useTranslation } from "react-i18next";
 import BulletChart from "./BulletChart";
 import axios from "axios";
 import TempChart from "./TempChart";
+import ProgressBar from "./ProgressBar";
+import ProgressChart from "./ProgressChart";
+import { type FactoryEventReponse } from "../FactoryLogDataType";
 type ProductChartProps = {
   title: string;
   department: string;
 };
 
+// This component is responsible for fetching the event data from the server.
+// How do I decide the date_start and date_end?
 export default function ProductChart({
   title: sysName,
   department,
 }: ProductChartProps) {
   const { postData, rawData } = useFactoryLogContext();
-  const [eventData, setEventData] = useState<any>({});
+  const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
   const post = rawData?.post;
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +30,9 @@ export default function ProductChart({
   const [isEventDataReady, setisEventDataReady] = useState(false);
 
   const options: Highcharts.Options = {
+    credits: {
+      enabled: false,
+    },
     xAxis: {
       categories: ["區間一", "區間二", "區間三", "區間四"],
     },
@@ -90,16 +98,11 @@ export default function ProductChart({
     ],
   };
 
-  //   {
-  //     "factory"   : "GD",
-  //     "department": "INJ",
-  //     "sys"       : "CE系列",
-  //     "date_start": "2023-01-01",
-  //     "date_end"  : "9999-12-31"
-  // }
   const fetchEventData = async () => {
     if (!rawData?.post) return;
-
+    // Use date_start as the date_end
+    // Calculate the date_start based on the date_type. For example, if the date_type is "half-year", the date_start should be 6 months ago.
+    // The problem right now is I am not sure if the event data will have missing data like rawData.
     const startDate = new Date(rawData.post.date_start);
     const interval = rawData.post.date_type === "half-year" ? 6 : 4;
     const endDate = new Date(
@@ -123,6 +126,7 @@ export default function ProductChart({
       );
 
       setEventData(response.data);
+      console.log(response.data);
       setisEventDataReady(true);
     } catch (error) {
       console.error(error);
@@ -133,7 +137,7 @@ export default function ProductChart({
     <span>
       <button
         type="button"
-        className="cursor-pointer underline shadow-sm hover:shadow-md desktop:text-base"
+        className="cursor-pointer underline shadow-sm hover:shadow-md focus:text-red-500 desktop:text-base"
         onClick={() => {
           setIsOpen(true);
           fetchEventData();
@@ -142,25 +146,26 @@ export default function ProductChart({
         {t(sysName)}
       </button>
 
-      <Modal onClose={() => setIsOpen(false)} openModal={isOpen}>
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType={"chart"}
-          options={options}
-        />
-        {/* <HighchartsReact
-          highcharts={Highcharts}
-          constructorType={"chart"}
-          options={options}
-        /> */}
+      <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
+        <div className="flex h-full flex-col gap-4">
+          <HighchartsReact
+            highcharts={Highcharts}
+            constructorType={"chart"}
+            options={options}
+          />
 
-        {/* <div>
-          <BulletChart title={title} department={department} />
-        </div> */}
-        <div>
-          {isEventDataReady && (
-            <TempChart department="CE" rawData={eventData} />
-          )}
+          <div>
+            {eventData && (
+              <TempChart department={sysName} rawData={eventData} />
+            )}
+          </div>
+          <div>
+            {eventData && (
+              <ProgressChart eventData={eventData}>
+                <div>this is title </div>
+              </ProgressChart>
+            )}
+          </div>
         </div>
       </Modal>
     </span>
