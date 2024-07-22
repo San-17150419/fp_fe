@@ -1,10 +1,16 @@
 import React, { useEffect, useRef } from "react";
 
+//
 type ProgressBarProps = {
+  title?: string;
   target: number;
   achieved: number;
 };
-export default function ProgressBar({ target, achieved }: ProgressBarProps) {
+export default function ProgressBar({
+  target,
+  achieved,
+  title,
+}: ProgressBarProps) {
   const progressBarRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (progressBarRef.current) {
@@ -16,10 +22,11 @@ export default function ProgressBar({ target, achieved }: ProgressBarProps) {
 
   const progressPercentage = (achieved / target) * 100;
   return (
-    <div className="flex flex-col gap-1 pr-8">
+    <div className="flex flex-col gap-1  px-4 my-2  ">
       <div className="flex justify-between">
-        <h2 className="text-sm">項目</h2>
-        <p className="text-xs">數字</p>
+        <h2 className="text-sm">{title || "項目"}</h2>
+        {/* TODO: I am not sure wether this should display the target or the achieved */}
+        <p className="text-xs">{achieved}</p>
       </div>
       <div className="flex gap-2 rounded bg-gray-300">
         <div
