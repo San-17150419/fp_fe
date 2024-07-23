@@ -8,7 +8,7 @@ type HiddenRowsToggleProps = {
   toggleVisibility: (label: string) => void;
   allHiddenToggled: boolean;
   toggleAllVisibility: () => void;
-  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  position?: Position;
 };
 
 type Position = "bottom-right" | "bottom-left" | "top-right" | "top-left";
@@ -59,7 +59,7 @@ const HiddenRowsToggle = ({
               className="w-full text-left text-xs desktop:text-sm"
               htmlFor="toggle-all"
             >
-              {allHiddenToggled ? "Show all" : "Hide all"}
+              {!allHiddenToggled ? "Show all" : "Hide all"}
             </label>
           </li>
           {hiddenRows.map((row, index) => (
