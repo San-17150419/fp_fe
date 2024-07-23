@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/San-17150419/fp_fe/static/css/main.5065e0eb.css",
-    "main.js": "/San-17150419/fp_fe/static/js/main.ea3b9245.js",
-    "static/js/453.8ba65e8c.chunk.js": "/San-17150419/fp_fe/static/js/453.8ba65e8c.chunk.js",
-    "static/media/highStockType1Demo.png": "/San-17150419/fp_fe/static/media/highStockType1Demo.b580da863555eb8a330b.png",
-    "static/media/highStockType2Demo.png": "/San-17150419/fp_fe/static/media/highStockType2Demo.9d07f5ecdadcff141f3e.png",
-    "static/media/highStockType3Demo.png": "/San-17150419/fp_fe/static/media/highStockType3Demo.29aaeb625b6d91c9c460.png",
-    "static/media/logo_banner5.png": "/San-17150419/fp_fe/static/media/logo_banner5.d81a4e549590d57f92fc.png",
-    "index.html": "/San-17150419/fp_fe/index.html",
-    "main.5065e0eb.css.map": "/San-17150419/fp_fe/static/css/main.5065e0eb.css.map",
-    "main.ea3b9245.js.map": "/San-17150419/fp_fe/static/js/main.ea3b9245.js.map",
-    "453.8ba65e8c.chunk.js.map": "/San-17150419/fp_fe/static/js/453.8ba65e8c.chunk.js.map"
+    "main.css": "/fp_fe/static/css/main.5065e0eb.css",
+    "main.js": "/fp_fe/static/js/main.86b33774.js",
+    "static/js/453.8ba65e8c.chunk.js": "/fp_fe/static/js/453.8ba65e8c.chunk.js",
+    "static/media/highStockType1Demo.png": "/fp_fe/static/media/highStockType1Demo.b580da863555eb8a330b.png",
+    "static/media/highStockType2Demo.png": "/fp_fe/static/media/highStockType2Demo.9d07f5ecdadcff141f3e.png",
+    "static/media/highStockType3Demo.png": "/fp_fe/static/media/highStockType3Demo.29aaeb625b6d91c9c460.png",
+    "static/media/logo_banner5.png": "/fp_fe/static/media/logo_banner5.d81a4e549590d57f92fc.png",
+    "index.html": "/fp_fe/index.html",
+    "main.5065e0eb.css.map": "/fp_fe/static/css/main.5065e0eb.css.map",
+    "main.86b33774.js.map": "/fp_fe/static/js/main.86b33774.js.map",
+    "453.8ba65e8c.chunk.js.map": "/fp_fe/static/js/453.8ba65e8c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5065e0eb.css",
-    "static/js/main.ea3b9245.js"
+    "static/js/main.86b33774.js"
   ]
 }
