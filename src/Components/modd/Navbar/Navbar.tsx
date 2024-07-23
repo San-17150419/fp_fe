@@ -8,7 +8,7 @@ type NavbarProps = {
 };
 export default function Navbar({ children }: NavbarProps) {
   return (
-    <nav className="nav-custom flex h-16 items-center justify-start gap-8 px-4 py-2 shadow-2xl shadow-black">
+    <nav className="nav-custom flex h-16 items-center justify-start gap-8 px-4 py-2 shadow shadow-black">
       {children}
     </nav>
   );

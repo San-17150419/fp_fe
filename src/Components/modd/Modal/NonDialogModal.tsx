@@ -85,7 +85,7 @@ export default function Modal({
             >
               X
             </button>
-            <div className="relative max-h-full overflow-auto rounded-md border hover:border-black">
+            <div className="scroll-container relative max-h-full overflow-auto rounded-md">
               {children}
             </div>
           </motion.div>

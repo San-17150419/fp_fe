@@ -20,7 +20,7 @@ function App() {
           <Navbar.Item className="text-lg">??</Navbar.Item>
         </Navbar.Items>
       </Navbar>
-      <div className="flex flex-grow border border-black bg-gray-200">
+      <div className="flex flex-grow bg-zinc-100">
         <Sidebar />
         <div className="relative flex grow flex-wrap border-4 px-5 py-5 tabletP:px-20 tabletP:py-10">
           <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
