@@ -5,6 +5,7 @@ import Select from "../../Select/Select";
 import { PostDataParams } from "./FactoryLogDataType";
 import InputBase from "../../Input/InputBase";
 import { GrSearch } from "react-icons/gr";
+import { GrDownload } from "react-icons/gr";
 
 export default function FactoryLogPreFilter() {
   const { preData, isPreDataReady, fetchRawData, setIsRequestMade } =
@@ -126,7 +127,7 @@ export default function FactoryLogPreFilter() {
             onChange={(e) => setDateStart(e.target.value)}
           />
         </div>
-        <div className="col-span-1 flex w-full flex-col">
+        <div className="col-span-1 flex w-full">
           <button
             title="Search"
             className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
@@ -134,6 +135,14 @@ export default function FactoryLogPreFilter() {
             form="form"
           >
             <GrSearch />
+          </button>
+          <button
+            type="button"
+            className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
+            onClick={() => alert("Download Excel")}
+            aria-label="Download Excel"
+          >
+            <GrDownload />
           </button>
         </div>
       </form>
