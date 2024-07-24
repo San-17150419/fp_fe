@@ -42,7 +42,7 @@ function App() {
       </Navbar>
       <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
-        <div className="relative flex-grow border-4 px-5 py-5 tabletP:px-20 tabletP:py-10 desktop:px-40 desktop:py-20">
+        <div className="relative flex-grow border-4 px-5 pt-5 tabletP:px-20 tabletP:pt-10 desktop:px-40 desktop:pt-20">
           <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
             <button
               type="button"

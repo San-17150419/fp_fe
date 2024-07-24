@@ -5,7 +5,7 @@ import FactoryLogTable from "./FactoryLogTable";
 export default function FactoryLog() {
   return (
     <FactoryLogContextProvider>
-      <div className="mx-8 my-4 flex h-full grow flex-col  gap-4 p-2 desktop:mx-16">
+      <div className="flex h-full grow flex-col gap-4 mx-3">
         <FactoryLogPreFilter />
         <FactoryLogTable />
       </div>

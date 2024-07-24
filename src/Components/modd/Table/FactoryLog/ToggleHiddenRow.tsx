@@ -48,7 +48,7 @@ const HiddenRowsToggle = ({
             },
           )}
         >
-          <li className="flex gap-2 py-2 pl-3 pr-4 hover:bg-gray-100">
+          <li className="flex gap-2 py-2 pl-3 pr-4 rounded-md hover:bg-gray-100">
             <input
               type="checkbox"
               checked={allHiddenToggled}
@@ -64,7 +64,7 @@ const HiddenRowsToggle = ({
           </li>
           {hiddenRows.map((row, index) => (
             <li
-              className="flex gap-2 py-2 pl-3 pr-4 hover:bg-gray-100"
+              className="flex gap-2 py-2 pl-3 rounded-md pr-4 hover:bg-gray-100"
               key={index}
             >
               <input

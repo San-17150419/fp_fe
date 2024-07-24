@@ -62,7 +62,7 @@ export default function FactoryTableComponent({
   };
 
   return (
-    <>
+    <div className="rounded-md bg-gray-200 shadow shadow-gray-500">
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <ColumnChart
           allData={sysData}
@@ -71,18 +71,15 @@ export default function FactoryTableComponent({
         />
       </Modal>
 
-      <Table
-        id={department}
-        className="mb-20 mt-12 table-fixed text-center shadow-md shadow-gray-400"
-      >
-        <Table.TableCaption className="my-2 font-semibold">
+      <Table id={department} className="mb-20 mt-12 table-fixed text-center">
+        <Table.TableCaption className="my-10 font-semibold">
           <div className="relative flex flex-col justify-center">
             <span className="absolute left-1/2 -translate-x-1/2 text-slate-700 drop-shadow-lg">
               {t(department)} {t("達成率")}
             </span>
           </div>
 
-          <div className="flex justify-end">
+          <div className="mr-4 flex justify-end">
             <HiddenRowsToggle
               hiddenRows={incompleteRows}
               visibleRows={visibleRows}
@@ -101,19 +98,19 @@ export default function FactoryTableComponent({
             </button> */}
           </div>
         </Table.TableCaption>
-        <Table.TableHeader>
-          <Table.TableRow className="bg-gray-400">
-            <Table.TableCell className="w-1/12 text-xs">
+        <Table.TableHeader className="">
+          <Table.TableRow className="bg-gray-200">
+            <Table.TableCell className="w-1/12 border-y border-black text-xs">
               {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
             {/* <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl"> */}
-            <Table.TableCell className="w-2/12 text-xs">
+            <Table.TableCell className="w-2/12 border-y border-black text-xs">
               {t("系列")}
             </Table.TableCell>
             {Array.from({ length: 3 }).map((_, index) => (
               <Table.TableCell
-                className="text-xs"
+                className="border-y border-black text-xs"
                 // className="tablet:text-base text-xs desktop:text-lg"
                 key={`${department}-table-header-cell-${index}`}
               >
@@ -125,7 +122,7 @@ export default function FactoryTableComponent({
                 </div>
               </Table.TableCell>
             ))}
-            <Table.TableCell className="border-gray-600 text-xs">
+            <Table.TableCell className="border-y border-black text-xs">
               {/* <Table.TableCell className="tablet:text-base border-gray-600 text-xs desktop:text-lg"> */}
               <span>{t("區間") + " " + 4}</span>
               <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
@@ -134,7 +131,10 @@ export default function FactoryTableComponent({
                 <span className="whitespace-pre">至今</span>
               </div>
             </Table.TableCell>
-            <Table.TableCell colspan={2} className="border-gray-600 text-xs">
+            <Table.TableCell
+              colspan={2}
+              className="border-y border-black text-xs"
+            >
               {t("比較其他區間")}
             </Table.TableCell>
           </Table.TableRow>
@@ -157,7 +157,7 @@ export default function FactoryTableComponent({
                   <button
                     onClick={() => setIsOpen(true)}
                     type="button"
-                    className="hover rounded-md p-1 "
+                    className="hover rounded-md p-1"
                     // className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
@@ -189,6 +189,6 @@ export default function FactoryTableComponent({
           ))}
         </Table.TableBody>
       </Table>
-    </>
+    </div>
   );
 }
