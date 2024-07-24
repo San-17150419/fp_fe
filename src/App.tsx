@@ -3,22 +3,45 @@ import { Outlet } from "react-router-dom";
 import logo from "./assets/logo_banner5.png";
 import Navbar from "./Components/modd/Navbar/Navbar";
 import { useTranslation } from "react-i18next";
+import React, { useRef, useState, useEffect } from "react";
 
 function App() {
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
+  // const ref = useRef<HTMLDivElement>(null);
+  // const [size, setSize] = useState({ width: 0, height: 0 });
+  // const updateSize = () => {
+  //   if (ref.current) {
+  //     setSize({
+  //       width: ref.current.offsetWidth,
+  //       height: ref.current.offsetHeight,
+  //     });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   updateSize();
+  //   window.addEventListener("resize", updateSize);
+  //   return () => {
+  //     window.removeEventListener("resize", updateSize);
+  //   };
+  // }, []);
 
   return (
-    <>
+
+    <div
+      // ref={ref}
+      className="mx-auto flex flex-col bg-lime-500 max-2xl:h-full lg:w-full desktop:min-h-[768px] desktop:min-w-[1366px] xl:max-h-[1080px] xl:max-w-[1920px] 2xl:h-[1080px] max-lg:portrait:max-h-[1280px] max-lg:portrait:min-h-[1024px] max-lg:portrait:min-w-[768px] max-lg:portrait:max-w-[800px] max-lg:landscape:h-[768px] max-lg:landscape:w-[1024px]"
+    >
       <Navbar>
         <Navbar.Logo src={logo} />
         <Navbar.Items>
           <Navbar.Item className="text-xl">工廠日誌</Navbar.Item>
         </Navbar.Items>
       </Navbar>
-      <div className="flex flex-grow bg-zinc-100">
+      <div className="flex h-full flex-grow bg-zinc-100">
         <Sidebar />
         <div className="relative flex grow flex-wrap border-4 px-5 py-5 tabletP:px-20 tabletP:py-10">
           <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
@@ -50,49 +73,11 @@ function App() {
           <Outlet />
         </div>
       </div>
-    </>
+
+      {/* <div className="absolute bottom-[50%] left-[50%] p-4 text-5xl">
+        Width: {size.width}px, Height: {size.height}px
+      </div> */}
+    </div>
   );
 }
-
 export default App;
-
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-
-// function MyComponent() {
-//   const [postData, setPostData] = useState(null);
-
-//   useEffect(() => {
-//     // 定義發送POST請求的函數
-//     const fetchData = async () => {
-//       try {
-//         const response = await axios.post('http://192.168.123.240:9000/api/mr/', {
-//           // 可以在這裡傳遞POST請求所需的資料
-//           'key01': 'values01',
-//           'key02': 'values02',
-//         });
-//         // 設定狀態以儲存回傳的資料
-//         setPostData(response.data);
-//       } catch (error) {
-//         console.error('Error fetching data:', error);
-//       }
-//     };
-
-//     // 呼叫發送POST請求的函數
-//     fetchData();
-//   }, []); // 空依賴陣列表示僅在組件初次渲染時執行
-
-//   return (
-//     <div>
-//       {postData ? (
-//         // 如果postData不為空，則顯示回傳的資料
-//         <pre>{JSON.stringify(postData, null, 2)}</pre>
-//       ) : (
-//         // 如果postData為空，顯示載入中或其他訊息
-//         <p>Loading...</p>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default MyComponent;
