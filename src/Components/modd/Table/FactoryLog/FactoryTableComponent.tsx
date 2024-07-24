@@ -147,7 +147,7 @@ export default function FactoryTableComponent({
               colspan={2}
               className="border-gray-600 text-xs tabletL:text-base desktop:text-2xl"
             >
-              {t("比較其他季度")}
+              {t("比較其他區間")}
             </Table.TableCell>
           </Table.TableRow>
         </Table.TableHeader>
