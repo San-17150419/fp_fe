@@ -15,9 +15,7 @@ function App() {
       <Navbar>
         <Navbar.Logo src={logo} />
         <Navbar.Items>
-          <Navbar.Item className="text-xl">Home </Navbar.Item>
-          <Navbar.Item className="text-lg">About</Navbar.Item>
-          <Navbar.Item className="text-lg">??</Navbar.Item>
+          <Navbar.Item className="text-xl">工廠日誌</Navbar.Item>
         </Navbar.Items>
       </Navbar>
       <div className="flex flex-grow bg-zinc-100">
