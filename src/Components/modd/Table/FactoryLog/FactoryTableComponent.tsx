@@ -8,7 +8,6 @@ import Modal from "../../Modal/NonDialogModal";
 import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/ProductChart";
 import HiddenRowsToggle from "./ToggleHiddenRow";
-import { GrDownload } from "react-icons/gr";
 
 export default function FactoryTableComponent({
   department,
@@ -28,12 +27,12 @@ export default function FactoryTableComponent({
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
   const { duration } = useFactoryLogContext();
 
-  const downloadExcel = (id: string) => {
-    const workbook = XLSX.utils.book_new();
-    const sheet = XLSX.utils.table_to_sheet(document.getElementById(id));
-    XLSX.utils.book_append_sheet(workbook, sheet, "Sheet1");
-    XLSX.writeFile(workbook, `${id}.xlsx`);
-  };
+  // const downloadExcel = (id: string) => {
+  //   const workbook = XLSX.utils.book_new();
+  //   const sheet = XLSX.utils.table_to_sheet(document.getElementById(id));
+  //   XLSX.utils.book_append_sheet(workbook, sheet, "Sheet1");
+  //   XLSX.writeFile(workbook, `${id}.xlsx`);
+  // };
 
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
@@ -98,7 +97,7 @@ export default function FactoryTableComponent({
               allHiddenToggled={allHiddenToggled}
               toggleAllVisibility={handleToggleAllVisibility}
             />
-            <button
+            {/* <button
               type="button"
               title="Download Excel"
               key={`download-${department}`}
@@ -106,7 +105,7 @@ export default function FactoryTableComponent({
               className="mx-2 block aspect-square rounded-md border px-2 hover:bg-gray-500 hover:text-gray-100"
             >
               <GrDownload />
-            </button>
+            </button> */}
           </div>
         </Table.TableCaption>
         <Table.TableHeader className="">
