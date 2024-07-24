@@ -27,13 +27,6 @@ export default function FactoryTableComponent({
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
   const { duration } = useFactoryLogContext();
 
-  // const downloadExcel = (id: string) => {
-  //   const workbook = XLSX.utils.book_new();
-  //   const sheet = XLSX.utils.table_to_sheet(document.getElementById(id));
-  //   XLSX.utils.book_append_sheet(workbook, sheet, "Sheet1");
-  //   XLSX.writeFile(workbook, `${id}.xlsx`);
-  // };
-
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
       sysData[system][point].includes(0),
@@ -82,7 +75,7 @@ export default function FactoryTableComponent({
         id={department}
         className="mb-20 mt-12 table-fixed text-center shadow-md shadow-gray-400"
       >
-        <Table.TableCaption className="my-2 text-2xl font-semibold">
+        <Table.TableCaption className="my-2 font-semibold">
           <div className="relative flex flex-col justify-center">
             <span className="absolute left-1/2 -translate-x-1/2 text-slate-700 drop-shadow-lg">
               {t(department)} {t("達成率")}
@@ -108,45 +101,40 @@ export default function FactoryTableComponent({
             </button> */}
           </div>
         </Table.TableCaption>
-        <Table.TableHeader className="">
-          <Table.TableRow className="bg-gray-300">
-            <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl">
+        <Table.TableHeader>
+          <Table.TableRow className="bg-gray-400">
+            <Table.TableCell className="w-1/12 text-xs">
+              {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
-            <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl">
+            {/* <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl"> */}
+            <Table.TableCell className="w-2/12 text-xs">
               {t("系列")}
             </Table.TableCell>
             {Array.from({ length: 3 }).map((_, index) => (
               <Table.TableCell
-                className="tablet:text-base text-xs desktop:text-lg"
+                className="text-xs"
+                // className="tablet:text-base text-xs desktop:text-lg"
                 key={`${department}-table-header-cell-${index}`}
               >
-                <div className="flex flex-col gap-3">
-                  {t("區間") + " " + (index + 1)}
-                  <div className="flex flex-col flex-wrap justify-center gap-1 text-xs text-gray-600">
-                    <span> {duration[3 - index].date_start || ""}</span>
-                    <span>到</span>
-                    <span>{duration[3 - index].date_end || ""}</span>
-                  </div>
+                {t("區間") + " " + (index + 1)}
+                <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
+                  {duration[3 - index].date_start || ""}
+                  <span className="whitespace-pre-wrap">到</span>
+                  {duration[3 - index].date_end || ""}
                 </div>
               </Table.TableCell>
             ))}
-            <Table.TableCell className="tablet:text-base border-gray-600 text-xs desktop:text-lg">
-              <div className="flex flex-col gap-3">
-                <span>{t("區間") + " " + 4}</span>
-                <div className="flex flex-col flex-wrap justify-center gap-1 text-xs text-gray-600">
-                  <span className="text-xs text-gray-600">
-                    {duration[0].date_start}
-                  </span>
-                  <span className="text-xs text-gray-600">到</span>
-                  <span className="text-xs text-gray-600">至今</span>
-                </div>
+            <Table.TableCell className="border-gray-600 text-xs">
+              {/* <Table.TableCell className="tablet:text-base border-gray-600 text-xs desktop:text-lg"> */}
+              <span>{t("區間") + " " + 4}</span>
+              <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
+                {duration[0].date_start}
+                <span className="whitespace-pre-wrap">到</span>
+                <span className="whitespace-pre">至今</span>
               </div>
             </Table.TableCell>
-            <Table.TableCell
-              colspan={2}
-              className="border-gray-600 text-xs tabletL:text-base desktop:text-2xl"
-            >
+            <Table.TableCell colspan={2} className="border-gray-600 text-xs">
               {t("比較其他區間")}
             </Table.TableCell>
           </Table.TableRow>
@@ -163,13 +151,14 @@ export default function FactoryTableComponent({
             >
               {index === 0 && (
                 <Table.TableCell
-                  className="border-gray-600 bg-red-50 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
+                  className="border-gray-600 bg-red-50 text-xs"
                   rowspan={visibleRows.length}
                 >
                   <button
                     onClick={() => setIsOpen(true)}
                     type="button"
-                    className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
+                    className="hover rounded-md p-1 "
+                    // className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
                   </button>
@@ -181,11 +170,13 @@ export default function FactoryTableComponent({
               </Table.TableCell>
               {sysData[sysName][point].map((arValue: number, index: number) => (
                 <Table.TableCell
-                  className="w-2/12 border-gray-600 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
+                  className="w-2/12 border-gray-600 text-xs"
+                  // className="w-2/12 border-gray-600 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
                   key={`${sysName}-${index}`}
                 >
                   <span
-                    className={`text-xs desktop:text-base ${arValue < 0.85 ? "text-red-500" : ""}`}
+                    className={`text-xs ${arValue < 0.85 ? "text-red-400" : ""}`}
+                    // className={`text-xs desktop:text-base ${arValue < 0.85 ? "text-red-500" : ""}`}
                   >
                     {arValue !== 0 ? `${(arValue * 100).toFixed(2)}%` : ""}
                   </span>

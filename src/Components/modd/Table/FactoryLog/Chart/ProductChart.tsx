@@ -137,7 +137,7 @@ export default function ProductChart({
     <span>
       <button
         type="button"
-        className="cursor-pointer underline shadow-sm hover:shadow-md focus:text-red-500 desktop:text-base"
+        className="cursor-pointer text-xs underline shadow-sm hover:shadow-md focus:text-red-500"
         onClick={() => {
           setIsOpen(true);
           fetchEventData();

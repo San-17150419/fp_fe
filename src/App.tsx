@@ -30,10 +30,9 @@ function App() {
   // }, []);
 
   return (
-
     <div
       // ref={ref}
-      className="mx-auto flex flex-col bg-lime-500 max-2xl:h-full lg:w-full desktop:min-h-[768px] desktop:min-w-[1366px] xl:max-h-[1080px] xl:max-w-[1920px] 2xl:h-[1080px] max-lg:portrait:max-h-[1280px] max-lg:portrait:min-h-[1024px] max-lg:portrait:min-w-[768px] max-lg:portrait:max-w-[800px] max-lg:landscape:h-[768px] max-lg:landscape:w-[1024px]"
+      className="mx-auto flex flex-col max-2xl:h-full lg:w-full desktop:min-h-[768px] desktop:min-w-[1366px] xl:max-h-[1080px] xl:max-w-[1920px] 2xl:h-[1080px] max-lg:portrait:max-h-[1280px] max-lg:portrait:min-h-[1024px] max-lg:portrait:min-w-[768px] max-lg:portrait:max-w-[800px] max-lg:landscape:h-[768px] max-lg:landscape:w-[1024px]"
     >
       <Navbar>
         <Navbar.Logo src={logo} />
@@ -41,9 +40,9 @@ function App() {
           <Navbar.Item className="text-xl">工廠日誌</Navbar.Item>
         </Navbar.Items>
       </Navbar>
-      <div className="flex h-full flex-grow bg-zinc-100">
+      <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
-        <div className="relative flex grow flex-wrap border-4 px-5 py-5 tabletP:px-20 tabletP:py-10">
+        <div className="relative flex-grow border-4 px-5 py-5 tabletP:px-20 tabletP:py-10 desktop:px-40 desktop:py-20">
           <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
             <button
               type="button"

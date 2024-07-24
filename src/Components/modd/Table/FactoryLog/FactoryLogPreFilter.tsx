@@ -104,7 +104,7 @@ export default function FactoryLogPreFilter() {
                 <Select
                   key={`key-${key}`}
                   name={key}
-                  className="my-1 font-semibold"
+                  className="my-1"
                   onSelect={onSelectHandler}
                   options={options}
                 />
@@ -120,7 +120,7 @@ export default function FactoryLogPreFilter() {
               defaultValue={dateStart}
               name="date"
               id="date"
-              className="font-semibold shadow shadow-slate-300"
+              className="font-normal shadow shadow-slate-300"
               onChange={(e) => setDateStart(e.target.value)}
             />
           </div>

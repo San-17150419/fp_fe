@@ -30,10 +30,10 @@ const HiddenRowsToggle = ({
     <div ref={dropdownRef} className="relative mt-2 w-full max-w-fit">
       <button
         type="button"
-        className="block h-6 rounded-md bg-white px-2 text-xs shadow shadow-slate-300 desktop:text-sm"
+        className="block rounded-md bg-white px-2 py-1 text-xs shadow shadow-slate-300 "
         onClick={() => setOpen((prev) => !prev)}
       >
-        Open
+        顯示隱藏系列
       </button>
 
       {open && (
@@ -56,7 +56,7 @@ const HiddenRowsToggle = ({
               onChange={toggleAllVisibility}
             />
             <label
-              className="w-full text-left text-xs desktop:text-sm"
+              className="w-full text-left text-xs "
               htmlFor="toggle-all"
             >
               {!allHiddenToggled ? "Show all" : "Hide all"}
@@ -74,7 +74,7 @@ const HiddenRowsToggle = ({
                 onChange={() => toggleVisibility(row)}
               />
               <label
-                className="w-full text-left text-xs desktop:text-sm"
+                className="w-full text-left text-xs "
                 htmlFor={`${row}-${index}`}
               >
                 {row}
