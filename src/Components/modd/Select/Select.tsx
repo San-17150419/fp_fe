@@ -47,7 +47,7 @@ export default function Select({
       defaultValue={selectedOption}
       as="div"
       className={cn(
-        "relative mx-1 my-2 flex h-7 w-full pr-2 text-xs desktop:text-base",
+        "relative mr-1 my-2 flex h-7 w-full pr-2 text-xs desktop:text-base",
         className,
       )}
     >

@@ -75,59 +75,58 @@ export default function FactoryLogPreFilter() {
     setSelectedPoint(value);
   }, []);
   return (
-    <section className="flex min-h-[100px] p-2">
-      <form
-        id="form"
-        onSubmit={handleSubmit}
-        className="grid w-full grid-cols-9 place-items-center gap-1"
-      >
-        {Object.entries(memoizedOptions).map(([key, options]) => {
-          let onSelectHandler: (value: any) => void;
-          switch (key) {
-            case "factory":
-              onSelectHandler = handleFactoryChange;
-              break;
-            case "date_type":
-              onSelectHandler = handleDateTypeChange;
-              break;
-            case "point":
-              onSelectHandler = handlePointChange;
-              break;
-            default:
-              onSelectHandler = () => {};
-          }
-          return (
-            <div key={key} className="col-span-2 flex w-full flex-col">
-              <label
-                className="ml-3 mt-2 text-xs desktop:text-sm"
-                htmlFor={key}
-              >
-                {t(key)}
-              </label>
-              <Select
-                key={`key-${key}`}
-                name={key}
-                className="my-1 font-semibold"
-                onSelect={onSelectHandler}
-                options={options}
-              />
-            </div>
-          );
-        })}
-        <div className="col-span-2 flex w-full flex-col">
-          <label className="ml-2 mt-2 text-xs desktop:text-sm" htmlFor="date">
-            {t("當期開始")}
-          </label>
-          <InputBase
-            type="date"
-            defaultValue={dateStart}
-            name="date"
-            id="date"
-            className="font-semibold shadow shadow-slate-300"
-            onChange={(e) => setDateStart(e.target.value)}
-          />
+    <section className="min-h-[100px] border-b border-black">
+      <form id="form" onSubmit={handleSubmit} className="flex w-full">
+        <div className="flex w-full flex-grow gap-4">
+          {Object.entries(memoizedOptions).map(([key, options]) => {
+            let onSelectHandler: (value: any) => void;
+            switch (key) {
+              case "factory":
+                onSelectHandler = handleFactoryChange;
+                break;
+              case "date_type":
+                onSelectHandler = handleDateTypeChange;
+                break;
+              case "point":
+                onSelectHandler = handlePointChange;
+                break;
+              default:
+                onSelectHandler = () => {};
+            }
+            return (
+              <div key={key} className="flex w-full flex-col">
+                <label
+                  className="ml-1 mt-2 text-xs desktop:text-sm"
+                  htmlFor={key}
+                >
+                  {t(key)}
+                </label>
+                <Select
+                  key={`key-${key}`}
+                  name={key}
+                  className="my-1 font-semibold"
+                  onSelect={onSelectHandler}
+                  options={options}
+                />
+              </div>
+            );
+          })}
+          <div className="flex w-full flex-col">
+            <label className="ml-1 mt-2 text-xs desktop:text-sm" htmlFor="date">
+              {t("當期開始")}
+            </label>
+            <InputBase
+              type="date"
+              defaultValue={dateStart}
+              name="date"
+              id="date"
+              className="font-semibold shadow shadow-slate-300"
+              onChange={(e) => setDateStart(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="col-span-1 flex w-full">
+
+        <div className="ml-4 flex gap-4">
           <button
             title="Search"
             className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
