@@ -23,18 +23,24 @@ function App() {
         <div className="relative flex grow flex-wrap border-4 px-5 py-5 tabletP:px-20 tabletP:py-10">
           <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
             <button
+              type="button"
+              aria-description="change language to traditional chinese"
               className="rounded border border-gray-400 p-2"
               onClick={() => changeLanguage("zh-TW")}
             >
               {t("繁體")}
             </button>
             <button
+              type="button"
+              aria-description="change language to english"
               className="rounded border border-gray-400 p-2"
               onClick={() => changeLanguage("en")}
             >
               {t("英文")}
             </button>
             <button
+              type="button"
+              aria-description="change language to simplified chinese"
               className="rounded border border-gray-400 p-2"
               onClick={() => changeLanguage("zh-CN")}
             >
