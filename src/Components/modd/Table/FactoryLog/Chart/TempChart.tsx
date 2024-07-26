@@ -1,6 +1,8 @@
-import  { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useFactoryLogContext } from "../FactoryLogContext";
-import HighchartsReact from "highcharts-react-official";
+import HighchartsReact, {
+  HighchartsReactRefObject,
+} from "highcharts-react-official";
 
 import Highcharts from "highcharts";
 // import Highcharts from "highcharts/highstock";
@@ -38,10 +40,11 @@ function formatData(d: FactoryEventReponse) {
 HighchartsExporting(Highcharts);
 // highcharts3d(Highcharts);
 HighchartsFullScreen(Highcharts);
+
 export default function TempChart({ department, rawData }: ColumnChartProps) {
   const sampleData = formatData(rawData);
   const { t } = useTranslation();
-  const chartRef = useRef<HighchartsReact.RefObject>(null);
+  const chartRef = useRef<HighchartsReactRefObject>(null);
   const [chartWidth, setChartWidth] = useState(1500);
   const { width } = useWindowDimensions();
   function generateColumnData(rawData: { [key: string]: any }) {
@@ -57,13 +60,14 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
   useEffect(() => {
     function calculateChartWidth() {
       const columnData = generateColumnData(rawData);
-      const minColumnWidth = 50;
-      const baseWidth = width / 3;
+      const minColumnWidth = 60;
+      const baseWidth = width * 0.8;
       return columnData.length * minColumnWidth + baseWidth;
     }
     const calculatedWidth = calculateChartWidth();
     setChartWidth(calculatedWidth);
   }, [width, rawData]);
+
   // TODO: I need to make sure the datalabel is visible in the chart in every window size
   const columnData = generateColumnData(rawData);
   const options: Highcharts.Options = {
@@ -73,14 +77,21 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
       // width: 1500,
       // width: chartWidth,
       // When you set the height as percentage, it will be calculated based on the width.
-      width: 0.85 * width,
+      // width: 0.67 * width,
+      // width: chartWidth ,
+      width: width * 0.65,
       plotBackgroundColor: "#EBEBEB",
       style: {
         color: "#000000",
         fontFamily: "Arial, sans-serif",
       },
       height: 600,
-
+      // Can't find anyway to remove the overflow:hidden in the container. This don't work
+      events: {
+        load: function () {
+          this.container.style.overflow = "visible";
+        },
+      },
       // options3d: {
       //   enabled: true,
       //   alpha: -2,
@@ -90,33 +101,32 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
       // },
       scrollablePlotArea: {
         // This will make the chart scrollable. If the plot area is smaller than 500px,
-        minWidth: 900,
+        minWidth: chartWidth,
         scrollPositionX: 1,
       },
-      borderWidth: 2,
-      borderColor: "#000",
+      // borderWidth: 2,
+      // borderColor: "#000",
       marginTop: 100,
       // Change the position of the title
       spacingTop: 50,
     },
-    colors: ["#595959", "#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3"],
+    colors: ["#fecaca", "#fef08a", "#d9f99d", "#a7f3d0", "#bae6fd", "#c7d2fe"],
     credits: {
       enabled: false,
     },
-    // plotOptions: {
-    //   column: {
-    //     pointPadding: 0,
-    //     borderWidth: 0,
-    //     groupPadding: 0,
-    //     depth: 50,
-    //   },
-    // },
+    plotOptions: {
+      column: {
+        pointPadding: 0.1,
+        borderWidth: 0,
+        groupPadding: 0.2,
+      },
+    },
     // TODO: Add responsive feature. I am not sure how would I approach this yet. The callback function has access to the chart object. But I don't know what data is in the chart. I might refactor the calculateChartWidth function to dynamicly calculate maxPointWidth, minPointWidth and baseWidth based on the window size(Maybe more). But I haven't figured out the correct fomula yet.
 
     title: {
       text: `${t(department)} 產品達成率`,
       style: {
-        fontSize: "1.5rem",
+        fontSize: "1rem",
         fontFamily: "Verdana, sans-serif",
         fontWeight: "bold",
         color: "#000000",
@@ -130,7 +140,7 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
         rotation: -45,
         // label under the x axis
         style: {
-          fontSize: "1rem",
+          fontSize: "0.75rem",
           fontFamily: "Verdana, sans-serif",
           color: "#666666",
         },
@@ -150,10 +160,9 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
     yAxis: {
       labels: {
         autoRotation: [0, -45],
-
         format: "{value}%",
         style: {
-          fontSize: "1rem",
+          fontSize: "0.75rem",
           fontFamily: "Verdana, sans-serif",
           color: "#666666",
         },
@@ -164,8 +173,9 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
         align: "high",
         text: "達成率",
         margin: 40,
+
         style: {
-          fontSize: "1.2rem",
+          fontSize: "1rem",
           fontWeight: "bold",
           color: "#000000",
         },
@@ -173,14 +183,12 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
         y: 50,
       },
       tickInterval: 20,
-      startOnTick: false,
-      endOnTick: false,
       gridLineColor: "#FFFFFF",
       gridLineWidth: 1.5,
       tickWidth: 1.5,
-      tickLength: 5,
+      tickLength: 1,
       tickColor: "#666666",
-      minorTickInterval: 0,
+      // minorTickInterval: 0,
       minorGridLineColor: "#FFFFFF",
       minorGridLineWidth: 0.5,
     },
@@ -204,8 +212,7 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
           verticalAlign: "top",
           y: 20,
           style: {
-            fontSize: width < 1200 ? "0.5rem" : "0.65rem",
-            fontFamily: "Verdana, sans-serif",
+            fontSize: width < 1200 ? "0.5rem" : "0.6rem",
           },
         },
       },
