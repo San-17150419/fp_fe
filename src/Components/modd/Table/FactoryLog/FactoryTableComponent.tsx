@@ -8,16 +8,26 @@ import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/ProductChart";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 
+const colors100 = [
+  'bg-[#fee2e2]',
+  'bg-[#fef9c3]',
+  'bg-[#dcfce7]',
+  'bg-[#e0f2fe]',
+  'bg-[#f3e8ff]',
+]
+
 export default function FactoryTableComponent({
   department,
   sysData,
   dateRanges,
   point = "ar",
+  index: tableNumber = 0,
 }: {
   department: string;
   sysData: any;
   dateRanges: { date_start: string; date_end: string }[];
   point?: "ar" | "pamt_p";
+  index: number;
 }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -150,7 +160,7 @@ export default function FactoryTableComponent({
             >
               {index === 0 && (
                 <Table.TableCell
-                  className="border-gray-600 bg-red-50 text-xs"
+                  className={`text-xs ${colors100[tableNumber % colors100.length]}`}
                   rowspan={visibleRows.length}
                 >
                   <button
@@ -164,7 +174,7 @@ export default function FactoryTableComponent({
                 </Table.TableCell>
               )}
 
-              <Table.TableCell className="focus-within:bg-green-300">
+              <Table.TableCell className="focus-within:bg-sky-100">
                 <ProductChart title={sysName} department={department} />
               </Table.TableCell>
               {sysData[sysName][point].map((arValue: number, index: number) => (

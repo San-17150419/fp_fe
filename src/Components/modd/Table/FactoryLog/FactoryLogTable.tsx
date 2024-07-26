@@ -11,12 +11,13 @@ export default function FactoryLogTable() {
   return (
     <div>
       {postData &&
-        Object.keys(postData).map((department: string) => (
+        Object.keys(postData).map((department: string, index) => (
           <FactoryTableComponent
             department={department}
             sysData={postData[department]}
             dateRanges={duration}
             key={department}
+            index={index}
           />
         ))}
     </div>
