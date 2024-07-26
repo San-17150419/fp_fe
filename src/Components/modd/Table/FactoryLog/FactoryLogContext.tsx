@@ -4,6 +4,8 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useMemo,
+  useCallback,
 } from "react";
 import axios from "axios";
 import {
@@ -12,8 +14,6 @@ import {
   FactoryLogRawData,
   FactoryLogContextType,
   FormattedData,
-  PreData,
-  RawData,
 } from "./FactoryLogDataType";
 import { formatFactoryLogData, transformData } from "./formatFactoryData";
 
@@ -72,53 +72,76 @@ export const FactoryLogContextProvider: React.FC<{
     fetchPreData();
   }, [preDataUrl]);
 
-  const fetchRawData: (
-    params: PostDataParams,
-  ) => Promise<FactoryLogRawData | undefined> = async ({
-    factory,
-    date_type,
-    date_start,
-  }) => {
-    setIsRequestMade(true);
-    setIsPostDataReady(false);
-    setIsTableDataReady(false);
-    try {
-      const response = await axios.post<FactoryLogRawData>(rawDataUrl, {
-        factory,
-        date_type,
-        date_start,
-      });
-      const data = response.data;
-      setDuration(data.duration);
-      setRawData(data);
-      console.log(data);
-      const postData = transformData(response.data.data);
-      setPostData(postData);
-      setIsPostDataReady(true);
-      setTableData(formatFactoryLogData(data));
-      setIsTableDataReady(true);
+  const fetchRawData = useCallback(
+    async ({
+      factory,
+      date_type,
+      date_start,
+    }: PostDataParams): Promise<FactoryLogRawData | undefined> => {
+      setIsRequestMade(true);
+      setIsPostDataReady(false);
+      setIsTableDataReady(false);
+      try {
+        const response = await axios.post<FactoryLogRawData>(rawDataUrl, {
+          factory,
+          date_type,
+          date_start,
+        });
+        const data = response.data;
+        setDuration(data.duration);
+        setRawData(data);
+        console.log(data);
+        const postData = transformData(response.data.data);
+        setPostData(postData);
+        setIsPostDataReady(true);
+        setTableData(formatFactoryLogData(data));
+        setIsTableDataReady(true);
 
-      return data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        return data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [
+      rawDataUrl,
+      setDuration,
+      setRawData,
+      transformData,
+      setPostData,
+      formatFactoryLogData,
+      setIsRequestMade,
+      setIsPostDataReady,
+      setIsTableDataReady,
+    ],
+  );
 
+  const value = useMemo(() => {
+    return {
+      preData,
+      fetchRawData,
+      isPreDataReady,
+      isRequestMade,
+      setIsRequestMade,
+      postData,
+      tableData,
+      isTableDataReady,
+      duration,
+      rawData,
+    };
+  }, [
+    preData,
+    fetchRawData,
+    isPreDataReady,
+    isRequestMade,
+    setIsRequestMade,
+    postData,
+    tableData,
+    isTableDataReady,
+    duration,
+    rawData,
+  ]);
   return (
-    <FactoryLogContext.Provider
-      value={{
-        preData,
-        fetchRawData,
-        isPreDataReady,
-        isRequestMade,
-        setIsRequestMade,
-        postData,
-        tableData,
-        isTableDataReady,
-        duration,
-        rawData
-      }}
-    >
+    <FactoryLogContext.Provider value={value}>
       {children}
     </FactoryLogContext.Provider>
   );
