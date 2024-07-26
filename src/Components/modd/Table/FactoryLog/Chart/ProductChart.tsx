@@ -10,6 +10,7 @@ import TempChart from "./TempChart";
 import ProgressBar from "./ProgressBar";
 import ProgressChart from "./ProgressChart";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
+import BubbleChart from "./BubbleChart";
 type ProductChartProps = {
   title: string;
   department: string;
@@ -21,24 +22,41 @@ export default function ProductChart({
   title: sysName,
   department,
 }: ProductChartProps) {
-  const { postData, rawData } = useFactoryLogContext();
+  const { postData, rawData, duration } = useFactoryLogContext();
   const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
   const post = rawData?.post;
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const data = postData[department][sysName];
+
+  function setCategories() {
+    const dateRange = duration.toReversed();
+    const categories: string[] = [];
+    dateRange.forEach((date: { date_start: string; date_end: string }) => {
+      if (date.date_end === "9999-12-31") {
+        categories.push(date.date_start + " 至 " + "現在");
+      }
+      categories.push(date.date_start + " 至 " + date.date_end);
+    });
+    return categories;
+  }
   const [isEventDataReady, setisEventDataReady] = useState(false);
 
   const options: Highcharts.Options = {
     credits: {
       enabled: false,
     },
+    tooltip: {
+      shared: true,
+    },
     xAxis: {
-      categories: ["區間一", "區間二", "區間三", "區間四"],
+      // categories: ["區間一", "區間二", "區間三", "區間四"],
+      categories: setCategories(),
     },
     yAxis: [
       // Primary axis
-      { labels: { align: "right", x: -3 } },
+      { labels: { align: "right", x: -3 }, title: { text: "產能" } },
+      // Secondary axis
       {
         labels: {
           align: "right",
@@ -51,49 +69,59 @@ export default function ProductChart({
         min: 0,
         title: { text: "達成率" },
         opposite: true,
+        plotLines: [
+          {
+            value: 0.85,
+            width: 2,
+            color: "#e11d48",
+            zIndex: 5,
+            label: {
+              text: "85%",
+            },
+          },
+        ],
       },
     ],
     title: {
-      text: sysName,
+      text: t(sysName),
     },
     series: [
+      // Primary yAxis (cpamt)
       {
         type: "column",
-        name: "cpamt",
+        name: t("cpamt"),
         data: data && data["cpamt"] && data["cpamt"],
-        color: "blue",
+        color: "#38bdf8", //sky-400
       },
+      // Primary yAxis (pamt)
       {
         type: "column",
-        name: "pamt",
+        name: t("pamt"),
         data: data && data["pamt"] && data["pamt"],
-        color: "green",
+        color: "#86efac", //green-300
       },
+
+      // Secondary yAxis (ar)
       {
         type: "line",
         yAxis: 1,
-        name: sysName,
+        name: t("達成率"),
         data: data && data["ar"] && data["ar"],
         color: "black",
         label: {
           formatter: function () {
-            return Number(this.name) * 100 + "%";
+            return "產能" + Number(this.name) * 100 + "%";
           },
         },
+
         tooltip: {
           valueDecimals: 2,
           valueSuffix: "%",
+
           pointFormatter: function () {
-            return (Number(this.y) * 100).toFixed(2) + "%";
+            return "產能: " + (Number(this.y) * 100).toFixed(2) + "%";
           },
         },
-      },
-      {
-        type: "line",
-        yAxis: 1,
-        name: "標準達成率",
-        data: [0.85, 0.85, 0.85, 0.85],
-        color: "red",
       },
     ],
   };
@@ -153,12 +181,13 @@ export default function ProductChart({
             constructorType={"chart"}
             options={options}
           />
-
+          <hr />
           <div>
             {eventData && (
               <TempChart department={sysName} rawData={eventData} />
             )}
           </div>
+          <hr />
           <div>
             {eventData && (
               <ProgressChart eventData={eventData}>
@@ -166,6 +195,7 @@ export default function ProductChart({
               </ProgressChart>
             )}
           </div>
+          <BubbleChart />
         </div>
       </Modal>
     </span>
