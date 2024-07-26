@@ -57,7 +57,7 @@ export default function Select({
               open ? "border-blue-300" : "border-gray-300"
             }`}
           >
-            <p className="max-w-4/5 truncate text-base ">
+            <p className="max-w-4/5 truncate text-xs ">
               {t(selectedOption.text)}
             </p>
             <PiCaretDownBold className={clsx("ml-auto duration-150", open ? "" : "rotate-180")} />
