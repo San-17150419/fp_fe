@@ -23,11 +23,12 @@ export default function ProgressChart({
   }
 
   return (
-    <div >
+    <div>
       {children}
       <div className="w-[90% mx-2 my-8 grid grid-cols-2 px-2 py-4">
-        {generateProgressChartData().map((item) => (
+        {generateProgressChartData().map((item, index) => (
           <ProgressBar
+            indexNmber={index}
             key={item.title}
             title={item.title}
             target={item.target}
