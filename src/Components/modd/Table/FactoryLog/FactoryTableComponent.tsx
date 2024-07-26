@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Table from "../TableTest/Table";
 import StatusComponent from "./StatusComponent";
-import * as XLSX from "xlsx";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import Modal from "../../Modal/NonDialogModal";
 import ColumnChart from "./Chart/ColumnChart";
