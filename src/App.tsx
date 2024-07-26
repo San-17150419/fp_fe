@@ -42,12 +42,12 @@ function App() {
       </Navbar>
       <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
-        <div className="relative flex-grow border-4 px-5 pt-5 tabletP:px-20 tabletP:pt-10 desktop:px-40 desktop:pt-20">
-          <div className="absolute right-5 top-0 flex w-full justify-end gap-3 text-xs">
+        <div className="relative flex-grow border-4 pt-4">
+          <div className="absolute right-12 top-8 flex w-full justify-end gap-3 text-xs">
             <button
               type="button"
               aria-description="change language to traditional chinese"
-              className="rounded border border-gray-400 p-2"
+              className="rounded bg-stone-200 p-2 shadow-sm shadow-gray-400"
               onClick={() => changeLanguage("zh-TW")}
             >
               {t("繁體")}
@@ -55,7 +55,7 @@ function App() {
             <button
               type="button"
               aria-description="change language to english"
-              className="rounded border border-gray-400 p-2"
+              className="rounded bg-stone-200 p-2 shadow-sm shadow-gray-400"
               onClick={() => changeLanguage("en")}
             >
               {t("英文")}
@@ -63,7 +63,7 @@ function App() {
             <button
               type="button"
               aria-description="change language to simplified chinese"
-              className="rounded border border-gray-400 p-2"
+              className="rounded bg-stone-200 p-2 shadow-sm shadow-gray-400"
               onClick={() => changeLanguage("zh-CN")}
             >
               {t("簡體")}
