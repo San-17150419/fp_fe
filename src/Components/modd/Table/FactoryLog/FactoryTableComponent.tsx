@@ -9,12 +9,12 @@ import ProductChart from "./Chart/ProductChart";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 
 const colors100 = [
-  'bg-[#fee2e2]',
-  'bg-[#fef9c3]',
-  'bg-[#dcfce7]',
-  'bg-[#e0f2fe]',
-  'bg-[#f3e8ff]',
-]
+  "bg-[#fee2e2]",
+  "bg-[#fef9c3]",
+  "bg-[#dcfce7]",
+  "bg-[#e0f2fe]",
+  "bg-[#f3e8ff]",
+];
 
 export default function FactoryTableComponent({
   department,
@@ -71,7 +71,7 @@ export default function FactoryTableComponent({
   };
 
   return (
-    <div className="rounded-md bg-gray-200 shadow shadow-gray-500">
+    <div className="rounded-md bg-white shadow shadow-gray-500">
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <ColumnChart
           allData={sysData}
@@ -108,8 +108,8 @@ export default function FactoryTableComponent({
           </div>
         </Table.TableCaption>
         <Table.TableHeader className="">
-          <Table.TableRow className="bg-gray-200">
-            <Table.TableCell className="w-1/12 border-y border-black text-xs">
+          <Table.TableRow className="bg-white">
+            <Table.TableCell className="w-[13%] border-y border-black text-xs">
               {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
@@ -166,7 +166,7 @@ export default function FactoryTableComponent({
                   <button
                     onClick={() => setIsOpen(true)}
                     type="button"
-                    className="hover rounded-md p-1"
+                    className="hover text-wrap rounded-md p-1"
                     // className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
@@ -174,7 +174,8 @@ export default function FactoryTableComponent({
                 </Table.TableCell>
               )}
 
-              <Table.TableCell className="focus-within:bg-sky-100">
+              <Table.TableCell>
+                {/* <Table.TableCell className="focus-within:bg-sky-100"> */}
                 <ProductChart title={sysName} department={department} />
               </Table.TableCell>
               {sysData[sysName][point].map((arValue: number, index: number) => (
