@@ -19,7 +19,7 @@ export default function FactoryLogPreFilter() {
   const [selectedPoint, setSelectedPoint] = useState<"ar" | "pamt_p">("ar");
   const { t } = useTranslation();
   const [dateStart, setDateStart] = useState<string>(
-    new Date(Date.now() -86400000).toISOString().split("T")[0],
+    new Date(Date.now() - 86400000 * 7).toISOString().split("T")[0],
   );
 
   const handleSubmit = useCallback(
