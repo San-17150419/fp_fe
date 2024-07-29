@@ -30,7 +30,7 @@ const HiddenRowsToggle = ({
     <div ref={dropdownRef} className="relative mt-2 w-full max-w-fit">
       <button
         type="button"
-        className="block rounded-md bg-white px-2 py-1 text-xs shadow shadow-slate-300 "
+        className="block rounded-md hover:bg-gray-300 bg-gray-200 px-2 py-1 text-xs shadow shadow-slate-400 "
         onClick={() => setOpen((prev) => !prev)}
       >
         顯示隱藏系列
