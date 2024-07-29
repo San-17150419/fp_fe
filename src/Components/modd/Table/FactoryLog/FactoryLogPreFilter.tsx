@@ -19,13 +19,8 @@ export default function FactoryLogPreFilter() {
   const [selectedPoint, setSelectedPoint] = useState<"ar" | "pamt_p">("ar");
   const { t } = useTranslation();
   const [dateStart, setDateStart] = useState<string>(
-    new Date().toISOString().slice(0, 10),
+    new Date(Date.now() -86400000).toISOString().split("T")[0],
   );
-  const selectHandlers = {
-    factory: setSelectedFactory,
-    date_type: setSelectedDateType,
-    point: setSelectedPoint,
-  };
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
