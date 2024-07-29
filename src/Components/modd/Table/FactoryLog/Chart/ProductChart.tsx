@@ -4,10 +4,9 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { useFactoryLogContext } from "../FactoryLogContext";
 import { useTranslation } from "react-i18next";
-import BulletChart from "./BulletChart";
+import ScatterChart3D from "./ScatterChart3D";
 import axios from "axios";
 import TempChart from "./TempChart";
-import ProgressBar from "./ProgressBar";
 import ProgressChart from "./ProgressChart";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
@@ -24,11 +23,9 @@ export default function ProductChart({
 }: ProductChartProps) {
   const { postData, rawData, duration } = useFactoryLogContext();
   const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
-  const post = rawData?.post;
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const data = postData[department][sysName];
-
   function setCategories() {
     const dateRange = duration.toReversed();
     const categories: string[] = [];
@@ -40,7 +37,6 @@ export default function ProductChart({
     });
     return categories;
   }
-  const [isEventDataReady, setisEventDataReady] = useState(false);
 
   const options: Highcharts.Options = {
     credits: {
@@ -50,12 +46,23 @@ export default function ProductChart({
       shared: true,
     },
     xAxis: {
-      // categories: ["區間一", "區間二", "區間三", "區間四"],
       categories: setCategories(),
     },
     yAxis: [
       // Primary axis
-      { labels: { align: "right", x: -3 }, title: { text: "產能" } },
+      {
+        labels: { align: "right", x: -3 },
+        title: {
+          text: "產能",
+          style: {
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "#000000",
+          },
+          margin: 40,
+          rotation: 0,
+        },
+      },
       // Secondary axis
       {
         labels: {
@@ -67,16 +74,31 @@ export default function ProductChart({
           },
         },
         min: 0,
-        title: { text: "達成率" },
+        title: {
+          text: "達成率",
+          style: {
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "#000000",
+          },
+          margin: 40,
+          rotation: 0,
+        },
         opposite: true,
         plotLines: [
           {
             value: 0.85,
-            width: 2,
+            width: 3,
+            dashStyle: "ShortDot",
             color: "#e11d48",
-            zIndex: 5,
+            // zIndex: 1,
             label: {
               text: "85%",
+              style: {
+                color: "red",
+                fontSize: "1.25rem",
+                textAlign: "center",
+              },
             },
           },
         ],
@@ -155,7 +177,6 @@ export default function ProductChart({
 
       setEventData(response.data);
       console.log(response.data);
-      setisEventDataReady(true);
     } catch (error) {
       console.error(error);
     }
@@ -187,15 +208,18 @@ export default function ProductChart({
               <TempChart department={sysName} rawData={eventData} />
             )}
           </div>
+
           <hr />
-          <div>
-            {eventData && (
-              <ProgressChart eventData={eventData}>
-                <div>this is title </div>
-              </ProgressChart>
-            )}
-          </div>
-          <BubbleChart />
+          {eventData && <BubbleChart eventData={eventData} />}
+          <div>{eventData && <ScatterChart3D eventData={eventData} />} </div>
+        </div>
+        <hr />
+        <div>
+          {eventData && (
+            <ProgressChart eventData={eventData}>
+              <div>this is title </div>
+            </ProgressChart>
+          )}
         </div>
       </Modal>
     </span>
