@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from "react";
-import { useFactoryLogContext } from "../FactoryLogContext";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 // import Highcharts from "highcharts/highstock";
@@ -7,7 +6,6 @@ import HighchartsExporting from "highcharts/modules/exporting";
 import { useTranslation } from "react-i18next";
 import highcharts3d from "highcharts/highcharts-3d";
 import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
-import Select from "../../../Select/Select";
 // TODO: I need to think about how to make this component more reusable. I don't think I should put data proccessing logic here.
 type ColumnChartProps = {
   title: string;
@@ -22,7 +20,6 @@ export default function ColumnChart({
   allData,
   visibleRows,
 }: ColumnChartProps) {
-  const { postData } = useFactoryLogContext();
   const { t } = useTranslation();
   const chartRef = useRef<HighchartsReact.RefObject>(null);
   const [chartWidth, setChartWidth] = useState(1500);
@@ -59,7 +56,7 @@ export default function ColumnChart({
       // width: 1500,
       // width: chartWidth,
       // When you set the height as percentage, it will be calculated based on the width.
-      width: width * 0.8,
+      width: width * 0.68,
       height: 600,
       options3d: {
         enabled: true,
@@ -70,7 +67,7 @@ export default function ColumnChart({
       },
       scrollablePlotArea: {
         // This will make the chart scrollable. If the plot area is smaller than 500px,
-        minWidth: 800,
+        minWidth: 700,
         scrollPositionX: 1,
       },
       borderWidth: 2,
@@ -170,7 +167,6 @@ export default function ColumnChart({
 
   return (
     <div className="relative isolate">
-      1231241
       {/* TODO: I want to add a drop down menu to allow user to select which interval they want to see */}
       {/* It might not be easy to do that */}
       {/* <Select className="z-[100] w-20" name="select" options={[1, 2, 3, 4]} /> */}
