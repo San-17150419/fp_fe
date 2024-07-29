@@ -23,11 +23,11 @@ export default function ProgressBar({
   }, [achieved, target]);
 
   const backgroundColors = [
-    "bg-red-500",
-    "bg-green-400",
-    "bg-sky-400",
-    "bg-amber-400",
-    "bg-purple-500",
+    "bg-red-300",
+    "bg-green-200",
+    "bg-sky-200",
+    "bg-amber-200",
+    "bg-purple-300",
   ];
 
   const progressPercentage = (achieved / target) * 100;
@@ -42,7 +42,7 @@ export default function ProgressBar({
         <div
           aria-label={`Progress: ${progressPercentage}%`}
           role="progressbar"
-          className={`relative h-6 rounded bg-gray-600 ${backgroundColors[indexNmber % backgroundColors.length]}`}
+          className={`relative h-6 rounded ${backgroundColors[indexNmber % backgroundColors.length]}`}
           style={{ width: `${progressPercentage}%` }}
         >
           <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-gray-200">
