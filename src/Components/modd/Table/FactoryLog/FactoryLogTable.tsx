@@ -16,7 +16,7 @@ export default function FactoryLogTable() {
             department={department}
             sysData={postData[department]}
             dateRanges={duration}
-            key={department}
+            key={`factory-table-${department}-${index}`}
             index={index}
           />
         ))}
