@@ -2,10 +2,16 @@ import React, { useState, useMemo, useCallback } from "react";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import Select from "../../Select/Select";
-import { PostDataParams } from "./FactoryLogDataType";
+import ProgressBar from "./Chart/ProgressBar";
+import {
+  PostDataParams,
+  FactoryLogRawData,
+} from "./FactoryLogDataType";
 import InputBase from "../../Input/InputBase";
 import { GrSearch } from "react-icons/gr";
 import { GrDownload } from "react-icons/gr";
+import axios, { type AxiosProgressEvent } from "axios";
+import Loading from "../../../Loading";
 
 export default function FactoryLogPreFilter() {
   const { preData, isPreDataReady, fetchRawData, setIsRequestMade } =
@@ -21,10 +27,45 @@ export default function FactoryLogPreFilter() {
   const [dateStart, setDateStart] = useState<string>(
     new Date(Date.now() - 86400000 * 7).toISOString().split("T")[0],
   );
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const factoryLogAPI = process.env.FACTORY_LOG_URL as string;
+  // const handleSubmit = useCallback(
+  //   (event: React.FormEvent<HTMLFormElement>) => {
+  //     event.preventDefault();
+
+  //     if (!selectedFactory || !selectedDateType || !selectedPoint) {
+  //       console.error("Missing required fields");
+  //       return;
+  //     }
+
+  //     const params: PostDataParams = {
+  //       date_start: dateStart,
+  //       factory: selectedFactory,
+  //       date_type: selectedDateType,
+  //       point: selectedPoint,
+  //     };
+
+  //     fetchRawData(params);
+  //     setIsRequestMade(true);
+  //   },
+  //   [dateStart, fetchRawData, setIsRequestMade],
+  // );
+
+  const onDownloadProgress = (progressEvent: AxiosProgressEvent) => {
+    if (!progressEvent.total) return;
+    const percentCompleted = Math.round(
+      (progressEvent.loaded * 100) / progressEvent.total,
+    );
+    setProgress(percentCompleted);
+    console.log(percentCompleted);
+  };
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      setIsLoading(true);
 
       if (!selectedFactory || !selectedDateType || !selectedPoint) {
         console.error("Missing required fields");
@@ -38,6 +79,30 @@ export default function FactoryLogPreFilter() {
         point: selectedPoint,
       };
 
+      const fetchFactoryLogRawData = async (
+        url: string = "http://192.168.123.240:9000/api/fj/raw-data/",
+        params: PostDataParams,
+      ): Promise<FactoryLogRawData | undefined> => {
+        try {
+          const response = await axios.post<FactoryLogRawData>(url, params, {
+            onDownloadProgress: onDownloadProgress,
+          });
+
+          return response.data;
+        } catch (error) {
+          console.error(error);
+          return undefined;
+        }
+      };
+
+      const rawData = fetchFactoryLogRawData(
+        "http://192.168.123.240:9000/api/fj/raw-data/",
+        params,
+      );
+      rawData.then((data) => {
+        if (!data) return;
+        setIsLoading(false);
+      });
       fetchRawData(params);
       setIsRequestMade(true);
     },
@@ -70,76 +135,87 @@ export default function FactoryLogPreFilter() {
     setSelectedPoint(value);
   }, []);
   return (
-    <section className="min-h-[100px] border-b border-black">
-      <form id="form" onSubmit={handleSubmit} className="flex w-full">
-        <div className="flex w-full flex-grow gap-4">
-          {Object.entries(memoizedOptions).map(([key, options]) => {
-            let onSelectHandler: (value: any) => void;
-            switch (key) {
-              case "factory":
-                onSelectHandler = handleFactoryChange;
-                break;
-              case "date_type":
-                onSelectHandler = handleDateTypeChange;
-                break;
-              case "point":
-                onSelectHandler = handlePointChange;
-                break;
-              default:
-                onSelectHandler = () => {};
-            }
-            return (
-              <div key={key} className="flex w-full flex-col">
-                <label
-                  className="ml-1 mt-2 text-xs desktop:text-sm"
-                  htmlFor={key}
-                >
-                  {t(key)}
-                </label>
-                <Select
-                  key={`key-${key}`}
-                  name={key}
-                  className="my-1"
-                  onSelect={onSelectHandler}
-                  options={options}
-                />
-              </div>
-            );
-          })}
-          <div className="flex w-full flex-col">
-            <label className="ml-1 mt-2 text-xs desktop:text-sm" htmlFor="date">
-              {t("當期開始")}
-            </label>
-            <InputBase
-              type="date"
-              defaultValue={dateStart}
-              name="date"
-              id="date"
-              className="font-normal shadow shadow-slate-300"
-              onChange={(e) => setDateStart(e.target.value)}
-            />
+    <>
+      <section className="min-h-[100px] border-b border-black">
+        <form id="form" onSubmit={handleSubmit} className="flex w-full">
+          <div className="flex w-full flex-grow gap-4">
+            {Object.entries(memoizedOptions).map(([key, options]) => {
+              let onSelectHandler: (value: any) => void;
+              switch (key) {
+                case "factory":
+                  onSelectHandler = handleFactoryChange;
+                  break;
+                case "date_type":
+                  onSelectHandler = handleDateTypeChange;
+                  break;
+                case "point":
+                  onSelectHandler = handlePointChange;
+                  break;
+                default:
+                  onSelectHandler = () => {};
+              }
+              return (
+                <div key={key} className="flex w-full flex-col">
+                  <label
+                    className="ml-1 mt-2 text-xs desktop:text-sm"
+                    htmlFor={key}
+                  >
+                    {t(key)}
+                  </label>
+                  <Select
+                    key={`key-${key}`}
+                    name={key}
+                    className="my-1"
+                    onSelect={onSelectHandler}
+                    options={options}
+                  />
+                </div>
+              );
+            })}
+            <div className="flex w-full flex-col">
+              <label
+                className="ml-1 mt-2 text-xs desktop:text-sm"
+                htmlFor="date"
+              >
+                {t("當期開始")}
+              </label>
+              <InputBase
+                type="date"
+                defaultValue={dateStart}
+                name="date"
+                id="date"
+                className="font-normal shadow shadow-slate-300"
+                onChange={(e) => setDateStart(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="ml-4 flex gap-4">
-          <button
-            title="Search"
-            className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
-            type="submit"
-            form="form"
-          >
-            <GrSearch />
-          </button>
-          <button
-            type="button"
-            className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
-            onClick={() => alert("Download Excel")}
-            aria-label="Download Excel"
-          >
-            <GrDownload />
-          </button>
+          <div className="ml-4 flex gap-4">
+            <button
+              title="Search"
+              className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
+              type="submit"
+              form="form"
+            >
+              <GrSearch />
+            </button>
+            <button
+              type="button"
+              className="ml-auto mt-6 flex h-[1.875rem] w-[1.875rem] items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800 focus:shadow focus:shadow-gray-800 desktop:mt-8 desktop:h-9 desktop:w-9 desktop:text-sm"
+              onClick={() => alert("Download Excel")}
+              aria-label="Download Excel"
+            >
+              <GrDownload />
+            </button>
+          </div>
+        </form>
+      </section>
+      <div>
+        <h2>{isLoading ? <Loading /> : "Finished loading"}</h2>
+        <div>
+          {isLoading && <ProgressBar achieved={progress} target={100} />}
         </div>
-      </form>
-    </section>
+      </div>
+    </>
   );
 }

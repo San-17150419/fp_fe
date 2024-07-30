@@ -72,6 +72,7 @@ export const FactoryLogContextProvider: React.FC<{
     fetchPreData();
   }, [preDataUrl]);
 
+  // fetch fectory log raw data
   const fetchRawData = useCallback(
     async ({
       factory,
@@ -82,15 +83,27 @@ export const FactoryLogContextProvider: React.FC<{
       setIsPostDataReady(false);
       setIsTableDataReady(false);
       try {
-        const response = await axios.post<FactoryLogRawData>(rawDataUrl, {
-          factory,
-          date_type,
-          date_start,
-        });
+        const response = await axios.post<FactoryLogRawData>(
+          rawDataUrl,
+          {
+            factory,
+            date_type,
+            date_start,
+          },
+          {
+            onDownloadProgress: (progressEvent) => {
+              if (!progressEvent.total) return;
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total,
+              );
+              console.log(percentCompleted);
+            },
+          },
+        );
         const data = response.data;
         setDuration(data.duration);
         setRawData(data);
-        console.log(data);
+        console.dir(data);
         const postData = transformData(response.data.data);
         setPostData(postData);
         setIsPostDataReady(true);
