@@ -33,16 +33,24 @@ export default function Sidebar() {
   }, [location]);
 
   return (
-    <div className="relative flex w-10 bg-white px-2 pt-4" ref={sidebarRef}>
-      <GoSidebarCollapse
-        size={24}
+    <div
+      className="relative z-10 flex items-start justify-start bg-white px-2 pt-4"
+      ref={sidebarRef}
+    >
+      <button
         className={cn(
-          "mx-auto ml-auto mt-2 cursor-pointer transition-all duration-300",
-          !isOpen && "rotate-180",
-          isOpen && "rotate-0",
+          "cursor-pointer p-0 transition-all duration-100 hover:bg-sky-600",
+          // "z-10 cursor-pointer p-0 outline transition-all duration-100 hover:bg-sky-600",
+          // !isOpen && "rotate-180",
+          // isOpen && "rotate-0",
         )}
         onClick={() => setIsOpen(!isOpen)}
-      />
+        aria-label="Toggle sidebar"
+        type="button"
+      >
+        <GoSidebarCollapse size={32} />
+      </button>
+
       <Transition
         show={isOpen}
         enter="transition-all ease-out duration-500"
@@ -54,10 +62,10 @@ export default function Sidebar() {
         as={Fragment}
       >
         <div
-          
+          // 48px is from p-2 in navbar and the size of the button.
           className={cn(
-            "absolute left-10 top-0 z-50 h-full min-w-max max-w-80 bg-white px-4 py-6 transition-all duration-300",
-            !isOpen && "invisible w-0",
+            "absolute left-12 top-0 z-50 h-full min-w-max max-w-80 bg-white px-4 py-6 transition-all duration-300",
+            !isOpen && "hidden w-0",
           )}
         >
           {options.map((option) => (
@@ -67,7 +75,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 cn(
                   "block rounded-full px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200",
-                  isActive && "bg-yellow-200",// Highlight last visited link
+                  isActive && "bg-yellow-200", // Highlight last visited link
                 )
               }
               onClick={() => setLastVisited(option.path)}

@@ -43,7 +43,7 @@ function App() {
       <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
         <div className="relative flex-grow border-4 pt-4">
-          <div className="absolute right-12 top-8 flex w-full justify-end gap-3 text-xs">
+          <div className="absolute right-8 top-8 flex w-full justify-end gap-3 text-xs">
             <button
               type="button"
               aria-description="change language to traditional chinese"
