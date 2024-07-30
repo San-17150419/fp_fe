@@ -36,6 +36,19 @@ type ScatterChart3DProps = {
 
 type Options3d = Highcharts.Options & Highcharts.Chart3dOptions;
 export default function ScatterChart3D({ eventData }: ScatterChart3DProps) {
+  const [options3d, setOptions3d] = useState<Options3d | undefined>({
+    enabled: true,
+    alpha: 10,
+    beta: 20,
+    depth: 250,
+    viewDistance: 5,
+    fitToPlot: false,
+    frame: {
+      bottom: { size: 1, color: "rgba(0,0,0,0.02)" },
+      back: { size: 1, color: "rgba(0,0,0,0.04)" },
+      front: { size: 1, color: "rgba(0,0,0,0.06)" },
+    },
+  });
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
   function generateScatterData(): [number, number, number][] {
     const scatterData: [number, number, number][] = [];
@@ -54,19 +67,7 @@ export default function ScatterChart3D({ eventData }: ScatterChart3DProps) {
       margin: 100,
       type: "scatter3d",
       animation: false,
-      options3d: {
-        enabled: true,
-        alpha: 10,
-        beta: 20,
-        depth: 250,
-        viewDistance: 5,
-        fitToPlot: false,
-        frame: {
-          bottom: { size: 1, color: "rgba(0,0,0,0.02)" },
-          back: { size: 1, color: "rgba(0,0,0,0.04)" },
-          front: { size: 1, color: "rgba(0,0,0,0.06)" },
-        },
-      },
+      options3d: options3d,
     },
     title: {
       text: "Draggable box",
@@ -74,9 +75,13 @@ export default function ScatterChart3D({ eventData }: ScatterChart3DProps) {
     // subtitle: {
     //   text: "Click and drag the plot area to rotate in space",
     // },
-    // plotOptions: {
-    //   scatter: {},
-    // },
+    plotOptions: {
+      scatter: {
+        // width: 10,
+        // height: 10,
+        // depth: 10
+      },
+    },
     yAxis: {
       type: "logarithmic",
       // TODO:It seems like 3d scatter chart cannot add plotlines
@@ -175,31 +180,43 @@ export default function ScatterChart3D({ eventData }: ScatterChart3DProps) {
       function drag(eventMove: MouseEvent | TouchEvent) {
         const eMove = chart.pointer.normalize(eventMove);
         if (alpha === undefined || beta === undefined) {
+          console.log("alpha or beta is undefined");
           return;
         }
-        chart.update({
-          chart: {
-            options3d: {
-              alpha: alpha + (eMove.chartY - posY) / sensitivity,
-              beta: beta + (posX - eMove.chartX) / sensitivity,
-            },
-          },
-        }, false, false, false);
+        setOptions3d((prev) => ({
+          ...prev,
+          alpha: alpha + (eMove.chartY - posY) / sensitivity,
+          beta: beta + (posX - eMove.chartX) / sensitivity,
+        }));
+
+        // chart.update(
+        //   {
+        //     chart: {
+        //       options3d: {
+        //         alpha: alpha + (eMove.chartY - posY) / sensitivity,
+        //         beta: beta + (posX - eMove.chartX) / sensitivity,
+        //       },
+        //     },
+        //   },
+        //   false,
+        //   false,
+        //   false,
+        // );
       }
 
       function unbindAll() {
-        eventHandlers.forEach(fn => fn());
+        eventHandlers.forEach((fn) => fn());
         eventHandlers.length = 0;
       }
 
-      eventHandlers.push(Highcharts.addEvent(document, 'mousemove', drag));
-      eventHandlers.push(Highcharts.addEvent(document, 'touchmove', drag));
-      eventHandlers.push(Highcharts.addEvent(document, 'mouseup', unbindAll));
-      eventHandlers.push(Highcharts.addEvent(document, 'touchend', unbindAll));
+      eventHandlers.push(Highcharts.addEvent(document, "mousemove", drag));
+      eventHandlers.push(Highcharts.addEvent(document, "touchmove", drag));
+      eventHandlers.push(Highcharts.addEvent(document, "mouseup", unbindAll));
+      eventHandlers.push(Highcharts.addEvent(document, "touchend", unbindAll));
     }
 
-    Highcharts.addEvent(chart.container, 'mousedown', startDrag);
-    Highcharts.addEvent(chart.container, 'touchstart', startDrag);
+    Highcharts.addEvent(chart.container, "mousedown", startDrag);
+    Highcharts.addEvent(chart.container, "touchstart", startDrag);
   }
 
   return (
