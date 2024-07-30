@@ -166,7 +166,7 @@ export default function FactoryTableComponent({
                   <button
                     onClick={() => setIsOpen(true)}
                     type="button"
-                    className="hover text-wrap rounded-md p-1"
+                    className="text-wrap rounded-md p-1 hover:opacity-90"
                     // className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
