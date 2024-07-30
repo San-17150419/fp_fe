@@ -11,7 +11,7 @@ import {
   TabPage,
   LayoutTestPage,
   FactoryLogPage,
-  ChartPage,
+  TestPage,
 } from "../pages";
 
 type LinkData = {
@@ -22,7 +22,8 @@ type LinkData = {
 };
 
 const options: LinkData[] = [
-  { index: true, text: "Home", path: "/", element: LayoutTestPage },
+  { index: true, text: "Home", path: "/", element: FactoryLogPage },
+  { text: "Test", path: "/test", element: TestPage },
   { text: "Input", path: "/input", element: InputPage },
   { text: "Select", path: "/select", element: SelectPage },
 
@@ -49,8 +50,7 @@ const options: LinkData[] = [
   { text: "Button", path: "/button", element: ButtonPage },
   { text: "Highcharts", path: "/highcharts", element: HighChartsPage },
   { text: "Tab", path: "/tab", element: TabPage },
-  { text: "Factory Log", path: "/factory-log", element: FactoryLogPage },
-  { text: "Chart", path: "/chart", element: ChartPage },
+  { text: "Factory Log", path: "/factory-log", element: LayoutTestPage },
 ];
 
 export default options;

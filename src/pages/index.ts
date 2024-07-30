@@ -11,4 +11,4 @@ export { default as HighChartsPage } from "./HighChartsPage";
 export { default as TabPage } from "./TabPage";
 export { default as LayoutTestPage } from "./LayoutTestPage";
 export { default as FactoryLogPage } from "./FactoryLog";
-export { default as ChartPage } from "./Chart";
+export { default as TestPage } from "./Test";
