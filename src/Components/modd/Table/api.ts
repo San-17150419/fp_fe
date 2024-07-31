@@ -12,8 +12,9 @@ export const getTableData = async (): Promise<FetchResult> => {
   try {
     const response: AxiosResponse<ResponseTableData> = await axios.get(API_URL);
     console.log("From api.ts: getTableData");
+    console.log(response)
     console.log(response.data);
-
+console.log('data receive ')
     return { data: response.data.demoData, error: null };
   } catch (error) {
     if (axios.isAxiosError(error)) {
