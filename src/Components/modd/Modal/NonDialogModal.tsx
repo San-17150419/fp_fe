@@ -8,7 +8,6 @@ type ModalProps = {
   isOpen: boolean;
   enter?: "leftTop" | "leftMiddle";
 };
-
 const animationVariants = {
   leftTop: {
     initial: {
@@ -55,7 +54,7 @@ export default function Modal({
           className="fixed bottom-0 left-0 right-0 top-0 z-50 flex bg-black/50"
           initial={{ opacity: 0 }}
           // The overlay is not reachable by pressing tab
-          // tabIndex={-1}
+          tabIndex={-1}
           aria-hidden="true"
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -71,7 +70,7 @@ export default function Modal({
             animate={currentVariant.animate}
             exit={currentVariant.exit}
             transition={currentVariant.transition}
-            className="relative left-1/2 top-1/2 max-h-[80%] min-h-[50%] min-w-[50%] max-w-[90%] rounded-md bg-white px-4 py-6"
+            className="relative left-1/2 top-1/2 max-h-[90%] min-h-[50%] min-w-[50%] max-w-[70%] rounded-md bg-white px-4 py-6 "
             ref={modalRef}
             role="dialog"
             aria-modal="true"
@@ -81,11 +80,11 @@ export default function Modal({
               type="button"
               onClick={onClose}
               aria-label="Close modal"
-              className="absolute right-0 top-0 z-10 h-8 w-8 rounded-full hover:bg-gray-300"
+              className="absolute right-1 top-1 z-10 h-10 w-10 text-base rounded-full hover:bg-gray-300"
             >
               X
             </button>
-            <div className="scroll-container relative max-h-full overflow-auto rounded-md">
+            <div className="scroll-container mt-4 relative max-h-full overflow-auto rounded-md">
               {children}
             </div>
           </motion.div>
