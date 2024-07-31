@@ -88,15 +88,26 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     name: string;
   }[] {
     const bubbleData: { x: number; y: number; z: number; name: string }[] = [];
-    eventData.data.forEach((event) => {
+    const calculateZ = (z: number | undefined) => {
+      const normalizedZ = z ?? 0;
+      // return normalizedZ + 1;
+      return (normalizedZ + 1) * (normalizedZ + 1);
+    };
+    let arNullCountInfo: [number, string][] = [];
+    eventData.data_mold.forEach((event) => {
+      if (event["ar"] === null) {
+        arNullCountInfo.push([event["ar"], event["prod_name"]]);
+      }
       bubbleData.push({
         x: event["ar"] * 100,
         y: event["pamt"],
-        z: event["wt"],
+        z: calculateZ(event["count_repaired"]),
         name: event["prod_name"],
       });
     });
-    console.dir(bubbleData);
+
+    console.log("arNullCountInfo", arNullCountInfo);
+    // console.dir(bubbleData);
     return bubbleData;
   }
 
@@ -110,7 +121,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     chart: {
       type: "bubble",
       plotBorderWidth: 1,
-      height: 700,
+      height: 650,
       zooming: {
         type: "xy",
       },
@@ -173,44 +184,43 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       type: "logarithmic",
       startOnTick: false,
       endOnTick: false,
-      // breaks: [{ from: 70000000, to: 100000000, breakSize: 1 }],
       title: {
         text: "產能",
+        rotation: 0,
       },
       // labels: {
       //   format: "{value} gr",
       // },
       maxPadding: 0.2,
-      // plotLines: [
-      //   {
-      //     color: "black",
-      //     width: 2,
-      //     value: 50,
-      //     label: {
-      //       align: "right",
-      //       style: {
-      //         fontStyle: "italic",
-      //       },
-      //       text: "Safe sugar intake 50g/day",
-      //       x: -10,
-      //     },
-      //     zIndex: 3,
-      //   },
-      // ],
-      // accessibility: {
-      //   rangeDescription: "Range: 0 to 160 grams.",
-      // },
+      plotLines: [
+        {
+          color: "black",
+          width: 2,
+          value: 50,
+          label: {
+            align: "right",
+            style: {
+              fontStyle: "italic",
+            },
+            text: "Safe sugar intake 50g/day",
+            x: -10,
+          },
+          zIndex: 3,
+        },
+      ],
+      accessibility: {
+        rangeDescription: "Range: 0 to 160 grams.",
+      },
     },
 
     tooltip: {
       useHTML: true,
       headerFormat: "<table>",
       pointFormat:
+        "<tr><th>產品:</th><td>{point.name} </td></tr>" +
         "<tr><th>達成率:</th><td>{point.x} %</td></tr>" +
         "<tr><th>產能:</th><td>{point.y}</td></tr>" +
         "<tr><th>工時:</th><td>{point.z} hr</td></tr>",
-      footerFormat: "</table>",
-      followPointer: true,
     },
 
     plotOptions: {
@@ -225,11 +235,21 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     series: [
       {
         type: "bubble",
-        maxSize: "10%",
+        // minSize: 2,
+        maxSize: 50,
+        minSize: 2,
+        sizeByAbsoluteValue: true,
+        dataGrouping: {
+          enabled: false,
+        },
+        jitter: {
+          x: 1.5,
+        },
         dataLabels: {
           align: "left",
           verticalAlign: "top",
           enabled: true,
+          allowOverlap: true,
           style: {
             color: "black",
             textOutline: "none",
@@ -238,7 +258,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             fontSize: "0.6rem",
           },
         },
-        // gapUnit: "relative",
+        gapUnit: "relative",
         point: {
           events: {
             click: function (event) {
@@ -255,28 +275,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         gapSize: 10,
 
         data: generateBubbleData(),
-        // data: [
-        //   { x: 95, y: 95, z: 13.8, name: "BE" },
-        //   { x: 86.5, y: 102.9, z: 14.7, name: "DE" },
-        //   { x: 80.8, y: 91.5, z: 15.8, name: "FI" },
-        //   { x: 80.4, y: 102.5, z: 12, name: "NL" },
-        //   { x: 80.3, y: 86.1, z: 11.8, name: "SE" },
-        //   { x: 78.4, y: 70.1, z: 16.6, name: "ES" },
-        //   { x: 74.2, y: 68.5, z: 14.5, name: "FR" },
-        //   { x: 73.5, y: 83.1, z: 10, name: "NO" },
-        //   { x: 71, y: 93.2, z: 24.7, name: "UK" },
-        //   { x: 69.2, y: 57.6, z: 10.4, name: "IT" },
-        //   { x: 68.6, y: 20, z: 16, name: "RU" },
-        //   {
-        //     x: 65.5,
-        //     y: 126.4,
-        //     z: 35.3,
-        //     name: "US",
-        //   },
-        //   { x: 65.4, y: 50.8, z: 28.5, name: "HU" },
-        //   { x: 63.4, y: 51.8, z: 15.4, name: "PT" },
-        //   { x: 64, y: 82.9, z: 31.3, name: "NZ" },
-        // ],
       },
     ],
   };
