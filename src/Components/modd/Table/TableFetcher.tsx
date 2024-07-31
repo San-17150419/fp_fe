@@ -1,7 +1,8 @@
-import { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { TableData } from "./type";
 import translateHeader from "../../../util/translateHeader";
 import Table from "./Table";
+import Loading from "../../Loading";
 
 type TableFetcherProps = {
   fetchData: () => Promise<{ data: TableData | null; error: string | null }>;
@@ -14,6 +15,7 @@ export default function TableFetcher({
 }: TableFetcherProps) {
   const [tableData, setTableData] = useState<TableData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAndProcessData = async () => {
@@ -21,11 +23,13 @@ export default function TableFetcher({
       if (result.error) {
         setError(result.error);
         setTableData(null);
+        setIsLoading(false);
       } else {
         const processedData = processData
           ? processData(result.data as TableData)
           : result.data;
         setTableData(processedData);
+        setIsLoading(false);
       }
     };
 
@@ -36,5 +40,9 @@ export default function TableFetcher({
     return <div>Error: {error}</div>;
   }
 
-  return <Table data={tableData as TableData} header={translateHeader()} />;
+  return isLoading ? (
+    <Loading />
+  ) : (
+    <Table data={tableData as TableData} header={translateHeader()} />
+  );
 }
