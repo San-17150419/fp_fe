@@ -1,17 +1,16 @@
-/** @jsxImportSource @emotion/react */
-
 import React from "react";
 import ModalButton from "../Components/modd/Modal/ModalButton/ModalButton";
-import "twin.macro";
 export default function ButtonPage() {
   return (
     <div>
       <h1>ButtonPage</h1>
       <div>
-        <ModalButton tw="m-4" variant="primary">
+        <ModalButton className="m-4" variant="primary">
           Button
         </ModalButton>
-        <ModalButton variant="secondary" size='sm'>Button</ModalButton>
+        <ModalButton variant="secondary" size="sm">
+          Button
+        </ModalButton>
         <ModalButton variant="cancel">Button</ModalButton>
         <ModalButton variant="submit">Button</ModalButton>
         <ModalButton variant="danger">Button</ModalButton>
