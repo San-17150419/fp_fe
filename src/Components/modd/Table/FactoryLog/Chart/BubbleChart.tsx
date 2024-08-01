@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
+// import Highcharts from "highcharts/highstock";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
@@ -8,79 +9,35 @@ import BrokenAxis from "highcharts/modules/broken-axis";
 HC_more(Highcharts);
 
 BrokenAxis(Highcharts);
-
-// const options: Highcharts.Options = {
-//   chart: {
-//     type: "bubble",
-//     plotBorderWidth: 1,
-//     zooming: {
-//       type: "xy",
-//     },
-//   },
-//   legend: {
-//     enabled: false,
-//   },
-//   title: {
-//     text: "bubble chart test 1",
-//   },
-//   xAxis: {
-//     categories: [
-//       "系列一",
-//       "系列二",
-//       "系列三",
-//       "系列四",
-//       "系列五",
-//       "系列六",
-//       "系列七",
-//       "系列八",
-//       "系列九",
-//       "系列十",
-//     ],
-//     title: {
-//       text: "產能",
-//     },
-//     plotLines: [
-//       {
-//         color: "black",
-//         width: 2,
-//         value: 65,
-//         label: {
-//           rotation: 0,
-//           y: 15,
-//           style: {
-//             fontStyle: "italic",
-//           },
-//           text: "Safe fat intake 65g/day",
-//         },
-//       },
-//     ],
-//   },
-//   yAxis: {
-//     title: {
-//       text: "達成率",
-//     },
-//   },
-//   series: [
-//     {
-//       type: "bubble",
-//       data: [
-//         ["系列一", 10, 1],
-//         ["系列二", 20, 2],
-//         ["系列三", 30, 7],
-//         ["系列四", 30, 1],
-//         ["系列五", 40, 2],
-//         ["系列六", 20, 6],
-//         ["系列七", 70, 4],
-//         ["系列八", 40, 2],
-//       ],
-//     },
-//   ],
-// };
-
+// TODO: y 軸改用總模次
+// TODO: y軸橫線用最高+最低模次 除2
+// TODO: group data by sn_num and prod_name
+// TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
 };
 export default function BubbleChart({ eventData }: BubbleChartProps) {
+  // useEffect(() => {
+  //   function GroupDataBySnNum(data: FactoryEventReponse["data_mold"]) {
+  //     const groupedData: {
+  //       [key: string]: FactoryEventReponse["data_mold"][0];
+  //     } = {};
+  //     data.forEach((d) => {
+  //       if (groupedData[d["sn_num"]] === undefined) {
+  //         groupedData[d["sn_num"]] = d;
+  //       } else {
+  //         const { ar, cpamt } = groupedData[d["sn_num"]];
+  //         groupedData[d["sn_num"]] = {
+  //           ...groupedData[d["sn_num"]],
+  //           ...d,
+  //         };
+  //       }
+  //     });
+  //     return groupedData;
+  //   }
+
+  //   const groupedData = GroupDataBySnNum(eventData.data_mold);
+  // });
   function generateBubbleData(): {
     x: number;
     y: number;
@@ -90,27 +47,43 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     const bubbleData: { x: number; y: number; z: number; name: string }[] = [];
     const calculateZ = (z: number | undefined) => {
       const normalizedZ = z ?? 0;
-      // return normalizedZ + 1;
-      return (normalizedZ + 1) * (normalizedZ + 1);
+      // return (normalizedZ + 1) * (normalizedZ + 1);
+      return normalizedZ + 1;
     };
-    let arNullCountInfo: [number, string][] = [];
+
     eventData.data_mold.forEach((event) => {
-      if (event["ar"] === null) {
-        arNullCountInfo.push([event["ar"], event["prod_name"]]);
-      }
+      // if(event["sn_num"] === "04-001-04")
+      // if (event["prod_name"] === "CE2")
       bubbleData.push({
         x: event["ar"] * 100,
-        y: event["pamt"],
+        // y: event["pamt_h"],//機均產出
+        y: event["mamt"], //總模次
+        // y: event["pamt"] / event["mamt"], //總產量/總模次
         z: calculateZ(event["count_repaired"]),
-        name: event["prod_name"],
+        // name: event["prod_name"],
+        name: event["sn_num"],
       });
     });
 
-    console.log("arNullCountInfo", arNullCountInfo);
     // console.dir(bubbleData);
     return bubbleData;
   }
 
+  function createProdNameObject(eventData: FactoryEventReponse) {
+    const result: Record<string, number[]> = {};
+
+    eventData.data_mold.forEach((d) => {
+      if (!result[d["prod_name"]]) {
+        result[d["prod_name"]] = [];
+      }
+      result[d["prod_name"]].push(Number((d["pamt"] / d["mamt"]).toFixed(2)));
+    });
+
+    return result;
+  }
+
+  const prodNameObject = createProdNameObject(eventData);
+  console.dir(prodNameObject);
   const bubbleData = generateBubbleData();
   const xAxisMin = Math.min(...bubbleData.map((d) => d["x"]));
   const xAxisMax = Math.max(...bubbleData.map((d) => d["x"]));
@@ -119,14 +92,14 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
 
   const options: Highcharts.Options = {
     chart: {
-      type: "bubble",
+      type: "stock",
       plotBorderWidth: 1,
       height: 650,
+      width: 1250,
       zooming: {
         type: "xy",
       },
     },
-
     legend: {
       enabled: false,
     },
@@ -134,18 +107,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     title: {
       text: "產能與達成率",
     },
-
-    // subtitle: {
-    //   text: 'Source: <a href="http://www.euromonitor.com/">Euromonitor</a> and <a href="https://data.oecd.org/">OECD</a>',
-    // },
-
-    // accessibility: {
-    //   point: {
-    //     valueDescriptionFormat:
-    //       "{index}. {point.name}, fat: {point.x}g, " +
-    //       "sugar: {point.y}g, obesity: {point.z}%.",
-    //   },
-    // },
 
     xAxis: {
       title: {
@@ -181,7 +142,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     },
 
     yAxis: {
-      type: "logarithmic",
+      // type: "logarithmic",
       startOnTick: false,
       endOnTick: false,
       title: {
@@ -192,39 +153,25 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       //   format: "{value} gr",
       // },
       maxPadding: 0.2,
-      plotLines: [
-        {
-          color: "black",
-          width: 2,
-          value: 50,
-          label: {
-            align: "right",
-            style: {
-              fontStyle: "italic",
-            },
-            text: "Safe sugar intake 50g/day",
-            x: -10,
-          },
-          zIndex: 3,
-        },
-      ],
-      accessibility: {
-        rangeDescription: "Range: 0 to 160 grams.",
-      },
     },
 
     tooltip: {
       useHTML: true,
       headerFormat: "<table>",
-      pointFormat:
-        "<tr><th>產品:</th><td>{point.name} </td></tr>" +
-        "<tr><th>達成率:</th><td>{point.x} %</td></tr>" +
-        "<tr><th>產能:</th><td>{point.y}</td></tr>" +
-        "<tr><th>工時:</th><td>{point.z} hr</td></tr>",
+      // https://github.com/highcharts/highcharts/issues/20778
+      // the type definition of formatter doesn't include the z index
+      formatter: function () {
+        console.log(this);
+        return `產品: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 產能: ${this.point.y?.toFixed(2)} <br> 工時: ${Math.sqrt(this.point.options.z!) - 1} hr`;
+      },
     },
 
     plotOptions: {
       series: {
+        dataGrouping: {
+          enabled: true,
+          approximation: "average",
+        },
         dataLabels: {
           enabled: true,
           format: "{point.name}",
@@ -236,14 +183,14 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       {
         type: "bubble",
         // minSize: 2,
-        maxSize: 50,
+        maxSize: 30,
         minSize: 2,
         sizeByAbsoluteValue: true,
         dataGrouping: {
           enabled: false,
         },
         jitter: {
-          x: 1.5,
+          x: 2.5,
         },
         dataLabels: {
           align: "left",
@@ -258,25 +205,16 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             fontSize: "0.6rem",
           },
         },
-        gapUnit: "relative",
-        point: {
-          events: {
-            click: function (event) {
-              // console.log(event);
-
-              alert(
-                `產品:${event.point.name} \n 達成率:${event.point.x} \n 產能:${event.point.y} \n 工時:${event.point}`,
-              );
-            },
-          },
-        },
-        stacking: "stream",
-        // dataGrouping: { enabled: false, },
-        gapSize: 10,
 
         data: generateBubbleData(),
       },
     ],
   };
-  return <HighchartsReact highcharts={Highcharts} options={options} />;
+  return (
+    <HighchartsReact
+      highcharts={Highcharts}
+      options={options}
+      // constructorType="stockChart"
+    />
+  );
 }
