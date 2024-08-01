@@ -7,6 +7,7 @@ import Modal from "../../Modal/NonDialogModal";
 import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/ProductChart";
 import HiddenRowsToggle from "./ToggleHiddenRow";
+import { isToday } from "date-fns";
 
 const colors100 = [
   "bg-[#fee2e2]",
@@ -109,7 +110,7 @@ export default function FactoryTableComponent({
         </Table.TableCaption>
         <Table.TableHeader className="">
           <Table.TableRow className="bg-white">
-            <Table.TableCell className="w-[13%] border-y border-black text-xs">
+            <Table.TableCell className="w-[12%] border-y border-black text-xs">
               {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
@@ -117,7 +118,23 @@ export default function FactoryTableComponent({
             <Table.TableCell className="w-2/12 border-y border-black text-xs">
               {t("系列")}
             </Table.TableCell>
-            {Array.from({ length: 3 }).map((_, index) => (
+
+            {duration
+              .toReversed()
+              .map((date: { date_start: string; date_end: string }, index) => (
+                <Table.TableCell
+                  className="border-y border-black text-xs"
+                  key={`${department}-table-header-cell-${index}`}
+                >
+                  {t("區間") + " " + (index + 1)}
+                  <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
+                    {date.date_start || ""}
+                    <span className="whitespace-pre-wrap">到</span>
+                    {isToday(date.date_end) ? t("今天") : date.date_end || ""}
+                  </div>
+                </Table.TableCell>
+              ))}
+            {/* {Array.from({ length: 3 }).map((_, index) => (
               <Table.TableCell
                 className="border-y border-black text-xs"
                 // className="tablet:text-base text-xs desktop:text-lg"
@@ -130,16 +147,16 @@ export default function FactoryTableComponent({
                   {duration[3 - index].date_end || ""}
                 </div>
               </Table.TableCell>
-            ))}
-            <Table.TableCell className="border-y border-black text-xs">
-              {/* <Table.TableCell className="tablet:text-base border-gray-600 text-xs desktop:text-lg"> */}
+            ))} */}
+
+            {/* <Table.TableCell className="border-y border-black text-xs">
               <span>{t("區間") + " " + 4}</span>
               <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
                 {duration[0].date_start}
                 <span className="whitespace-pre-wrap">到</span>
                 <span className="whitespace-pre">至今</span>
               </div>
-            </Table.TableCell>
+            </Table.TableCell> */}
             <Table.TableCell
               colspan={2}
               className="border-y border-black text-xs"
