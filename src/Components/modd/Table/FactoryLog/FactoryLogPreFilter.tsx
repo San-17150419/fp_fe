@@ -5,6 +5,7 @@ import Select from "../../Select/Select";
 import ProgressBar from "./Chart/ProgressBar";
 import {
   PostDataParams,
+  FactoryLogPreData,
   FactoryLogRawData,
 } from "./FactoryLogDataType";
 import InputBase from "../../Input/InputBase";
@@ -210,12 +211,13 @@ export default function FactoryLogPreFilter() {
           </div>
         </form>
       </section>
-      <div>
+      {/* <div>
         <h2>{isLoading ? <Loading /> : "Finished loading"}</h2>
         <div>
           {isLoading && <ProgressBar achieved={progress} target={100} />}
+          {!isLoading && <div>{progress}%</div>}
         </div>
-      </div>
+      </div> */}
     </>
   );
 }
