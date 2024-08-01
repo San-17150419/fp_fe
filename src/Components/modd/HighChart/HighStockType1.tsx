@@ -91,6 +91,7 @@ const HighStockType1: React.FC<HighStockType1Props> = ({
       backgroundColor: "#ededeb",
       type: "stock",
     },
+
     data: {},
     time: {
       timezone: "Asia/Taipei",
@@ -234,6 +235,7 @@ const HighStockType1: React.FC<HighStockType1Props> = ({
         ],
       },
     ],
+
     responsive: {
       rules: [
         {

@@ -1,5 +1,4 @@
 import { FactoryLogRawData, LogData } from "./FactoryLogDataType";
-
 type FormattedData = {
   [key: string]: any;
 };
