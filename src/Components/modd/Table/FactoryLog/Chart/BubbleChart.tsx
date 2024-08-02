@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HighchartsReact from "highcharts-react-official";
-import Highcharts from "highcharts";
+import Highcharts, { type Series } from "highcharts";
 // import Highcharts from "highcharts/highstock";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
@@ -8,6 +8,7 @@ import BrokenAxis from "highcharts/modules/broken-axis";
 
 HC_more(Highcharts);
 
+// TODO:https://jsfiddle.net/menXU/1/ label collision
 BrokenAxis(Highcharts);
 // TODO: y 軸改用總模次
 // TODO: y軸橫線用最高+最低模次 除2
@@ -17,27 +18,6 @@ type BubbleChartProps = {
   eventData: FactoryEventReponse;
 };
 export default function BubbleChart({ eventData }: BubbleChartProps) {
-  // useEffect(() => {
-  //   function GroupDataBySnNum(data: FactoryEventReponse["data_mold"]) {
-  //     const groupedData: {
-  //       [key: string]: FactoryEventReponse["data_mold"][0];
-  //     } = {};
-  //     data.forEach((d) => {
-  //       if (groupedData[d["sn_num"]] === undefined) {
-  //         groupedData[d["sn_num"]] = d;
-  //       } else {
-  //         const { ar, cpamt } = groupedData[d["sn_num"]];
-  //         groupedData[d["sn_num"]] = {
-  //           ...groupedData[d["sn_num"]],
-  //           ...d,
-  //         };
-  //       }
-  //     });
-  //     return groupedData;
-  //   }
-
-  //   const groupedData = GroupDataBySnNum(eventData.data_mold);
-  // });
   function generateBubbleData(): {
     x: number;
     y: number;
@@ -53,7 +33,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
 
     eventData.data_mold.forEach((event) => {
       // if(event["sn_num"] === "04-001-04")
-      // if (event["prod_name"] === "CE2")
       bubbleData.push({
         x: event["ar"] * 100,
         // y: event["pamt_h"],//機均產出
@@ -69,21 +48,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     return bubbleData;
   }
 
-  function createProdNameObject(eventData: FactoryEventReponse) {
-    const result: Record<string, number[]> = {};
-
-    eventData.data_mold.forEach((d) => {
-      if (!result[d["prod_name"]]) {
-        result[d["prod_name"]] = [];
-      }
-      result[d["prod_name"]].push(Number((d["pamt"] / d["mamt"]).toFixed(2)));
-    });
-
-    return result;
-  }
-
-  const prodNameObject = createProdNameObject(eventData);
-  console.dir(prodNameObject);
   const bubbleData = generateBubbleData();
   const xAxisMin = Math.min(...bubbleData.map((d) => d["x"]));
   const xAxisMax = Math.max(...bubbleData.map((d) => d["x"]));
@@ -95,17 +59,47 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       type: "stock",
       plotBorderWidth: 1,
       height: 650,
-      width: 1250,
+      // width: 1250,
       zooming: {
         type: "xy",
       },
+      events: {
+        redraw: function () {
+          console.log("redraw");
+          console.log(this.series[0].data);
+          console.log(this.series[0].data[0].getLabelConfig().point.graphic);
+          console.log(this.series[0].data[0].getLabelConfig());
+          this.series[0].data.forEach((data) => {
+            data.x = data.x + 30;
+          });
+          // TODO: Find relevant data and use it to draw data labels.
+          // x, y is the value of the data
+          // plotX, plotY is the position of the data on the chart
+          // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
+          // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
+
+          console.log(this.series.length);
+          function staggerDataLabels(series: Highcharts.Series) {
+            const length = series.data.length;
+            // if there are less than 2 data points, do nothing.
+            if (length < 2) return;
+            for (let i = 0; i < length; i++) {
+              const point1 = series.data[i];
+              const point2 = series.data[i + 1];
+            }
+          }
+        },
+      },
+    },
+    credits: {
+      enabled: false,
     },
     legend: {
       enabled: false,
     },
 
     title: {
-      text: "產能與達成率",
+      text: "達成率/總模次/維修次數",
     },
 
     xAxis: {
@@ -115,7 +109,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       labels: {
         format: "{value} %",
       },
-      min: xAxisMin >= 20 ? xAxisMin - 10 : xAxisMin,
       plotLines: [
         {
           color: "black",
@@ -132,26 +125,24 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           zIndex: 3,
         },
       ],
-      breaks: [
-        {
-          from: 100,
-          to: 180,
-          breakSize: 10,
-        },
-      ],
+      // breaks: [
+      //   {
+      //     from: 100,
+      //     to: 180,
+      //     breakSize: 10,
+      //   },
+      // ],
     },
 
     yAxis: {
-      // type: "logarithmic",
+      type: "logarithmic",
       startOnTick: false,
       endOnTick: false,
       title: {
-        text: "產能",
+        text: "總模次",
         rotation: 0,
       },
-      // labels: {
-      //   format: "{value} gr",
-      // },
+
       maxPadding: 0.2,
     },
 
@@ -162,19 +153,16 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       // the type definition of formatter doesn't include the z index
       formatter: function () {
         console.log(this);
-        return `產品: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 產能: ${this.point.y?.toFixed(2)} <br> 工時: ${Math.sqrt(this.point.options.z!) - 1} hr`;
+        return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z! - 1} 次`;
       },
     },
 
     plotOptions: {
       series: {
-        dataGrouping: {
-          enabled: true,
-          approximation: "average",
-        },
         dataLabels: {
           enabled: true,
           format: "{point.name}",
+          allowOverlap: false,
         },
       },
     },
@@ -182,7 +170,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     series: [
       {
         type: "bubble",
-        // minSize: 2,
         maxSize: 30,
         minSize: 2,
         sizeByAbsoluteValue: true,
@@ -190,23 +177,24 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           enabled: false,
         },
         jitter: {
-          x: 2.5,
+          x: -1.5,
         },
         dataLabels: {
-          align: "left",
+          align: "center",
           verticalAlign: "top",
           enabled: true,
           allowOverlap: true,
+
+          y: -15,
           style: {
             color: "black",
             textOutline: "none",
             fontWeight: "bold",
-
-            fontSize: "0.6rem",
+            fontSize: "0.5rem",
           },
         },
 
-        data: generateBubbleData(),
+        data: generateBubbleData().slice(0, 2),
       },
     ],
   };
@@ -218,3 +206,5 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     />
   );
 }
+
+// detect if two lable is overlapping
