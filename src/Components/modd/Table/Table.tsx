@@ -46,15 +46,19 @@ function Table({ data, header }: TableProps) {
 
   const handlePrintWithReactToPrint = useReactToPrint({
     content: () => target.current,
-    // pageStyle does not work. Or at least I can't make it work.
-    pageStyle: `@page { 
-    @bottom-left {
-      content: counter(page);
-    } }`,
-    documentTitle: "My Document",
+    // pageStyle is not consistent. It varys from browser to browser and the version of the browser. If pageStyle does not work, you can wrap the print content with style tags. But so far, only the page related styles work. I still can't change the position of the page number. And somehow, after adding `@bottom-left{content: counter(page);`, the print dialog don't even have option to toggle `headers and footers`.
+    pageStyle: `@media print {
+      @page {
+        size: 5000mm 500mm;
+        margin: 0;
+      }
+    }`,
+
+    documentTitle: "My Document2",
     onBeforePrint: () => {},
     onAfterPrint: () => {
       console.log("onAfterPrint");
+      alert("onAfterPrint");
     },
   });
 
@@ -64,12 +68,12 @@ function Table({ data, header }: TableProps) {
     const canvas = await html2canvas(element);
     const data = canvas.toDataURL("image/png");
 
-    const pdf = new jsPDF();
+    const pdf = new jsPDF("l", "mm", "a4");
     const imgProperties = pdf.getImageProperties(data);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
 
-    pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(data, "PNG", 1, 5, pdfWidth, pdfHeight);
     pdf.save("print.pdf");
   };
   const handlePrintWithJsPDFAutoTable = () => {
@@ -82,15 +86,35 @@ function Table({ data, header }: TableProps) {
     // console.log(doc.getFontList());
     autoTable(doc, {
       html: "#my-table",
-
-      styles: { font: "NotoSansTC-Regular", fontStyle: "normal" },
+      headStyles: {
+        fillColor: "#d1d5db",
+        textColor: "black",
+        lineWidth: 0.1,
+        lineColor: "#94a3b8",
+      },
+      styles: {
+        font: "NotoSansTC-Regular",
+        fontStyle: "normal",
+        halign: "center",
+        lineWidth: 0.1,
+        lineColor: "#94a3b8",
+      },
+      // theme: "grid",
+      // columnStyles: { 0: { halign: "center" } },
       //didDrawPage is called after each page is drawn. Can be used to add headers or any other content that you want on each page.
       // But this hook does not know the total number of pages before it starts drawing. So I can't add something like `pageCount/totalPages` here.
       // I am not sure if other hooks can do this since the documentation of jsPDF is not clear.
+
+      didParseCell: (data) => {
+        data.settings.useCss = true;
+      },
       didDrawPage: (data) => {
+        data.settings.useCss = true;
         console.dir(data);
+        console.log(data.doc.getStyle());
         // Add page number
         const pageCount = doc.internal.pages;
+        console.log(data.table.pageCount);
         const pageSize = doc.internal.pageSize;
         const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
         const pageHeight = pageSize.height
@@ -126,7 +150,8 @@ function Table({ data, header }: TableProps) {
   // }
 
   const titles = header || Object.keys(tableData[0]);
-
+  const pageStyle = `@page{size: 500mm 500mm; margin: 0;}
+  @bottom-left{content: counter(page);}`;
   return (
     <>
       <button
