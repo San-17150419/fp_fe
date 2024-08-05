@@ -4,7 +4,6 @@ import Td from "./TableTd";
 import { useReactToPrint } from "react-to-print";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "../../../assets/fonts/NotoSansTC-Regular-normal";
 import html2canvas from "html2canvas";
 import React from "react";
 
@@ -25,6 +24,10 @@ type TableProps = {
   header?: string[];
   onRowClick?: (data: TableData) => void;
   onRowDoubleClick?: (data: TableData) => void;
+};
+
+const loadFont = () => {
+  return import("../../../assets/fonts/NotoSansTC-Regular-normal");
 };
 
 function Table({ data, header }: TableProps) {
@@ -76,11 +79,13 @@ function Table({ data, header }: TableProps) {
     pdf.addImage(data, "PNG", 1, 5, pdfWidth, pdfHeight);
     pdf.save("print.pdf");
   };
-  const handlePrintWithJsPDFAutoTable = () => {
+  const handlePrintWithJsPDFAutoTable = async () => {
     // I need to add a custom font for chinese characters to display correctly.
     // The default fonts provided by jsPDF can't display Chinese characters.
 
     // In the document, it did not said how to set the orientation. In one of the articles online I found mentioned that jsPDF can accept `landscape` and `portrait` as the parameter.
+    const { callAddFont } = await loadFont();
+    jsPDF.API.events.push(["addFonts", callAddFont]);
     const doc = new jsPDF("landscape");
     // If unsure what font is available, use doc.getFontList()
     // console.log(doc.getFontList());

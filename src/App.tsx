@@ -3,7 +3,8 @@ import { Outlet } from "react-router-dom";
 import logo from "./assets/logo_banner5.png";
 import Navbar from "./Components/modd/Navbar/Navbar";
 import { useTranslation } from "react-i18next";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, Suspense } from "react";
+import Loading from "./Components/Loading";
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -47,7 +48,9 @@ function App() {
           </button>
         </div>
         <div className="relative flex-grow border-4 pt-4">
-          <Outlet />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
         </div>
       </div>
 
