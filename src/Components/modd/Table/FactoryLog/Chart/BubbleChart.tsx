@@ -1,6 +1,5 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-// import Highcharts from "highcharts/highstock";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
@@ -9,9 +8,6 @@ HC_more(Highcharts);
 
 // TODO:https://jsfiddle.net/menXU/1/ label collision
 BrokenAxis(Highcharts);
-// TODO: y 軸改用總模次
-// TODO: y軸橫線用最高+最低模次 除2
-// TODO: group data by sn_num and prod_name
 // TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
@@ -47,48 +43,85 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     return bubbleData;
   }
 
-  const bubbleData = generateBubbleData();
-  const xAxisMin = Math.min(...bubbleData.map((d) => d["x"]));
-  const xAxisMax = Math.max(...bubbleData.map((d) => d["x"]));
-  const yAxisMin = Math.min(...bubbleData.map((d) => d["y"]));
-  const yAxisMax = Math.max(...bubbleData.map((d) => d["y"]));
+  function findMedian(arr: number[]) {
+    const sortedArr = arr.sort((a, b) => a - b);
+    const middle = Math.floor(sortedArr.length / 2);
+    if (sortedArr.length % 2 === 0) {
+      return (sortedArr[middle - 1] + sortedArr[middle]) / 2;
+    } else {
+      return sortedArr[middle];
+    }
+  }
+
+  function findAverage(arr: number[]) {
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return sum / arr.length;
+  }
+  console.log(findMedian(eventData.data_mold.map((event) => event["mamt"])));
 
   const options: Highcharts.Options = {
     chart: {
       type: "stock",
       plotBorderWidth: 1,
+
       height: 650,
       // width: 1250,
       zooming: {
         type: "xy",
       },
-      events: {
-        redraw: function () {
-          console.log("redraw");
-          console.log(this.series[0].data);
-          console.log(this.series[0].data[0].getLabelConfig().point.graphic);
-          console.log(this.series[0].data[0].getLabelConfig());
-          this.series[0].data.forEach((data) => {
-            data.x = data.x + 30;
-          });
-          // TODO: Find relevant data and use it to draw data labels.
-          // x, y is the value of the data
-          // plotX, plotY is the position of the data on the chart
-          // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
-          // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
+      // events: {
+      //   // redraw: function () {
+      //   //   console.log("redraw");
+      //   //   console.log(this.series[0].data);
+      //   //   console.log(this.series[0].data[0].getLabelConfig().point.graphic);
+      //   //   console.log(this.series[0].data[0].getLabelConfig());
+      //   //   this.series[0].data.forEach((data) => {
+      //   //     data.x = data.x + 10;
+      //   //   });
+      //   //   // TODO: Find relevant data and use it to draw data labels.
+      //   //   // x, y is the value of the data
+      //   //   // plotX, plotY is the position of the data on the chart
+      //   //   // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
+      //   //   // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
 
-          console.log(this.series.length);
-          function staggerDataLabels(series: Highcharts.Series) {
-            const length = series.data.length;
-            // if there are less than 2 data points, do nothing.
-            if (length < 2) return;
-            for (let i = 0; i < length; i++) {
-              const point1 = series.data[i];
-              const point2 = series.data[i + 1];
-            }
-          }
-        },
-      },
+      //   //   console.log(this.series.length);
+      //   //   function staggerDataLabels(series: Highcharts.Series) {
+      //   //     const length = series.data.length;
+      //   //     // if there are less than 2 data points, do nothing.
+      //   //     if (length < 2) return;
+      //   //     for (let i = 0; i < length; i++) {
+      //   //       const point1 = series.data[i];
+      //   //       const point2 = series.data[i + 1];
+      //   //     }
+      //   //   }
+      //   // },
+      //   load: function () {
+      //     console.log("redraw");
+      //     console.log(this.series[0].data);
+      //     console.log(this.series[0].data[0].getLabelConfig().point.graphic);
+      //     console.log(this.series[0].data[0].getLabelConfig());
+      //     this.series[0].data.forEach((data) => {
+      //       // data.y = data.y && data.y + 15000;
+      //       data.x = data.x + 300;
+      //     });
+      //     // TODO: Find relevant data and use it to draw data labels.
+      //     // x, y is the value of the data
+      //     // plotX, plotY is the position of the data on the chart
+      //     // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
+      //     // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
+
+      //     console.log(this.series.length);
+      //     function staggerDataLabels(series: Highcharts.Series) {
+      //       const length = series.data.length;
+      //       // if there are less than 2 data points, do nothing.
+      //       if (length < 2) return;
+      //       for (let i = 0; i < length; i++) {
+      //         const point1 = series.data[i];
+      //         const point2 = series.data[i + 1];
+      //       }
+      //     }
+      //   },
+      // },
     },
     credits: {
       enabled: false,
@@ -124,13 +157,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           zIndex: 3,
         },
       ],
-      // breaks: [
-      //   {
-      //     from: 100,
-      //     to: 180,
-      //     breakSize: 10,
-      //   },
-      // ],
     },
 
     yAxis: {
@@ -138,11 +164,36 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       startOnTick: false,
       endOnTick: false,
       title: {
+        style: {
+          fontSize: "1.25rem",
+        },
         text: "總模次",
+        margin: 40,
         rotation: 0,
       },
-
-      maxPadding: 0.2,
+      labels: {
+        style: {
+          fontSize: "0.75rem",
+        },
+      },
+      maxPadding: 0.1,
+      plotLines: [
+        {
+          color: "black",
+          width: 2,
+          value: findMedian(eventData.data_mold.map((event) => event["mamt"])),
+          // value: findAverage(eventData.data_mold.map((event) => event["mamt"])),
+          label: {
+            rotation: 0,
+            style: {
+              fontStyle: "italic",
+            },
+            text: "中間值",
+            // text: "平均值",
+          },
+          zIndex: 3,
+        },
+      ],
     },
 
     tooltip: {
@@ -193,7 +244,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           },
         },
 
-        data: generateBubbleData().slice(0, 2),
+        data: generateBubbleData(),
       },
     ],
   };
@@ -201,9 +252,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     <HighchartsReact
       highcharts={Highcharts}
       options={options}
-      // constructorType="stockChart"
     />
   );
 }
-
-// detect if two lable is overlapping
