@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import exampleImage from "../assets/highStockType3Demo.png";
 import HighStockType3 from "../Components/modd/HighChart/HighStockType3";
 import { processData } from "../Components/modd/HighChart/util/formatData";
 import {
@@ -93,7 +92,6 @@ export default function TestPage() {
           <HighStockType3 data={chartSeriesData} />
         )}
       </div>
-      <img src={exampleImage} alt="Example" />
     </div>
   );
 }

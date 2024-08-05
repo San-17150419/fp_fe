@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import example from "../assets/highStockType2Demo.png";
 import HighStockType2 from "../Components/modd/HighChart/HighStockType2";
 import { ItemPreData, Type2RawData } from "../Components/modd/HighChart/highChartTypes";
 // Define the API URL
@@ -119,7 +118,6 @@ export default function TestPage() {
           <HighStockType2 title={title} data={formattedData} />
         )}
       </div>
-      <img src={example} alt="Example" />
     </div>
   );
 }

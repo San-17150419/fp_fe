@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
+import  { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import HighStockType1 from "../Components/modd/HighChart/HighStockType1";
-import example from "../assets/highStockType1Demo.png";
 import { format, startOfMonth } from "date-fns";
 // Define the API URL
 const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";
@@ -111,7 +110,6 @@ export default function TestPage() {
         )} */}
       </div>
 
-      <img src={example} alt="Example" />
     </div>
   );
 }

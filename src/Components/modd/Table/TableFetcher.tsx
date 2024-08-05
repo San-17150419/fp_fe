@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { TableData } from "./type";
 import translateHeader from "../../../util/translateHeader";
 import Table from "./Table";

@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import { useFactoryLogContext } from "../FactoryLogContext";
 import HighchartsReact, {
   HighchartsReactRefObject,
 } from "highcharts-react-official";

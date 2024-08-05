@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosError } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ResponseTableData, Data } from "./type";
 
 const API_URL = "http://192.168.123.240:9000/api/modd/data-table";

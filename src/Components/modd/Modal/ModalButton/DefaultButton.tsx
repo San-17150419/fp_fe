@@ -1,5 +1,5 @@
 import ModalButton from "./ModalButton";
-import React, { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 export default ({ children, ...props }: ButtonProps) => (

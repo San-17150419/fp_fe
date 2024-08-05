@@ -2,17 +2,14 @@ import React, { useState, useMemo, useCallback } from "react";
 import { useFactoryLogContext } from "./FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import Select from "../../Select/Select";
-import ProgressBar from "./Chart/ProgressBar";
 import {
   PostDataParams,
-  FactoryLogPreData,
   FactoryLogRawData,
 } from "./FactoryLogDataType";
 import InputBase from "../../Input/InputBase";
 import { GrSearch } from "react-icons/gr";
 import { GrDownload } from "react-icons/gr";
 import axios, { type AxiosProgressEvent } from "axios";
-import Loading from "../../../Loading";
 
 export default function FactoryLogPreFilter() {
   const { preData, isPreDataReady, fetchRawData, setIsRequestMade } =

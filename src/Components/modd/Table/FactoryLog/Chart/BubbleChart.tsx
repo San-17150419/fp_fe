@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
 import HighchartsReact from "highcharts-react-official";
-import Highcharts, { type Series } from "highcharts";
+import Highcharts from "highcharts";
 // import Highcharts from "highcharts/highstock";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";

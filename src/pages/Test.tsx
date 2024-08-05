@@ -1,17 +1,12 @@
-import { FactoryLogContextProvider } from "../Components/modd/Table/FactoryLog/FactoryLogContext";
-import Container from "../Components/modd/Table/FactoryLog/Chart/Container";
-import BubbleChart from "../Components/modd/Table/FactoryLog/Chart/BubbleChart";
 import {
   Document,
   Page,
   Text,
   View,
   StyleSheet,
-  PDFViewer,
   pdf,
 } from "@react-pdf/renderer";
-import { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { saveAs } from "file-saver";
 export default function Chart() {
   const [file, setFile] = useState<FileList | null>(null);
@@ -56,7 +51,6 @@ export default function Chart() {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     console.log(event.target.files);
-    setFile(event.target.files);
 
     if (event.target.files) {
       // const filesNumber = event.target.files.length;

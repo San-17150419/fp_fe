@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
+import  { useState } from "react";
 import Modal from "../../../Modal/NonDialogModal";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { useFactoryLogContext } from "../FactoryLogContext";
 import { useTranslation } from "react-i18next";
-import ScatterChart3D from "./ScatterChart3D";
 import axios from "axios";
-import TempChart from "./TempChart";
-import ProgressChart from "./ProgressChart";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
 type ProductChartProps = {

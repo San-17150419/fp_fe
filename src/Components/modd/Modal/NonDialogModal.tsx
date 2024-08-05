@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef} from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
 

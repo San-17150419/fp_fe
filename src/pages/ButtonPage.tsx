@@ -1,4 +1,3 @@
-import React from "react";
 import ModalButton from "../Components/modd/Modal/ModalButton/ModalButton";
 export default function ButtonPage() {
   return (

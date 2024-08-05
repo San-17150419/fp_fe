@@ -5,7 +5,6 @@ import {
   TabPanel,
   TabPanels,
 } from "@headlessui/react";
-import { motion } from "framer-motion";
 
 function Tab() {
   return (
