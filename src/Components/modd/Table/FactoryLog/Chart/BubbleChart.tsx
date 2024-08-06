@@ -1,8 +1,9 @@
 import HighchartsReact from "highcharts-react-official";
-import Highcharts from "highcharts";
+import Highcharts, { type Series } from "highcharts";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
+import { stringify } from "flatted";
 
 HC_more(Highcharts);
 
@@ -23,18 +24,14 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     const calculateZ = (z: number | undefined) => {
       const normalizedZ = z ?? 0;
       // return (normalizedZ + 1) * (normalizedZ + 1);
-      return normalizedZ + 1;
+      return normalizedZ;
     };
 
     eventData.data_mold.forEach((event) => {
-      // if(event["sn_num"] === "04-001-04")
       bubbleData.push({
         x: event["ar"] * 100,
-        // y: event["pamt_h"],//機均產出
-        y: event["mamt"], //總模次
-        // y: event["pamt"] / event["mamt"], //總產量/總模次
+        y: event["mamt"],
         z: calculateZ(event["count_repaired"]),
-        // name: event["prod_name"],
         name: event["sn_num"],
       });
     });
@@ -58,76 +55,34 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     return sum / arr.length;
   }
   console.log(findMedian(eventData.data_mold.map((event) => event["mamt"])));
-
+  console.log("find z max value");
+  console.log(Math.max(...generateBubbleData().map((event) => event["z"])));
   const options: Highcharts.Options = {
     chart: {
-      type: "stock",
+      type: "bubble",
       plotBorderWidth: 1,
 
       height: 650,
-      // width: 1250,
       zooming: {
         type: "xy",
       },
-      // events: {
-      //   // redraw: function () {
-      //   //   console.log("redraw");
-      //   //   console.log(this.series[0].data);
-      //   //   console.log(this.series[0].data[0].getLabelConfig().point.graphic);
-      //   //   console.log(this.series[0].data[0].getLabelConfig());
-      //   //   this.series[0].data.forEach((data) => {
-      //   //     data.x = data.x + 10;
-      //   //   });
-      //   //   // TODO: Find relevant data and use it to draw data labels.
-      //   //   // x, y is the value of the data
-      //   //   // plotX, plotY is the position of the data on the chart
-      //   //   // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
-      //   //   // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
-
-      //   //   console.log(this.series.length);
-      //   //   function staggerDataLabels(series: Highcharts.Series) {
-      //   //     const length = series.data.length;
-      //   //     // if there are less than 2 data points, do nothing.
-      //   //     if (length < 2) return;
-      //   //     for (let i = 0; i < length; i++) {
-      //   //       const point1 = series.data[i];
-      //   //       const point2 = series.data[i + 1];
-      //   //     }
-      //   //   }
-      //   // },
-      //   load: function () {
-      //     console.log("redraw");
-      //     console.log(this.series[0].data);
-      //     console.log(this.series[0].data[0].getLabelConfig().point.graphic);
-      //     console.log(this.series[0].data[0].getLabelConfig());
-      //     this.series[0].data.forEach((data) => {
-      //       // data.y = data.y && data.y + 15000;
-      //       data.x = data.x + 300;
-      //     });
-      //     // TODO: Find relevant data and use it to draw data labels.
-      //     // x, y is the value of the data
-      //     // plotX, plotY is the position of the data on the chart
-      //     // marker is the size of the bubble. Including the radius of the bubble, the height of the bubble, and the width of the bubble.
-      //     // TODO: Maybe I can use `marker` to reposition the bubble. Currently, I use jitter in the series to make the bubble not overlap to a certain degree. But it is not consistent. Manually repositioning all the bubbles might be better.
-
-      //     console.log(this.series.length);
-      //     function staggerDataLabels(series: Highcharts.Series) {
-      //       const length = series.data.length;
-      //       // if there are less than 2 data points, do nothing.
-      //       if (length < 2) return;
-      //       for (let i = 0; i < length; i++) {
-      //         const point1 = series.data[i];
-      //         const point2 = series.data[i + 1];
-      //       }
-      //     }
-      //   },
-      // },
+      events: {
+        load: function () {
+          staggerDataLabels(this.series[0]);
+        },
+        redraw: function () {
+          const series = this.series[0];
+          setTimeout(() => {
+            staggerDataLabels(series);
+          }, 1000);
+        },
+      },
     },
     credits: {
       enabled: false,
     },
     legend: {
-      enabled: false,
+      enabled: true,
     },
 
     title: {
@@ -138,6 +93,12 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       title: {
         text: "達成率",
       },
+      max:
+        Math.max(
+          100,
+          Math.max(...generateBubbleData().map((event) => event["x"])),
+        ) + 5,
+      min: Math.min(...generateBubbleData().map((event) => event["x"])) - 5,
       labels: {
         format: "{value} %",
       },
@@ -203,7 +164,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       // the type definition of formatter doesn't include the z index
       formatter: function () {
         console.log(this);
-        return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z! - 1} 次`;
+        return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z} 次`;
+        // return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z! - 1} 次`;
       },
     },
 
@@ -220,14 +182,17 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     series: [
       {
         type: "bubble",
-        maxSize: 30,
-        minSize: 2,
-        sizeByAbsoluteValue: true,
+        maxSize:
+          Math.max(...generateBubbleData().map((event) => event["z"])) * 10 +
+          10,
+        minSize: 10,
+        sizeBy: "width",
+        // sizeByAbsoluteValue: true,
         dataGrouping: {
           enabled: false,
         },
         jitter: {
-          x: -1.5,
+          x: 1.5,
         },
         dataLabels: {
           align: "center",
@@ -244,14 +209,101 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           },
         },
 
+        // data: generateBubbleData().slice(0, 2),
         data: generateBubbleData(),
+      },
+      // An invisible series for maintaining visual consistency. In bubble charts, the size of the bubble is relative to the z value. Bubbles that have the lowsest z value have the smallest size which is `minSize`. If in chart A, the lowest z value is 2, then bubbles with z values of 2 will be the smallest. In chart B, the lowest z value is 0, then bubbles with z values of 0 will be the smallest. If you caompare chart A and chart B, it will looks like bubbles with z values of 2 in chart A have the same size as bubbles with z values of 0 in chart B. Visually, it can be misleading. By adding an invisible series that garantees the lowest z value is always 0, it maintains the visual consistency across charts.
+      {
+        type: "bubble",
+        data: [[999, 9999999999999, 0]],
+        legendIndex: 0,
+        visible: false,
+        showInLegend: false,
       },
     ],
   };
-  return (
-    <HighchartsReact
-      highcharts={Highcharts}
-      options={options}
-    />
-  );
+  return <HighchartsReact highcharts={Highcharts} options={options} />;
+}
+
+function staggerDataLabels(series: Highcharts.Series) {
+  console.log("from staggerDataLabels");
+  if (series.points.length < 2) {
+    return;
+  }
+  for (let i = 0; i < series.points.length - 1; i++) {
+    const pointA = series.points[i];
+    const pointB = series.points[i + 1];
+    console.log(pointA, pointB);
+    // if one of the points is undefined, skip the loop
+    if (!pointA || !pointB) {
+      return;
+    }
+    // Need to be careful after this. datalabels are type any. So there won't be any warning from typescript
+    const dataLabelA = (pointA as any).dataLabel;
+    const dataLabelB = (pointB as any).dataLabel;
+    const diff = dataLabelB.y - dataLabelA.y;
+    const h = dataLabelA.height + 4;
+    if (!dataLabelA || !dataLabelB) {
+      return;
+    }
+    if (isLabelOnLabel(pointA, pointB)) {
+      if (diff < 0)
+        dataLabelA.translate(
+          dataLabelA.translateX,
+          dataLabelA.translateY - (h + diff),
+        );
+      else
+        dataLabelB.translate(
+          dataLabelB.translateX,
+          dataLabelB.translateY - (h - diff),
+        );
+    }
+  }
+}
+
+type PartialDataLabel = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+function isLabelOnLabel(
+  pointA: Highcharts.Point,
+  pointB: Highcharts.Point,
+): boolean {
+  const dataLabelA: PartialDataLabel = (pointA as any).dataLabel;
+  const dataLabelB: PartialDataLabel = (pointB as any).dataLabel;
+  const al = dataLabelA.x - dataLabelA.width / 2;
+  const ar = dataLabelA.x + dataLabelA.width / 2;
+  const bl = dataLabelB.x - dataLabelB.width / 2;
+  const br = dataLabelB.x + dataLabelB.width / 2;
+  console.log(al, ar, bl, br);
+
+  const at = dataLabelA.y;
+  const ab = dataLabelA.y + dataLabelA.height;
+  const bt = dataLabelB.y;
+  const bb = dataLabelB.y + dataLabelB.height;
+  console.log("from isLabelOnLabel");
+  console.log(pointA, pointB);
+  if (bl > ar || br < al) {
+    return false;
+  } //overlap not possible
+  if (bt > ab || bb < at) {
+    return false;
+  } //overlap not possible
+  if (bl > al && bl < ar) {
+    return true;
+  }
+  if (br > al && br < ar) {
+    return true;
+  }
+
+  if (bt > at && bt < ab) {
+    return true;
+  }
+  if (bb > at && bb < ab) {
+    return true;
+  }
+
+  return false;
 }
