@@ -164,7 +164,6 @@ export type FactoryEventReponseMoldData = {
   pamt: number;
   pamt_h: number;
   pl: string;
-  prod_name: string;
   sn_num: string;
   sys: string;
   wt: number;
