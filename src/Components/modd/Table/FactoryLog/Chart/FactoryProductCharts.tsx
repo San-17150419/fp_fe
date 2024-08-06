@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import Modal from "../../../Modal/NonDialogModal";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
+import BubbleChart2 from "./BubbleChart2";
+import BubbleTest from "./BubbleTest";
 type ProductChartProps = {
   title: string;
   department: string;
@@ -160,6 +162,16 @@ export default function ProductChart({
       .toISOString()
       .split("T")[0];
 
+    const temp = {
+      factory: rawData.post.factory,
+      department,
+      sys: sysName,
+      date_start: endDate,
+      date_end: rawData.post.date_start,
+    };
+
+    console.log(temp);
+
     try {
       const response = await axios.post(
         "http://192.168.123.240:9000/api/fj/event-data/",
@@ -174,6 +186,7 @@ export default function ProductChart({
 
       setEventData(response.data);
       console.log(response.data);
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -200,24 +213,32 @@ export default function ProductChart({
             options={options}
           />
           <hr />
-          <div>
+          {/* <div>
             {eventData && (
               <TempChart department={sysName} rawData={eventData} />
             )}
           </div>
 
-          <hr />
-          {eventData && <BubbleChart eventData={eventData} />}
-          <div>{eventData && <ScatterChart3D eventData={eventData} />} </div>
+          <hr /> */}
+          {department === "INJ" && eventData && (
+            <BubbleChart eventData={eventData} />
+          )}
+          {department === "INJ" && eventData && (
+            <BubbleChart2 eventData={eventData} />
+          )}
+          {department === "INJ" && eventData && (
+            <BubbleTest eventData={eventData} />
+          )}
+          {/* <div>{eventData && <ScatterChart3D eventData={eventData} />} </div> */}
         </div>
         <hr />
-        <div>
+        {/* <div>
           {eventData && (
             <ProgressChart eventData={eventData}>
               <div>this is title </div>
             </ProgressChart>
           )}
-        </div>
+        </div> */}
       </Modal>
     </span>
   );
