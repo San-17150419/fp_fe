@@ -14,32 +14,80 @@ type BubbleChartProps = {
   eventData: FactoryEventReponse;
 };
 export default function BubbleChart({ eventData }: BubbleChartProps) {
+  function getColor(z: number, maxZ: number): string {
+    const red = Math.min(255, Math.round((z / maxZ) * 255));
+    return `rgb(${red}, 0, 0)`;
+  }
+
+  function generateColors(start: string, end: string, step: number) {
+    const colors = [];
+    const hex = function (x: number) {
+      const hex = x.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+    for (let i = 1; i < step; i++) {
+      var r = Math.ceil(
+        (parseInt(start.substring(1, 3), 16) * i) / step +
+          parseInt(end.substring(1, 3), 16) * (1 - i / step),
+      );
+      var g = Math.ceil(
+        (parseInt(start.substring(3, 5), 16) * i) / step +
+          parseInt(end.substring(3, 5), 16) * (1 - i / step),
+      );
+      var b = Math.ceil(
+        (parseInt(start.substring(5, 7), 16) * i) / step +
+          parseInt(end.substring(5, 7), 16) * (1 - i / step),
+      );
+
+      colors.push("#" + hex(r) + hex(g) + hex(b));
+    }
+
+    return colors;
+  }
+
   function generateBubbleData(): {
     x: number;
     y: number;
     z: number;
     name: string;
+    color: string;
   }[] {
-    const bubbleData: { x: number; y: number; z: number; name: string }[] = [];
+    const bubbleData: {
+      x: number;
+      y: number;
+      z: number;
+      name: string;
+      color: string;
+    }[] = [];
     const calculateZ = (z: number | undefined) => {
       const normalizedZ = z ?? 0;
-      // return (normalizedZ + 1) * (normalizedZ + 1);
       return normalizedZ;
     };
 
+    const maxZ = Math.max(
+      ...eventData.data_mold.map((event) =>
+        calculateZ(event["count_repaired"]),
+      ),
+    );
+
+    const colors = generateColors("#f02213", "#ff00ea", 5);
+    console.log(colors);
+
     eventData.data_mold.forEach((event) => {
+      const zValue = calculateZ(event["count_repaired"]);
+      const color = colors[event["count_repaired"] ?? 0 + 1]; // Higher zValue will be more red
+      console.log(color);
       bubbleData.push({
         x: event["ar"] * 100,
         y: event["mamt"],
-        z: calculateZ(event["count_repaired"]),
+        z: zValue,
         name: event["sn_num"],
+        color: color,
       });
     });
 
-    // console.dir(bubbleData);
     return bubbleData;
   }
-
   function findMedian(arr: number[]) {
     const sortedArr = arr.sort((a, b) => a - b);
     const middle = Math.floor(sortedArr.length / 2);
@@ -54,15 +102,16 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     const sum = arr.reduce((a, b) => a + b, 0);
     return sum / arr.length;
   }
-  console.log(findMedian(eventData.data_mold.map((event) => event["mamt"])));
-  console.log("find z max value");
-  console.log(Math.max(...generateBubbleData().map((event) => event["z"])));
+  // console.log(findMedian(eventData.data_mold.map((event) => event["mamt"])));
+  // console.log("find z max value");
+  // console.log(Math.max(...generateBubbleData().map((event) => event["z"])));
   const options: Highcharts.Options = {
     chart: {
       type: "bubble",
       plotBorderWidth: 1,
 
       height: 650,
+      width: 1250,
       zooming: {
         type: "xy",
       },
@@ -96,9 +145,20 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       max:
         Math.max(
           100,
-          Math.max(...generateBubbleData().map((event) => event["x"])),
+          Math.max(
+            ...generateBubbleData()
+              .sort((a, b) => b["x"] - a["x"])
+              .filter((value) => value["x"] !== 0 && value["x"] <= 100)
+              .map((event) => event["x"]),
+          ),
         ) + 5,
-      min: Math.min(...generateBubbleData().map((event) => event["x"])) - 5,
+      min:
+        Math.min(
+          ...generateBubbleData()
+            .sort((a, b) => b["x"] - a["x"])
+            .filter((value) => value["x"] !== 0 && value["x"] <= 100)
+            .map((event) => event["x"]),
+        ) - 5,
       labels: {
         format: "{value} %",
       },
@@ -163,7 +223,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       // https://github.com/highcharts/highcharts/issues/20778
       // the type definition of formatter doesn't include the z index
       formatter: function () {
-        console.log(this);
+        // console.log(this);
         return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z} 次`;
         // return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z! - 1} 次`;
       },
@@ -210,7 +270,11 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         },
 
         // data: generateBubbleData().slice(0, 2),
-        data: generateBubbleData(),
+        // data: generateBubbleData(),
+        data: generateBubbleData()
+          .sort((a, b) => b["x"] - a["x"])
+          .filter((value) => value["x"] !== 0 && value["x"] <= 100),
+        // data: generateBubbleData().sort((a, b) => a["x"] - b["x"]),
       },
       // An invisible series for maintaining visual consistency. In bubble charts, the size of the bubble is relative to the z value. Bubbles that have the lowsest z value have the smallest size which is `minSize`. If in chart A, the lowest z value is 2, then bubbles with z values of 2 will be the smallest. In chart B, the lowest z value is 0, then bubbles with z values of 0 will be the smallest. If you caompare chart A and chart B, it will looks like bubbles with z values of 2 in chart A have the same size as bubbles with z values of 0 in chart B. Visually, it can be misleading. By adding an invisible series that garantees the lowest z value is always 0, it maintains the visual consistency across charts.
       {
@@ -226,14 +290,14 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
 }
 
 function staggerDataLabels(series: Highcharts.Series) {
-  console.log("from staggerDataLabels");
+  // console.log("from staggerDataLabels");
   if (series.points.length < 2) {
     return;
   }
   for (let i = 0; i < series.points.length - 1; i++) {
     const pointA = series.points[i];
     const pointB = series.points[i + 1];
-    console.log(pointA, pointB);
+    // console.log(pointA, pointB);
     // if one of the points is undefined, skip the loop
     if (!pointA || !pointB) {
       return;
@@ -277,14 +341,14 @@ function isLabelOnLabel(
   const ar = dataLabelA.x + dataLabelA.width / 2;
   const bl = dataLabelB.x - dataLabelB.width / 2;
   const br = dataLabelB.x + dataLabelB.width / 2;
-  console.log(al, ar, bl, br);
+  // console.log(al, ar, bl, br);
 
   const at = dataLabelA.y;
   const ab = dataLabelA.y + dataLabelA.height;
   const bt = dataLabelB.y;
   const bb = dataLabelB.y + dataLabelB.height;
-  console.log("from isLabelOnLabel");
-  console.log(pointA, pointB);
+  // console.log("from isLabelOnLabel");
+  // console.log(pointA, pointB);
   if (bl > ar || br < al) {
     return false;
   } //overlap not possible
