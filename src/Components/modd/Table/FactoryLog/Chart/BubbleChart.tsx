@@ -1,123 +1,158 @@
 import HighchartsReact from "highcharts-react-official";
-import Highcharts, { type Series } from "highcharts";
+import Highcharts, {
+  SeriesBubbleOptions,
+  type Series,
+  type SeriesOptionsType,
+} from "highcharts";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import { stringify } from "flatted";
+import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
+import Gradient from "./test";
+import { useEffect, useState } from "react";
+import {
+  findAverage,
+  findMedian,
+  formatMoldDataForBubbleChart,
+  separateByZValue,
+  generateColors,
+} from "../../../../../util/bubbleChartUtils";
 
-HC_more(Highcharts);
-
-// TODO:https://jsfiddle.net/menXU/1/ label collision
-BrokenAxis(Highcharts);
 // TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
+// TODO:https://jsfiddle.net/menXU/1/ label collision
+
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
 };
+
+HC_more(Highcharts);
+BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
-  function getColor(z: number, maxZ: number): string {
-    const red = Math.min(255, Math.round((z / maxZ) * 255));
-    return `rgb(${red}, 0, 0)`;
-  }
+  const { width } = useWindowDimensions();
+  const [series, setSeries] = useState<
+    [x: number, y: number, z: number, name?: string, color?: string][]
+  >([]);
 
-  function generateColors(start: string, end: string, step: number) {
-    const colors = [];
-    const hex = function (x: number) {
-      const hex = x.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
+  const bubbleData = formatMoldDataForBubbleChart({
+    data_mold: eventData.data_mold,
+    xKey: "ar",
+    yKey: "pamt",
+    zKey: "count_repaired",
+    nameKey: "sn_num",
+  });
+
+  const { dataByZValue: separateData, maxZValue } =
+    separateByZValue(bubbleData);
+  const yArray = eventData.data_mold.map((event) => event["pamt"]);
+  // const yAverage = findAverage(yArray);
+  const yMedian = findMedian(yArray);
+  const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
+  const xMin =
+    Math.min(...eventData.data_mold.map((event) => event["ar"])) * 100;
+
+  const xMax =
+    Math.max(...eventData.data_mold.map((event) => event["ar"])) * 100;
+
+  const generateSeries = () => {
+    const series: SeriesBubbleOptions[] = [
+      // An invisible series for maintaining visual consistency. In bubble charts, the size of the bubble is relative to the z value. Bubbles that have the lowsest z value have the smallest size which is `minSize`. If in chart A, the lowest z value is 2, then bubbles with z values of 2 will be the smallest. In chart B, the lowest z value is 0, then bubbles with z values of 0 will be the smallest. If you caompare chart A and chart B, it will looks like bubbles with z values of 2 in chart A have the same size as bubbles with z values of 0 in chart B. Visually, it can be misleading. By adding an invisible series that garantees the lowest z value is always 0, it maintains the visual consistency across charts.
+    ];
+    // Have to cast the default config as SeriesBubbleOptions. Otherwise, when mapping through the `separateData` object, typescript will throw an error.
+    const defaultConfig: SeriesBubbleOptions = {
+      type: "bubble",
+
+      maxSize: maxZValue * 10 + 10,
+
+      minSize: 10,
+
+      sizeBy: "width",
+
+      dataGrouping: {
+        enabled: false,
+      },
+
+      jitter: {
+        x: 0.5,
+      },
+
+      dataLabels: {
+        align: "center",
+
+        verticalAlign: "top",
+
+        enabled: true,
+
+        allowOverlap: true,
+
+        y: -15,
+
+        style: {
+          color: "black",
+
+          textOutline: "none",
+
+          fontWeight: "bold",
+
+          fontSize: "0.5rem",
+        },
+      },
     };
-    for (let i = 1; i < step; i++) {
-      var r = Math.ceil(
-        (parseInt(start.substring(1, 3), 16) * i) / step +
-          parseInt(end.substring(1, 3), 16) * (1 - i / step),
-      );
-      var g = Math.ceil(
-        (parseInt(start.substring(3, 5), 16) * i) / step +
-          parseInt(end.substring(3, 5), 16) * (1 - i / step),
-      );
-      var b = Math.ceil(
-        (parseInt(start.substring(5, 7), 16) * i) / step +
-          parseInt(end.substring(5, 7), 16) * (1 - i / step),
-      );
 
-      colors.push("#" + hex(r) + hex(g) + hex(b));
-    }
-
-    return colors;
-  }
-
-  function generateBubbleData(): {
-    x: number;
-    y: number;
-    z: number;
-    name: string;
-    color: string;
-  }[] {
-    const bubbleData: {
-      x: number;
-      y: number;
-      z: number;
-      name: string;
-      color: string;
-    }[] = [];
-    const calculateZ = (z: number | undefined) => {
-      const normalizedZ = z ?? 0;
-      return normalizedZ;
-    };
-
-    const maxZ = Math.max(
-      ...eventData.data_mold.map((event) =>
-        calculateZ(event["count_repaired"]),
-      ),
-    );
-
-    const colors = generateColors("#f02213", "#ff00ea", 5);
-    console.log(colors);
-
-    eventData.data_mold.forEach((event) => {
-      const zValue = calculateZ(event["count_repaired"]);
-      const color = colors[event["count_repaired"] ?? 0 + 1]; // Higher zValue will be more red
-      console.log(color);
-      bubbleData.push({
-        x: event["ar"] * 100,
-        y: event["mamt"],
-        z: zValue,
-        name: event["sn_num"],
-        color: color,
+    Object.keys(separateData).map((key) => {
+      const numericKey = Number(key);
+      series.push({
+        ...defaultConfig,
+        data: separateData[numericKey] as Highcharts.PointOptionsObject[],
+        color: colorsArray[numericKey],
+        legendIndex: numericKey,
+        name: `維修次數: ${numericKey}`,
       });
     });
+    // Object.values(separateData).map((data, index) => {
+    //   series.push({
+    //     ...defaultConfig,
+    //     data: data as Highcharts.PointOptionsObject[],
+    //     color: colorsArray[index],
+    //     legendIndex: index,
+    //     name: `維修次數: ${index}`,
+    //   });
+    // });
+    series.push({
+      type: "bubble",
+      maxSize: maxZValue * 10 + 10,
 
-    return bubbleData;
-  }
-  function findMedian(arr: number[]) {
-    const sortedArr = arr.sort((a, b) => a - b);
-    const middle = Math.floor(sortedArr.length / 2);
-    if (sortedArr.length % 2 === 0) {
-      return (sortedArr[middle - 1] + sortedArr[middle]) / 2;
-    } else {
-      return sortedArr[middle];
-    }
-  }
+      minSize: 10,
 
-  function findAverage(arr: number[]) {
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return sum / arr.length;
-  }
-  // console.log(findMedian(eventData.data_mold.map((event) => event["mamt"])));
-  // console.log("find z max value");
-  // console.log(Math.max(...generateBubbleData().map((event) => event["z"])));
+      sizeBy: "width",
+      data: [
+        [999, 9999999999999, 0],
+        [999, 9999999999999, 1],
+      ],
+      legendIndex: 999,
+      visible: false,
+      showInLegend: false,
+    });
+
+    return series;
+  };
+
   const options: Highcharts.Options = {
     chart: {
       type: "bubble",
       plotBorderWidth: 1,
-
       height: 650,
-      width: 1250,
+      width: width * 0.67,
       zooming: {
         type: "xy",
       },
+      // TODO: Handle null values
       events: {
         load: function () {
-          staggerDataLabels(this.series[0]);
+          this.series.forEach((series) => {
+            staggerDataLabels(series);
+          });
+          // staggerDataLabels(this.series[0]);
         },
         redraw: function () {
           const series = this.series[0];
@@ -133,32 +168,15 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     legend: {
       enabled: true,
     },
-
     title: {
       text: "達成率/總模次/維修次數",
     },
-
     xAxis: {
       title: {
         text: "達成率",
       },
-      max:
-        Math.max(
-          100,
-          Math.max(
-            ...generateBubbleData()
-              .sort((a, b) => b["x"] - a["x"])
-              .filter((value) => value["x"] !== 0 && value["x"] <= 100)
-              .map((event) => event["x"]),
-          ),
-        ) + 5,
-      min:
-        Math.min(
-          ...generateBubbleData()
-            .sort((a, b) => b["x"] - a["x"])
-            .filter((value) => value["x"] !== 0 && value["x"] <= 100)
-            .map((event) => event["x"]),
-        ) - 5,
+      max: xMax + 5,
+      min: xMin - 5,
       labels: {
         format: "{value} %",
       },
@@ -179,7 +197,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         },
       ],
     },
-
     yAxis: {
       type: "logarithmic",
       startOnTick: false,
@@ -187,6 +204,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       title: {
         style: {
           fontSize: "1.25rem",
+          fontWeight: "bold",
         },
         text: "總模次",
         margin: 40,
@@ -202,8 +220,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         {
           color: "black",
           width: 2,
-          value: findMedian(eventData.data_mold.map((event) => event["mamt"])),
-          // value: findAverage(eventData.data_mold.map((event) => event["mamt"])),
+          value: yMedian,
           label: {
             rotation: 0,
             style: {
@@ -225,7 +242,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       formatter: function () {
         // console.log(this);
         return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z} 次`;
-        // return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z! - 1} 次`;
       },
     },
 
@@ -236,80 +252,46 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           format: "{point.name}",
           allowOverlap: false,
         },
+        marker: {
+          fillOpacity: 0.9,
+        },
       },
     },
 
-    series: [
-      {
-        type: "bubble",
-        maxSize:
-          Math.max(...generateBubbleData().map((event) => event["z"])) * 10 +
-          10,
-        minSize: 10,
-        sizeBy: "width",
-        // sizeByAbsoluteValue: true,
-        dataGrouping: {
-          enabled: false,
-        },
-        jitter: {
-          x: 1.5,
-        },
-        dataLabels: {
-          align: "center",
-          verticalAlign: "top",
-          enabled: true,
-          allowOverlap: true,
-
-          y: -15,
-          style: {
-            color: "black",
-            textOutline: "none",
-            fontWeight: "bold",
-            fontSize: "0.5rem",
-          },
-        },
-
-        // data: generateBubbleData().slice(0, 2),
-        // data: generateBubbleData(),
-        data: generateBubbleData()
-          .sort((a, b) => b["x"] - a["x"])
-          .filter((value) => value["x"] !== 0 && value["x"] <= 100),
-        // data: generateBubbleData().sort((a, b) => a["x"] - b["x"]),
-      },
-      // An invisible series for maintaining visual consistency. In bubble charts, the size of the bubble is relative to the z value. Bubbles that have the lowsest z value have the smallest size which is `minSize`. If in chart A, the lowest z value is 2, then bubbles with z values of 2 will be the smallest. In chart B, the lowest z value is 0, then bubbles with z values of 0 will be the smallest. If you caompare chart A and chart B, it will looks like bubbles with z values of 2 in chart A have the same size as bubbles with z values of 0 in chart B. Visually, it can be misleading. By adding an invisible series that garantees the lowest z value is always 0, it maintains the visual consistency across charts.
-      {
-        type: "bubble",
-        data: [[999, 9999999999999, 0]],
-        legendIndex: 0,
-        visible: false,
-        showInLegend: false,
-      },
-    ],
+    // series: generateSeries(),
+    series: generateSeries(),
   };
-  return <HighchartsReact highcharts={Highcharts} options={options} />;
+
+  return (
+    <>
+      <HighchartsReact highcharts={Highcharts} options={options} />
+    </>
+  );
 }
 
 function staggerDataLabels(series: Highcharts.Series) {
-  // console.log("from staggerDataLabels");
   if (series.points.length < 2) {
     return;
   }
   for (let i = 0; i < series.points.length - 1; i++) {
     const pointA = series.points[i];
     const pointB = series.points[i + 1];
-    // console.log(pointA, pointB);
+
     // if one of the points is undefined, skip the loop
     if (!pointA || !pointB) {
       return;
     }
+
     // Need to be careful after this. datalabels are type any. So there won't be any warning from typescript
     const dataLabelA = (pointA as any).dataLabel;
     const dataLabelB = (pointB as any).dataLabel;
     const diff = dataLabelB.y - dataLabelA.y;
-    const h = dataLabelA.height + 4;
+    const h = dataLabelA.height + 2;
+
     if (!dataLabelA || !dataLabelB) {
       return;
     }
+
     if (isLabelOnLabel(pointA, pointB)) {
       if (diff < 0)
         dataLabelA.translate(
@@ -341,14 +323,12 @@ function isLabelOnLabel(
   const ar = dataLabelA.x + dataLabelA.width / 2;
   const bl = dataLabelB.x - dataLabelB.width / 2;
   const br = dataLabelB.x + dataLabelB.width / 2;
-  // console.log(al, ar, bl, br);
 
   const at = dataLabelA.y;
   const ab = dataLabelA.y + dataLabelA.height;
   const bt = dataLabelB.y;
   const bb = dataLabelB.y + dataLabelB.height;
-  // console.log("from isLabelOnLabel");
-  // console.log(pointA, pointB);
+
   if (bl > ar || br < al) {
     return false;
   } //overlap not possible
