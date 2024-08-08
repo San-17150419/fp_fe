@@ -1,7 +1,4 @@
-import {
-  type FactoryEventReponse,
-  type FactoryEventReponseMoldData,
-} from "../Components/modd/Table/FactoryLog/FactoryLogDataType";
+import { type FactoryEventReponseMoldData } from "../Components/modd/Table/FactoryLog/FactoryLogDataType";
 
 /**
  * Formats a number into a hexadecimal string with a leading zero if necessary.
@@ -42,8 +39,26 @@ function generateColors(
   const endGreen = parseInt(endColor.substring(3, 5), 16);
   const endBlue = parseInt(endColor.substring(5, 7), 16);
 
+  if (numberOfColors <= 0) {
+    throw new Error("numberOfColors must be greater than 0");
+  }
+
+  if (numberOfColors === 1) {
+    colors.push(startColor);
+    return colors;
+  }
+
+  if (numberOfColors === 2) {
+    colors.push(startColor);
+    colors.push(endColor);
+    return colors;
+  }
+
   for (let i = 0; i < numberOfColors; i++) {
     const ratio = i / (numberOfColors - 1);
+    if (isNaN(ratio)) {
+      throw new Error("Unexpected error, ratio is NaN");
+    }
     const interpolatedRed = Math.round(startRed * (1 - ratio) + endRed * ratio);
     const interpolatedGreen = Math.round(
       startGreen * (1 - ratio) + endGreen * ratio,
