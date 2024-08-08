@@ -194,6 +194,89 @@ function separateByZValue(bubbleData: BubbleData[]): {
   return { maxZValue, dataByZValue };
 }
 
+function staggerDataLabels(series: Highcharts.Series) {
+  if (series.points.length < 2) {
+    return;
+  }
+  for (let i = 0; i < series.points.length - 1; i++) {
+    const pointA = series.points[i];
+    const pointB = series.points[i + 1];
+
+    // if one of the points is undefined, skip the loop
+    if (!pointA || !pointB) {
+      return;
+    }
+
+    // Need to be careful after this. datalabels are type any. So there won't be any warning from typescript
+    const dataLabelA = (pointA as any).dataLabel;
+    const dataLabelB = (pointB as any).dataLabel;
+    const diff = dataLabelB.y - dataLabelA.y;
+    const h = dataLabelA.height + 2;
+
+    if (!dataLabelA || !dataLabelB) {
+      return;
+    }
+
+    if (isLabelOnLabel(pointA, pointB)) {
+      if (diff < 0)
+        dataLabelA.translate(
+          dataLabelA.translateX,
+          dataLabelA.translateY - (h + diff),
+        );
+      else
+        dataLabelB.translate(
+          dataLabelB.translateX,
+          dataLabelB.translateY - (h - diff),
+        );
+    }
+  }
+}
+
+type PartialDataLabel = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+function isLabelOnLabel(
+  pointA: Highcharts.Point,
+  pointB: Highcharts.Point,
+): boolean {
+  const dataLabelA: PartialDataLabel = (pointA as any).dataLabel;
+  const dataLabelB: PartialDataLabel = (pointB as any).dataLabel;
+  const al = dataLabelA.x - dataLabelA.width / 2;
+  const ar = dataLabelA.x + dataLabelA.width / 2;
+  const bl = dataLabelB.x - dataLabelB.width / 2;
+  const br = dataLabelB.x + dataLabelB.width / 2;
+
+  const at = dataLabelA.y;
+  const ab = dataLabelA.y + dataLabelA.height;
+  const bt = dataLabelB.y;
+  const bb = dataLabelB.y + dataLabelB.height;
+
+  if (bl > ar || br < al) {
+    return false;
+  } //overlap not possible
+  if (bt > ab || bb < at) {
+    return false;
+  } //overlap not possible
+  if (bl > al && bl < ar) {
+    return true;
+  }
+  if (br > al && br < ar) {
+    return true;
+  }
+
+  if (bt > at && bt < ab) {
+    return true;
+  }
+  if (bb > at && bb < ab) {
+    return true;
+  }
+
+  return false;
+}
+
 export {
   formatMoldDataForBubbleChart,
   findMedian,
@@ -201,4 +284,6 @@ export {
   separateByZValue,
   generateColors,
   formatHex,
+  staggerDataLabels,
+  isLabelOnLabel,
 };
