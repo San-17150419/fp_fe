@@ -1,31 +1,25 @@
 import HighchartsReact from "highcharts-react-official";
-import Highcharts, {
-  SeriesBubbleOptions,
-  type Series,
-  type SeriesOptionsType,
-} from "highcharts";
+import Highcharts, { SeriesBubbleOptions } from "highcharts";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
-import { stringify } from "flatted";
 import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
-import Gradient from "./test";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  findAverage,
   findMedian,
   formatMoldDataForBubbleChart,
   separateByZValue,
   generateColors,
+  findAverage,
 } from "../../../../../util/bubbleChartUtils";
 
 // TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
 // TODO:https://jsfiddle.net/menXU/1/ label collision
+// TODO: Make it easier to identify which data label belongs to which bubble. Maybe increase the font size according to the z value?
 
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
 };
-
 HC_more(Highcharts);
 BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
@@ -33,6 +27,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
   const [series, setSeries] = useState<
     [x: number, y: number, z: number, name?: string, color?: string][]
   >([]);
+  console.dir(eventData);
 
   const bubbleData = formatMoldDataForBubbleChart({
     data_mold: eventData.data_mold,
@@ -42,10 +37,11 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     nameKey: "sn_num",
   });
 
+  const sysName = eventData.post.sys;
   const { dataByZValue: separateData, maxZValue } =
     separateByZValue(bubbleData);
   const yArray = eventData.data_mold.map((event) => event["pamt"]);
-  // const yAverage = findAverage(yArray);
+  const yAverage = findAverage(yArray);
   const yMedian = findMedian(yArray);
   const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
   const xMin =
@@ -75,31 +71,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       jitter: {
         x: 0.5,
       },
-
-      dataLabels: {
-        align: "center",
-
-        verticalAlign: "top",
-
-        enabled: true,
-
-        allowOverlap: true,
-
-        y: -15,
-
-        style: {
-          color: "black",
-
-          textOutline: "none",
-
-          fontWeight: "bold",
-
-          fontSize: "0.5rem",
-        },
-      },
     };
-
-    Object.keys(separateData).map((key) => {
+    Object.keys(separateData).map((key, index) => {
       const numericKey = Number(key);
       series.push({
         ...defaultConfig,
@@ -107,33 +80,29 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         color: colorsArray[numericKey],
         legendIndex: numericKey,
         name: `維修次數: ${numericKey}`,
+        dataLabels: {
+          align: "center",
+
+          verticalAlign: "top",
+
+          enabled: true,
+
+          allowOverlap: false,
+
+          y: -15,
+          zIndex: 9,
+          // zIndex: 9 + index,
+
+          style: {
+            color: "black",
+
+            fontWeight: "bold",
+
+            fontSize: "0.5rem",
+          },
+        },
       });
     });
-    // Object.values(separateData).map((data, index) => {
-    //   series.push({
-    //     ...defaultConfig,
-    //     data: data as Highcharts.PointOptionsObject[],
-    //     color: colorsArray[index],
-    //     legendIndex: index,
-    //     name: `維修次數: ${index}`,
-    //   });
-    // });
-    series.push({
-      type: "bubble",
-      maxSize: maxZValue * 10 + 10,
-
-      minSize: 10,
-
-      sizeBy: "width",
-      data: [
-        [999, 9999999999999, 0],
-        [999, 9999999999999, 1],
-      ],
-      legendIndex: 999,
-      visible: false,
-      showInLegend: false,
-    });
-
     return series;
   };
 
@@ -148,19 +117,34 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       },
       // TODO: Handle null values
       events: {
-        load: function () {
-          this.series.forEach((series) => {
-            staggerDataLabels(series);
-          });
-          // staggerDataLabels(this.series[0]);
-        },
-        redraw: function () {
-          const series = this.series[0];
-          setTimeout(() => {
-            staggerDataLabels(series);
-          }, 1000);
-        },
+        // load: function () {
+        //   this.series.forEach((series) => {
+        //     staggerDataLabels(series);
+        //   });
+        // },
+        // redraw: function () {
+        //   const series = this.series[0];
+        //   this.series.forEach((series) => {
+        //     series.points.forEach((point) => {
+        //       console.log(point);
+        //     });
+        //   });
+        //   setTimeout(() => {
+        //     staggerDataLabels(series);
+        //   }, 1000);
+        // },
       },
+    },
+    subtitle: {
+      text: `${eventData.post.date_start} ~ ${eventData.post.date_end}`,
+      style: {
+        color: "#666666",
+        padding: "15px",
+        margin: "15px",
+
+        top: "10px",
+      },
+      align: "center",
     },
     credits: {
       enabled: false,
@@ -169,13 +153,13 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       enabled: true,
     },
     title: {
-      text: "達成率/總模次/維修次數",
+      text: `${sysName} (達成率/總模次/維修次數) `,
     },
     xAxis: {
       title: {
         text: "達成率",
       },
-      max: xMax + 5,
+      max: xMax + 5 <= 100 ? 100 : xMax + 5,
       min: xMin - 5,
       labels: {
         format: "{value} %",
@@ -193,7 +177,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             },
             text: "標準產能 (85%)",
           },
-          zIndex: 3,
+          zIndex: 8,
         },
       ],
     },
@@ -203,7 +187,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       endOnTick: false,
       title: {
         style: {
-          fontSize: "1.25rem",
+          fontSize: "0.8rem",
           fontWeight: "bold",
         },
         text: "總模次",
@@ -229,19 +213,38 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             text: "中間值",
             // text: "平均值",
           },
-          zIndex: 3,
+          zIndex: 8,
+        },
+        {
+          color: "black",
+          width: 2,
+          value: yAverage,
+          label: {
+            rotation: 0,
+            style: {
+              fontStyle: "italic",
+            },
+            // text: "中間值",
+            text: "平均值",
+          },
+          zIndex: 8,
         },
       ],
     },
 
     tooltip: {
+      borderWidth: 0,
+      padding: 0,
       useHTML: true,
       headerFormat: "<table>",
+      // For me, enable followPointer is not a good experience. It feels like you're lagging.
+      // followPointer: true,
       // https://github.com/highcharts/highcharts/issues/20778
       // the type definition of formatter doesn't include the z index
       formatter: function () {
-        // console.log(this);
-        return `唯一碼: ${this.point.name} <br> 達成率: ${this.point.x.toFixed(2)} % <br> 總模次: ${this.point.y?.toFixed(2)} <br> 維修次數: ${this.point.options.z} 次`;
+        // The
+        //
+        return `<div style="text-align:left; padding: 0.5rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● 唯一碼: ${this.point.name}</p> <br> <p>● 達成率: ${this.point.x.toFixed(2)} % </p><br> <p>● 總模次: ${this.point.y?.toFixed(2)} </p><br> <p>● 維修次數: ${this.point.options.z} 次</p></div>`;
       },
     },
 
@@ -253,12 +256,10 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           allowOverlap: false,
         },
         marker: {
-          fillOpacity: 0.9,
+          fillOpacity: 1,
         },
       },
     },
-
-    // series: generateSeries(),
     series: generateSeries(),
   };
 
@@ -267,87 +268,4 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       <HighchartsReact highcharts={Highcharts} options={options} />
     </>
   );
-}
-
-function staggerDataLabels(series: Highcharts.Series) {
-  if (series.points.length < 2) {
-    return;
-  }
-  for (let i = 0; i < series.points.length - 1; i++) {
-    const pointA = series.points[i];
-    const pointB = series.points[i + 1];
-
-    // if one of the points is undefined, skip the loop
-    if (!pointA || !pointB) {
-      return;
-    }
-
-    // Need to be careful after this. datalabels are type any. So there won't be any warning from typescript
-    const dataLabelA = (pointA as any).dataLabel;
-    const dataLabelB = (pointB as any).dataLabel;
-    const diff = dataLabelB.y - dataLabelA.y;
-    const h = dataLabelA.height + 2;
-
-    if (!dataLabelA || !dataLabelB) {
-      return;
-    }
-
-    if (isLabelOnLabel(pointA, pointB)) {
-      if (diff < 0)
-        dataLabelA.translate(
-          dataLabelA.translateX,
-          dataLabelA.translateY - (h + diff),
-        );
-      else
-        dataLabelB.translate(
-          dataLabelB.translateX,
-          dataLabelB.translateY - (h - diff),
-        );
-    }
-  }
-}
-
-type PartialDataLabel = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-function isLabelOnLabel(
-  pointA: Highcharts.Point,
-  pointB: Highcharts.Point,
-): boolean {
-  const dataLabelA: PartialDataLabel = (pointA as any).dataLabel;
-  const dataLabelB: PartialDataLabel = (pointB as any).dataLabel;
-  const al = dataLabelA.x - dataLabelA.width / 2;
-  const ar = dataLabelA.x + dataLabelA.width / 2;
-  const bl = dataLabelB.x - dataLabelB.width / 2;
-  const br = dataLabelB.x + dataLabelB.width / 2;
-
-  const at = dataLabelA.y;
-  const ab = dataLabelA.y + dataLabelA.height;
-  const bt = dataLabelB.y;
-  const bb = dataLabelB.y + dataLabelB.height;
-
-  if (bl > ar || br < al) {
-    return false;
-  } //overlap not possible
-  if (bt > ab || bb < at) {
-    return false;
-  } //overlap not possible
-  if (bl > al && bl < ar) {
-    return true;
-  }
-  if (br > al && br < ar) {
-    return true;
-  }
-
-  if (bt > at && bt < ab) {
-    return true;
-  }
-  if (bb > at && bb < ab) {
-    return true;
-  }
-
-  return false;
 }
