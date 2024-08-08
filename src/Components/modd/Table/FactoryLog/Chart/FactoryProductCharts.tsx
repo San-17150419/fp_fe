@@ -7,19 +7,18 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
-import BubbleChart2 from "./BubbleChart2";
-import BubbleTest from "./BubbleTest";
+import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
 type ProductChartProps = {
   title: string;
   department: string;
 };
 
 // This component is responsible for fetching the event data from the server.
-// How do I decide the date_start and date_end?
 export default function ProductChart({
   title: sysName,
   department,
 }: ProductChartProps) {
+  const { width } = useWindowDimensions();
   const { postData, rawData, duration } = useFactoryLogContext();
   const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
   const { t } = useTranslation();
@@ -37,12 +36,29 @@ export default function ProductChart({
     return categories;
   }
 
+  Highcharts.setOptions({
+    lang: {
+      thousandsSep: ",",
+    },
+  });
   const options: Highcharts.Options = {
     credits: {
       enabled: false,
     },
+    chart: {
+      height: 600,
+      width: width * 0.67,
+    },
     tooltip: {
       shared: true,
+    },
+    plotOptions: {
+      series: {
+        marker: {
+          enabled: true,
+          symbol: "circle",
+        },
+      },
     },
     xAxis: {
       categories: setCategories(),
@@ -60,14 +76,14 @@ export default function ProductChart({
           },
           margin: 40,
           rotation: 0,
+          x: 20,
         },
       },
       // Secondary axis
       {
         labels: {
           align: "right",
-          x: -3,
-
+          x: 30,
           formatter: function () {
             return Number(this.value) * 100 + "%";
           },
@@ -82,20 +98,23 @@ export default function ProductChart({
           },
           margin: 40,
           rotation: 0,
+          x: 30,
         },
         opposite: true,
         plotLines: [
           {
             value: 0.85,
-            width: 3,
+            width: 2,
+            zIndex: 6,
             dashStyle: "ShortDot",
             color: "#e11d48",
-            // zIndex: 1,
             label: {
               text: "85%",
+              y: -15,
+              x: 20,
               style: {
                 color: "red",
-                fontSize: "1.25rem",
+                fontSize: "1rem",
                 textAlign: "center",
               },
             },
@@ -129,18 +148,21 @@ export default function ProductChart({
         name: t("達成率"),
         data: data && data["ar"] && data["ar"],
         color: "black",
-        label: {
-          formatter: function () {
-            return "產能" + Number(this.name) * 100 + "%";
-          },
-        },
 
         tooltip: {
-          valueDecimals: 2,
-          valueSuffix: "%",
-
           pointFormatter: function () {
-            return "產能: " + (Number(this.y) * 100).toFixed(2) + "%";
+            return (
+              "● " + t("產能") + ": " + (Number(this.y) * 100).toFixed(2) + "%"
+            );
+          },
+
+          valueSuffix: "%",
+        },
+        dataLabels: {
+          enabled: true,
+          y: -10,
+          formatter: function () {
+            return (Number(this.y) * 100).toFixed(2) + "%";
           },
         },
       },
@@ -149,29 +171,6 @@ export default function ProductChart({
 
   const fetchEventData = async () => {
     if (!rawData?.post) return;
-    // Use date_start as the date_end
-    // Calculate the date_start based on the date_type. For example, if the date_type is "half-year", the date_start should be 6 months ago.
-    // The problem right now is I am not sure if the event data will have missing data like rawData.
-    const startDate = new Date(rawData.post.date_start);
-    const interval = rawData.post.date_type === "half-year" ? 6 : 4;
-    const endDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth() - interval,
-      startDate.getDate(),
-    )
-      .toISOString()
-      .split("T")[0];
-
-    const temp = {
-      factory: rawData.post.factory,
-      department,
-      sys: sysName,
-      date_start: endDate,
-      date_end: rawData.post.date_start,
-    };
-
-    console.log(temp);
-
     try {
       const response = await axios.post(
         "http://192.168.123.240:9000/api/fj/event-data/",
@@ -179,14 +178,11 @@ export default function ProductChart({
           factory: rawData.post.factory,
           department,
           sys: sysName,
-          date_start: endDate,
-          date_end: rawData.post.date_start,
+          date_start: duration[0].date_start,
+          date_end: duration[0].date_end,
         },
       );
-
       setEventData(response.data);
-      console.log(response.data);
-      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -218,18 +214,10 @@ export default function ProductChart({
               <TempChart department={sysName} rawData={eventData} />
             )}
           </div>
-
           <hr /> */}
           {department === "INJ" && eventData && (
             <BubbleChart eventData={eventData} />
           )}
-          {department === "INJ" && eventData && (
-            <BubbleChart2 eventData={eventData} />
-          )}
-          {department === "INJ" && eventData && (
-            <BubbleTest eventData={eventData} />
-          )}
-          {/* <div>{eventData && <ScatterChart3D eventData={eventData} />} </div> */}
         </div>
         <hr />
         {/* <div>
