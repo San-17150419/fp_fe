@@ -136,13 +136,11 @@ export type FactoryEventReponse = {
 };
 
 export type FactoryEventResponsePostData = {
-  post: {
-    factory: Factory;
-    department: string;
-    sys: string;
-    date_start: string;
-    date_end: string;
-  };
+  factory: Factory;
+  department: string;
+  sys: string;
+  date_start: string;
+  date_end: string;
 };
 
 export type FactoryEventResponseData = {
