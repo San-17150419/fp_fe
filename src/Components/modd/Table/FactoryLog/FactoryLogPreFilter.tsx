@@ -1,19 +1,23 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { useFactoryLogContext } from "./FactoryLogContext";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Select from "../../Select/Select";
-import {
-  PostDataParams,
-  FactoryLogRawData,
-} from "./FactoryLogDataType";
+import { PostDataParams, FactoryLogRawData } from "./FactoryLogDataType";
 import InputBase from "../../Input/InputBase";
 import { GrSearch } from "react-icons/gr";
 import { GrDownload } from "react-icons/gr";
-import axios, { type AxiosProgressEvent } from "axios";
+import axios, { isAxiosError, type AxiosProgressEvent } from "axios";
+import Loading from "../../../Loading";
+import ProgressBar from "./Chart/ProgressBar";
+import { type FactoryLogPreData } from "./FactoryLogDataType";
+import FactoryLogTable from "./FactoryLogTable";
 
-export default function FactoryLogPreFilter() {
-  const { preData, isPreDataReady, fetchRawData, setIsRequestMade } =
-    useFactoryLogContext();
+type FactoryLogPreFilterProps = {
+  preData: FactoryLogPreData["preData"];
+};
+
+export default function FactoryLogPreFilter({
+  preData,
+}: FactoryLogPreFilterProps) {
   const [selectedFactory, setSelectedFactory] = useState<"GD" | "HP" | "DL">(
     "GD",
   );
@@ -27,85 +31,75 @@ export default function FactoryLogPreFilter() {
   );
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-
-  const factoryLogAPI = process.env.FACTORY_LOG_URL as string;
-  // const handleSubmit = useCallback(
-  //   (event: React.FormEvent<HTMLFormElement>) => {
-  //     event.preventDefault();
-
-  //     if (!selectedFactory || !selectedDateType || !selectedPoint) {
-  //       console.error("Missing required fields");
-  //       return;
-  //     }
-
-  //     const params: PostDataParams = {
-  //       date_start: dateStart,
-  //       factory: selectedFactory,
-  //       date_type: selectedDateType,
-  //       point: selectedPoint,
-  //     };
-
-  //     fetchRawData(params);
-  //     setIsRequestMade(true);
-  //   },
-  //   [dateStart, fetchRawData, setIsRequestMade],
-  // );
+  const [factoryLogRawData, setFactoryLogRawData] =
+    useState<FactoryLogRawData | null>(null);
 
   const onDownloadProgress = (progressEvent: AxiosProgressEvent) => {
+    console.log(progressEvent);
     if (!progressEvent.total) return;
     const percentCompleted = Math.round(
-      (progressEvent.loaded * 100) / progressEvent.total,
+      (progressEvent.loaded / progressEvent.total) * 100,
     );
     setProgress(percentCompleted);
-    console.log(percentCompleted);
   };
 
-  const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      setIsLoading(true);
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setFactoryLogRawData(null);
+    if (!selectedFactory || !selectedDateType || !selectedPoint) {
+      console.error("Missing required fields");
+      return;
+    }
 
-      if (!selectedFactory || !selectedDateType || !selectedPoint) {
-        console.error("Missing required fields");
-        return;
-      }
+    const params: PostDataParams = {
+      date_start: dateStart,
+      factory: selectedFactory,
+      date_type: selectedDateType,
+      point: selectedPoint,
+    };
 
-      const params: PostDataParams = {
-        date_start: dateStart,
-        factory: selectedFactory,
-        date_type: selectedDateType,
-        point: selectedPoint,
-      };
-
-      const fetchFactoryLogRawData = async (
-        url: string = "http://192.168.123.240:9000/api/fj/raw-data/",
-        params: PostDataParams,
-      ): Promise<FactoryLogRawData | undefined> => {
-        try {
-          const response = await axios.post<FactoryLogRawData>(url, params, {
+    const fetchFactoryLogRawData = async (
+      url: string = "http://192.168.123.240:9000/api/fj/raw-data/",
+      params: PostDataParams,
+    ): Promise<FactoryLogRawData | undefined> => {
+      try {
+        const response = await axios
+          .post<FactoryLogRawData>(url, params, {
             onDownloadProgress: onDownloadProgress,
+          })
+          .then((response) => {
+            setTimeout(() => {
+              setProgress(0);
+              setIsLoading(false);
+            }, 500);
+            return response;
           });
-
-          return response.data;
-        } catch (error) {
-          console.error(error);
-          return undefined;
-        }
-      };
-
-      const rawData = fetchFactoryLogRawData(
-        "http://192.168.123.240:9000/api/fj/raw-data/",
-        params,
-      );
-      rawData.then((data) => {
-        if (!data) return;
         setIsLoading(false);
-      });
-      fetchRawData(params);
-      setIsRequestMade(true);
-    },
-    [dateStart, fetchRawData, setIsRequestMade],
-  );
+        console.dir(response);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        isAxiosError(error) &&
+          error.response &&
+          console.error(error.response.data);
+        // return undefined indicating that the request failed
+        return undefined;
+      }
+    };
+
+    fetchFactoryLogRawData(
+      "http://192.168.123.240:9000/api/fj/raw-data/",
+      params,
+    ).then((data) => {
+      if (!data) return;
+      setIsLoading(false);
+      setFactoryLogRawData(data);
+      // console.log(Object.keys(data.));
+      console.log(data.dep);
+      console.log(data.duration);
+    });
+  };
 
   const memoizedOptions = useMemo(() => {
     if (!preData) return {};
@@ -135,6 +129,12 @@ export default function FactoryLogPreFilter() {
   return (
     <>
       <section className="min-h-[100px] border-b border-black">
+        {isLoading && (
+          <>
+            <div>{progress}%</div>
+            <div>Loading</div>
+          </>
+        )}
         <form id="form" onSubmit={handleSubmit} className="flex w-full">
           <div className="flex w-full flex-grow gap-4">
             {Object.entries(memoizedOptions).map(([key, options]) => {
@@ -208,13 +208,10 @@ export default function FactoryLogPreFilter() {
           </div>
         </form>
       </section>
-      {/* <div>
-        <h2>{isLoading ? <Loading /> : "Finished loading"}</h2>
-        <div>
-          {isLoading && <ProgressBar achieved={progress} target={100} />}
-          {!isLoading && <div>{progress}%</div>}
-        </div>
-      </div> */}
+      {/* Show loading indicator when a request is made but data is not yet loaded */}
+      {isLoading && !factoryLogRawData && <Loading />}
+      {/* Only show table when data is loaded */}
+      {factoryLogRawData && <FactoryLogTable logData={factoryLogRawData} />}
     </>
   );
 }

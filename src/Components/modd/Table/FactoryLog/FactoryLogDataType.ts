@@ -1,5 +1,3 @@
-type GenericObject = Record<string, any>;
-
 export type FactoryLogPreData = {
   preData: PreData;
 };
@@ -21,7 +19,7 @@ export type PostDataParams = {
 };
 
 export type LogData = {
-  dep: Factory;
+  dep: string;
   data: Array<{
     date_start: string;
     date_end: string;
@@ -30,7 +28,8 @@ export type LogData = {
 };
 
 export type FactoryLogRawData = {
-  data: Temp[];
+  data: LogData[];
+  dep: string;
   duration: Array<{ date_start: string; date_end: string }>;
   post: {
     factory: Factory;
@@ -39,42 +38,25 @@ export type FactoryLogRawData = {
     point: "ar" | "pamt_p" | null;
   };
 };
+// export type FactoryLogRawData<F extends Factory> = {
+//   data: LogData<F>[];
+//   dep: DepartmentDictionary<F>;
+//   duration: Array<{ date_start: string; date_end: string }>;
+//   post: {
+//     factory: Factory;
+//     date_type: "half-year" | "quarter";
+//     date_start: string;
+//     point: "ar" | "pamt_p" | null;
+//   };
+// };
 
-type Temp = {
-  dep: Factory;
-  data: Array<{
-    date_start: string;
-    date_end: string;
-    raw: RawData[];
-  }>;
-};
-
-export type FactoryLogContextType = {
-  preData: FactoryLogPreData["preData"] | null;
-  fetchRawData: (
-    params: PostDataParams,
-  ) => Promise<FactoryLogRawData | undefined>;
-  isPreDataReady: boolean;
-  // isRawDataReady: boolean;
-  // rawData: FactoryLogRawData | null;
-  // isPostDataReady: boolean;
-  // departmentList: string[];
-  isRequestMade: boolean;
-  setIsRequestMade: React.Dispatch<React.SetStateAction<boolean>>;
-  // currentDepartment: string;
-  // setCurrentDepartment: React.Dispatch<React.SetStateAction<string>>;
-  // processedData: FormattedData | null;
-  // isProcessedDataReady: boolean;
-  postData: Record<string, any>;
-  tableData: FormattedData | null;
-  isTableDataReady: boolean;
-  duration: Array<{ date_start: string; date_end: string }>;
-  rawData: FactoryLogRawData | null;
-};
-
-export type FormattedData = {
-  [key: string]: any;
-};
+// export type FormattedData<F extends Factory> = {
+//   [K in DepartmentDictionary<F> as string]: {
+//     [sys: string]: {
+//       [p in Point]: number[];
+//     };
+//   };
+// };
 
 export type Factory = "GD" | "HP" | "DL";
 
@@ -90,6 +72,11 @@ export type Point =
 
 export type DateType = "half-year" | "quarter";
 
+// export type DepartmentDictionary<F extends Factory> = {
+//   [D in Department<F>]: string;
+// };
+
+// export type DepartmentsForFactory<F extends Factory> = DepartmentMap[F];
 export type GD_Departments =
   | "INJ"
   | "CE"

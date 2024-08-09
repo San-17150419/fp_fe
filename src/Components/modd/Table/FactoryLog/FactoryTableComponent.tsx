@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Table from "../TableTest/Table";
-import StatusComponent from "./StatusComponent";
-import { useFactoryLogContext } from "./FactoryLogContext";
 import Modal from "../../Modal/NonDialogModal";
+import StatusComponent from "./StatusComponent";
 import ColumnChart from "./Chart/ColumnChart";
-import ProductChart from "./Chart/ProductChart";
+import ProductChart from "./Chart/FactoryProductCharts";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 import { isToday } from "date-fns";
-
+import { type Factory, type Department } from "./FactoryLogDataType";
 const colors100 = [
   "bg-[#fee2e2]",
   "bg-[#fef9c3]",
@@ -18,25 +17,26 @@ const colors100 = [
 ];
 
 export default function FactoryTableComponent({
+  factory,
   department,
   sysData,
-  dateRanges,
+  duration,
   point = "ar",
   index: tableNumber = 0,
 }: {
-  department: string;
+  factory: Factory;
+  department: Department<Factory>;
   sysData: any;
-  dateRanges: { date_start: string; date_end: string }[];
+  duration: { date_start: string; date_end: string }[];
   point?: "ar" | "pamt_p";
   index: number;
 }) {
+  console.log(sysData);
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [visibleRows, setVisibleRows] = useState<string[]>([]);
   const [incompleteRows, setIncompleteRows] = useState<string[]>([]);
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
-  const { duration } = useFactoryLogContext();
-
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
       sysData[system][point].includes(0),
@@ -193,7 +193,13 @@ export default function FactoryTableComponent({
 
               <Table.TableCell>
                 {/* <Table.TableCell className="focus-within:bg-sky-100"> */}
-                <ProductChart title={sysName} department={department} />
+                <ProductChart
+                  title={sysName}
+                  department={department}
+                  postData={sysData}
+                  factory={factory}
+                  duration={duration}
+                />
               </Table.TableCell>
               {sysData[sysName][point].map((arValue: number, index: number) => (
                 <Table.TableCell

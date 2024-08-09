@@ -1,21 +1,43 @@
-import { useFactoryLogContext } from "./FactoryLogContext";
 import Loading from "../../../Loading";
 import FactoryTableComponent from "./FactoryTableComponent";
+import {
+  type FactoryLogRawData,
+  type DepartmentMap,
+} from "./FactoryLogDataType";
+import { transformData } from "./formatFactoryData";
+import { useEffect, useState } from "react";
+type FactoryLogTableProps = {
+  logData: FactoryLogRawData;
+};
+export default function FactoryLogTable({ logData }: FactoryLogTableProps) {
+  // const { postData, duration, isRequestMade, isTableDataReady } =
+  //   useFactoryLogContext();
+  const [postData, setPostData] = useState<Record<string, any> | null>(null);
+  useEffect(() => {
+    const formData = transformData(logData.data);
+    setPostData(transformData(logData.data));
+  }, [logData.data]);
 
-export default function FactoryLogTable() {
-  const { postData, duration, isRequestMade, isTableDataReady } =
-    useFactoryLogContext();
-  if (!postData) return null;
-  if (!isRequestMade) return null;
-  if (!isTableDataReady) return <Loading />;
+  // Just a safe check. It should not happen since this component is only rendered when the data is ready
+  if (!postData)
+    return (
+      <div>
+        No data available <h2>This should not happen</h2>
+      </div>
+    );
+  console.log(postData);
   return (
     <div>
       {postData &&
         Object.keys(postData).map((department: string, index) => (
           <FactoryTableComponent
-            department={department}
+            factory={logData.post.factory}
+            // TODO: modify type definition to enable type checking
+            department={
+              department as DepartmentMap[typeof logData.post.factory]
+            }
             sysData={postData[department]}
-            dateRanges={duration}
+            duration={logData.duration}
             key={`factory-table-${department}-${index}`}
             index={index}
           />

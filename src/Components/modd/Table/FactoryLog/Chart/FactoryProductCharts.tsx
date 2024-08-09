@@ -2,28 +2,32 @@ import { useState } from "react";
 import Modal from "../../../Modal/NonDialogModal";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import { useFactoryLogContext } from "../FactoryLogContext";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { type FactoryEventReponse } from "../FactoryLogDataType";
+import { Factory, type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
 import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
 type ProductChartProps = {
+  factory: Factory;
+  duration: { date_start: string; date_end: string }[];
+  postData: Record<string, any>;
   title: string;
   department: string;
 };
 
 // This component is responsible for fetching the event data from the server.
 export default function ProductChart({
+  factory,
+  postData,
+  duration,
   title: sysName,
   department,
 }: ProductChartProps) {
   const { width } = useWindowDimensions();
-  const { postData, rawData, duration } = useFactoryLogContext();
   const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const data = postData[department][sysName];
+  const data = postData[sysName];
   function setCategories() {
     const dateRange = duration.toReversed();
     const categories: string[] = [];
@@ -170,12 +174,11 @@ export default function ProductChart({
   };
 
   const fetchEventData = async () => {
-    if (!rawData?.post) return;
     try {
       const response = await axios.post(
         "http://192.168.123.240:9000/api/fj/event-data/",
         {
-          factory: rawData.post.factory,
+          factory: factory,
           department,
           sys: sysName,
           date_start: duration[0].date_start,
