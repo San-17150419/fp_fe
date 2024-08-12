@@ -20,7 +20,7 @@ export default function FactoryButtons({
   const DownloadExcel = async () => {
     if (factory !== "DL" || duration === undefined) return;
     setIsLoading(true);
-    const url = "192.168.123.240:9000/api/fj/export-data/";
+    const url = "http://192.168.123.240:9000/api/fj/export-data/";
     const params = {
       factory: factory,
       duration: duration,
@@ -28,7 +28,7 @@ export default function FactoryButtons({
     try {
       const response = await axios.post(
         url,
-        { params },
+        { ...params },
         {
           responseType: "blob",
         },
@@ -40,6 +40,7 @@ export default function FactoryButtons({
       link.setAttribute("download", "factory_log.xlsx");
       document.body.appendChild(link);
       link.click();
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }

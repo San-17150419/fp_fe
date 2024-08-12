@@ -116,6 +116,7 @@ export default function FactoryLogPreFilter({
               return (
                 <FactoryPreFilterSelect
                   text={key}
+                  key={key}
                   options={options}
                   onSelect={onSelectHandler}
                 />
