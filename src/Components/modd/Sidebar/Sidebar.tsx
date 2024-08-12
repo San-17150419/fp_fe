@@ -2,12 +2,29 @@ import { useState, Fragment, useRef, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { GoSidebarCollapse } from "react-icons/go";
 import { NavLink, useLocation } from "react-router-dom";
-import options from "../../../util/SidebarLinkData";
 import cn from "../../../util/cn";
 
+// The behavior I want is after clicking the link, the sidebar remain open while the mouse is still hovering over the link. As soons as the mouse leaves the link, the sidebar closes.
+// TODO: I need to think about this behavior. One is close the sidebar whenever the mouse leaves, the other is only close the sidebar after the mouse leaves the sidebar immediately after clicking a link (or a certain amount of time, like 300ms).
 export default function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
-
+  const links: [string, string][] = [
+    ["工廠日誌", "/"],
+    ["數據表", "/table-dialog"],
+    // ["數據表", "/data-table"],
+    ["表單", "/test"],
+    ["下拉選單", "/select"],
+    ["按鈕", "/button"],
+    ["標籤", "/tab"],
+    ["圖表", "/highcharts"],
+    ["圖表2", "/highstock-type-1"],
+    ["圖表3", "/highstock-type-2"],
+    ["圖表4", "/highstock-type-3"],
+    ["輸入", "/input"],
+    ["佈局", "/layout-test"],
+    ["登入", "/login"],
+    ["保護頁面", "/protected"],
+  ];
   const [isOpen, setIsOpen] = useState(false);
   const [lastVisited, setLastVisited] = useState<string | null>(null);
   const location = useLocation();
@@ -41,8 +58,8 @@ export default function Sidebar() {
         className={cn(
           "cursor-pointer p-0 transition-all duration-100 hover:bg-sky-600",
           // "z-10 cursor-pointer p-0 outline transition-all duration-100 hover:bg-sky-600",
-          // !isOpen && "rotate-180",
-          // isOpen && "rotate-0",
+          !isOpen && "rotate-180",
+          isOpen && "rotate-0",
         )}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle sidebar"
@@ -68,19 +85,21 @@ export default function Sidebar() {
             !isOpen && "hidden w-0",
           )}
         >
-          {options.map((option) => (
+          {links.map(([text, path], index: number) => (
             <NavLink
-              key={option.text}
-              to={option.path}
+              key={text}
+              to={path}
               className={({ isActive }) =>
                 cn(
                   "block rounded-full px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200",
                   isActive && "bg-yellow-200", // Highlight last visited link
                 )
               }
-              onClick={() => setLastVisited(option.path)}
+              onClick={() => {
+                setLastVisited(path);
+              }}
             >
-              {option.text}
+              {text}
             </NavLink>
           ))}
         </div>
