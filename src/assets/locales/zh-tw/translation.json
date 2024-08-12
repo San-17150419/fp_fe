@@ -45,5 +45,8 @@
   "PA系列": "PA系列",
   "Department": "部門",
   "department": "部門",
-  "部门": "部門"
+  "部门": "部門",
+  "Loading": "下載中",
+  "加载需35秒到40秒": "下載需35秒到40秒",
+  "it might take 35-40 seconds to load": "下載需35秒到40秒"
 }

@@ -73,5 +73,7 @@
   "department": "department",
   "Department": "Department",
   "部門": "Department",
-  "部门": "部门"
+  "部门": "部门",
+  "加载需35秒到40秒": "it might take 35-40 seconds to load",
+  "下載需35秒到40秒": "it might take 35-40 seconds to load"
 }
