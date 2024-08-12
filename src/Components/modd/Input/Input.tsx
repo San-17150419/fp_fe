@@ -111,7 +111,7 @@ export default function Input({
   };
 
   return (
-    <div className="relative mx-1 my-5 flex h-[38px] flex-col gap-2">
+    <div className="relative mx-1 mb-5 flex h-[38px] flex-col gap-2">
       <input
         type={type}
         name={name}
@@ -131,7 +131,7 @@ export default function Input({
       >
         {labelMessage}
       </label>
-      <div className="absolute top-11 flex items-center gap-1">
+      <div className="absolute top-8 flex items-center gap-1">
         {!isMessageLegal && (
           <MessageBox displayMessage={DISPLAYMESSAGE[type]} />
         )}
