@@ -12,3 +12,5 @@ export { default as TabPage } from "./TabPage";
 export { default as LayoutTestPage } from "./LayoutTestPage";
 export { default as FactoryLogPage } from "./FactoryLog";
 export { default as TestPage } from "./Test";
+export { default as LoginPage } from "./LoginPage";
+export { default as ProtectedPage } from "./ProtectedPage";
