@@ -153,3 +153,43 @@ export type FactoryEventReponseMoldData = {
   sys: string;
   wt: number;
 };
+
+export type FactoryLogPreFilterState = {
+  selectedFactory: "GD" | "HP" | "DL";
+  selectedDateType: "half-year" | "quarter";
+  selectedPoint: "ar" | "pamt_p";
+  dateStart: string;
+  progress: number;
+  isLoading: boolean;
+  factoryLogRawData: FactoryLogRawData | null;
+};
+
+export type FactoryLogPreFilterAction =
+  | {
+      type: "setSelectedFactory";
+      payload: FactoryLogPreFilterState["selectedFactory"];
+    }
+  | {
+      type: "setSelectedDateType";
+      payload: FactoryLogPreFilterState["selectedDateType"];
+    }
+  | {
+      type: "setSelectedPoint";
+      payload: FactoryLogPreFilterState["selectedPoint"];
+    }
+  | {
+      type: "setDateStart";
+      payload: FactoryLogPreFilterState["dateStart"];
+    }
+  | {
+      type: "setIsLoading";
+      payload: FactoryLogPreFilterState["isLoading"];
+    }
+  | {
+      type: "setFactoryLogRawData";
+      payload: FactoryLogPreFilterState["factoryLogRawData"];
+    };
+
+export type FactoryLogPreFilterProps = {
+  preData: PreData;
+};
