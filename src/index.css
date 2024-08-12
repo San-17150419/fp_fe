@@ -2,49 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@media all {
-  .page-break {
-    display: none;
-  }
-}
-
-@media print {
-  html,
-  body {
-    height: initial !important;
-    overflow: initial !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
-
-@media print {
-  .page-break {
-    margin-top: 1rem;
-    display: block;
-    page-break-before: auto;
-  }
-  @page {
-    size: auto;
-    margin: 20mm;
-    @bottom-center {
-      content: "counter(pages)";
-    }
-  }
-}
 /* https://stackoverflow.com/questions/20050939/print-page-numbers-on-pages-when-printing-html */
 /* Based on the response from https://github.com/MatthewHerbst/react-to-print/issues/322 and https://github.com/MatthewHerbst/react-to-print/issues/306, is seems like it is not possible to customize the page number after calling `.print()` */
 /* I  wasn't able to change the position of the page number using the @bottom-center. It still appears at the bottom right of the page.  */
-@page {
-  size: auto;
-  margin: 20mm;
-  @bottom-center {
-    content: "counter(pages)";
-  }
-}
-/* * {
-  box-sizing: border-box;
-} */
 
 .nav-custom {
   background: linear-gradient(to bottom, #434343, #000000);
