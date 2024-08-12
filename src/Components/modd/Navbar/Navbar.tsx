@@ -17,7 +17,7 @@ export default function Navbar({ children }: NavbarProps) {
 type NavbarLogoProps = ImgHTMLAttributes<HTMLImageElement>;
 
 function NavbarLogo({ src }: NavbarLogoProps) {
-  return <img className="w-48 object-contain" src={src} alt="" />;
+  return <img className="w-48 object-contain" src={src} alt="logo"  loading="lazy"/>;
 }
 
 type NavbarItemsProps = {
