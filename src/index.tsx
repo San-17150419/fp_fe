@@ -4,16 +4,9 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AuthProvider from "./Components/modd/Table/FactoryLog/AuthContext";
 import "./i18n";
-import {
-  ErrorPage,
-  ButtonPage,
-
-  FactoryLogPage,
-
-  Loading,
-
-} from "./pages";
+import { ErrorPage, FactoryLogPage, Loading } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -25,12 +18,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <FactoryLogPage />,
-        // lazy: async () => {
-        //   let { default: FactoryLogPage } = await import("./pages/FactoryLog");
-        //   return {
-        //     Component: FactoryLogPage,
-        //   };
-        // },
       },
       {
         path: "button",
@@ -42,8 +29,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "data-table",
-        // element: <DataTablePage />,
+        path: "/table-dialog",
         lazy: async () => {
           let { default: DataTablePage } = await import(
             "./pages/DataTablePage"
@@ -54,8 +40,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "select",
-        // element: <SelectPage />,
+        path: "/select",
         lazy: async () => {
           let { default: SelectPage } = await import("./pages/SelectPage");
           return {
@@ -64,8 +49,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "tab",
-        // element: <TabPage />,
+        path: "/tab",
         lazy: async () => {
           let { default: TabPage } = await import("./pages/TabPage");
           return {
@@ -74,8 +58,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "test",
-        // element: <TestPage />,
+        path: "/test",
         lazy: async () => {
           let { default: TestPage } = await import("./pages/Test");
           return {
@@ -84,8 +67,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "highcharts",
-        // element: <HighChartsPage />,
+        path: "/highcharts",
         lazy: async () => {
           let { default: HighChartsPage } = await import(
             "./pages/HighChartsPage"
@@ -96,8 +78,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "highstock-type1",
-        // element: <HighStockType1Page />,
+        path: "/highstock-type-1",
         lazy: async () => {
           let { default: HighStockType1Page } = await import(
             "./pages/HighStockType1Page"
@@ -108,8 +89,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "highstock-type2",
-        // element: <HighStockType2Page />,
+        path: "/highstock-type-2",
         lazy: async () => {
           let { default: HighStockType2Page } = await import(
             "./pages/HighStockType2Page"
@@ -120,8 +100,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "highstock-type3",
-        // element: <HighStockType3Page />,
+        path: "/highstock-type-3",
         lazy: async () => {
           let { default: HighStockType3Page } = await import(
             "./pages/HighStockType3Page"
@@ -132,8 +111,7 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "input",
-        // element: <InputPage />,
+        path: "/input",
         lazy: async () => {
           let { default: InputPage } = await import("./pages/InputPage");
           return {
@@ -153,6 +131,26 @@ const router = createBrowserRouter([
           };
         },
       },
+      {
+        path: "/login",
+        lazy: async () => {
+          let { default: LoginPage } = await import("./pages/LoginPage");
+          return {
+            Component: LoginPage,
+          };
+        },
+      },
+      {
+        path: "/protected",
+        lazy: async () => {
+          let { default: ProtectedPage } = await import(
+            "./pages/ProtectedPage"
+          );
+          return {
+            Component: ProtectedPage,
+          };
+        },
+      },
     ],
   },
 ]);
@@ -163,7 +161,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router}></RouterProvider>
+    </AuthProvider>
   </React.StrictMode>,
 );
 
