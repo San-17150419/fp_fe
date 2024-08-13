@@ -23,6 +23,7 @@ export default function ColumnChart({
   const { t } = useTranslation();
   const chartRef = useRef<HighchartsReact.RefObject>(null);
   const { width } = useWindowDimensions();
+
   function generateColumnData(rawData: { [key: string]: any }) {
     const data: [string, number][] = [];
     const keysToUse = visibleRows || Object.keys(rawData);
@@ -45,7 +46,7 @@ export default function ColumnChart({
       // width: 1500,
       // width: chartWidth,
       // When you set the height as percentage, it will be calculated based on the width.
-      width: width * 0.68,
+      width: width * 0.65,
       height: 600,
       options3d: {
         enabled: true,
@@ -155,7 +156,7 @@ export default function ColumnChart({
   };
 
   return (
-    <div className="relative isolate">
+    <div className="relative isolate flex justify-center">
       {/* TODO: I want to add a drop down menu to allow user to select which interval they want to see */}
       {/* It might not be easy to do that */}
       {/* <Select className="z-[100] w-20" name="select" options={[1, 2, 3, 4]} /> */}

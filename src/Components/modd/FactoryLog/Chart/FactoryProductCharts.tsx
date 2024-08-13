@@ -51,7 +51,7 @@ export default function ProductChart({
     },
     chart: {
       height: 600,
-      width: width * 0.67,
+      width: width * 0.64,
     },
     tooltip: {
       shared: true,
@@ -80,7 +80,6 @@ export default function ProductChart({
           },
           margin: 40,
           rotation: 0,
-          x: 20,
         },
       },
       // Secondary axis
@@ -156,7 +155,11 @@ export default function ProductChart({
         tooltip: {
           pointFormatter: function () {
             return (
-              "● " + t("產能") + ": " + (Number(this.y) * 100).toFixed(2) + "%"
+              "● " +
+              t("達成率") +
+              ": " +
+              (Number(this.y) * 100).toFixed(2) +
+              "%"
             );
           },
 
@@ -205,12 +208,15 @@ export default function ProductChart({
       </button>
 
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
-        <div className="flex h-full flex-col gap-4">
+        <div className="flex flex-col items-center justify-center gap-4 px-1 py-2">
+          <div className="flex w-[95%] justify-center border border-gray-200">
+            {/* <div className="flex w-[95%] justify-center border border-black"> */}
           <HighchartsReact
             highcharts={Highcharts}
             constructorType={"chart"}
             options={options}
           />
+          </div>
           <hr />
           {/* <div>
             {eventData && (

@@ -14,7 +14,6 @@ import {
 
 // TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
 // TODO:https://jsfiddle.net/menXU/1/ label collision
-// TODO: Make it easier to identify which data label belongs to which bubble. Maybe increase the font size according to the z value?
 
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
@@ -24,10 +23,13 @@ BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
   const { width } = useWindowDimensions();
 
+  // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
+  const filteredData = eventData.data_mold.filter((event) => !!event["ar"]);
+
   const bubbleData = formatMoldDataForBubbleChart({
-    data_mold: eventData.data_mold,
+    data_mold: filteredData,
     xKey: "ar",
-    yKey: "pamt",
+    yKey: "mamt",
     zKey: "count_repaired",
     nameKey: "sn_num",
   });
@@ -35,15 +37,15 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
   const sysName = eventData.post.sys;
   const { dataByZValue: separateData, maxZValue } =
     separateByZValue(bubbleData);
-  const yArray = eventData.data_mold.map((event) => event["pamt"]);
+  const yArray = filteredData
+    .filter((event) => !!event["ar"])
+    .map((event) => event["mamt"]);
   const yAverage = findAverage(yArray);
   const yMedian = findMedian(yArray);
   const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
-  const xMin =
-    Math.min(...eventData.data_mold.map((event) => event["ar"])) * 100;
+  const xMin = Math.min(...filteredData.map((event) => event["ar"])) * 100;
 
-  const xMax =
-    Math.max(...eventData.data_mold.map((event) => event["ar"])) * 100;
+  const xMax = Math.max(...filteredData.map((event) => event["ar"])) * 100;
 
   const generateSeries = () => {
     const series: SeriesBubbleOptions[] = [
@@ -101,12 +103,25 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
     return series;
   };
 
+  Highcharts.setOptions({
+    lang: {
+      thousandsSep: ",",
+    },
+  });
+
   const options: Highcharts.Options = {
+    exporting: {
+      buttons: {
+        contextButton: {
+          menuItems: ["downloadPNG"],
+        },
+      },
+    },
     chart: {
       type: "bubble",
       plotBorderWidth: 1,
-      height: 650,
-      width: width * 0.67,
+      height: 600,
+      width: width * 0.64,
       zooming: {
         type: "xy",
       },
@@ -177,13 +192,14 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       ],
     },
     yAxis: {
-      type: "logarithmic",
+      // type: "logarithmic",
       startOnTick: false,
       endOnTick: false,
       title: {
         style: {
-          fontSize: "0.8rem",
+          fontSize: "1rem",
           fontWeight: "bold",
+          color: "#000000",
         },
         text: "總模次",
         margin: 40,
@@ -237,9 +253,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       // https://github.com/highcharts/highcharts/issues/20778
       // the type definition of formatter doesn't include the z index
       formatter: function () {
-        // The
-        //
-        return `<div style="text-align:left; padding: 0.5rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● 唯一碼: ${this.point.name}</p> <br> <p>● 達成率: ${this.point.x.toFixed(2)} % </p><br> <p>● 總模次: ${this.point.y?.toFixed(2)} </p><br> <p>● 維修次數: ${this.point.options.z} 次</p></div>`;
+        // thousandsSep somehow does not work here. I am not sure why. Maybe because I am using html? Or formatter?
+        return `<div style="text-align:left; padding: 0.5rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● 唯一碼: ${this.point.name}</p> <br> <p>● 達成率: ${this.point.x.toFixed(2)} % </p><br> <p>● 總模次: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● 維修次數: ${this.point.options.z} 次</p></div>`;
       },
     },
 
@@ -259,8 +274,9 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
   };
 
   return (
-    <>
+    <div className="flex w-[95%] justify-center border border-gray-200 ">
+      {/* <div className="w-[95%] border border-black flex justify-center"> */}
       <HighchartsReact highcharts={Highcharts} options={options} />
-    </>
+    </div>
   );
 }

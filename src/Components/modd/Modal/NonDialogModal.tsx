@@ -1,4 +1,4 @@
-import React, { useRef} from "react";
+import React, { useRef } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -70,7 +70,7 @@ export default function Modal({
             animate={currentVariant.animate}
             exit={currentVariant.exit}
             transition={currentVariant.transition}
-            className="relative left-1/2 top-1/2 max-h-[90%] min-h-[50%] min-w-[50%] max-w-[70%] rounded-md bg-white px-4 py-6 "
+            className="relative left-1/2 top-1/2 max-h-[90%] min-h-[50%] min-w-[50%] max-w-[70%] rounded-md bg-white py-6"
             ref={modalRef}
             role="dialog"
             aria-modal="true"
@@ -80,11 +80,11 @@ export default function Modal({
               type="button"
               onClick={onClose}
               aria-label="Close modal"
-              className="absolute right-1 top-1 z-10 h-10 w-10 text-base rounded-full hover:bg-gray-300"
+              className="absolute right-1 top-1 z-10 h-10 w-10 rounded-full text-base hover:bg-gray-300"
             >
               X
             </button>
-            <div className="scroll-container mt-4 relative max-h-full overflow-auto rounded-md">
+            <div className="scroll-container relative mx-3 mt-4 max-h-full overflow-auto rounded-md">
               {children}
             </div>
           </motion.div>
