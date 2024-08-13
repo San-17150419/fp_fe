@@ -1,14 +1,14 @@
-import FactoryLogPreFilter from "../Components/modd/Table/FactoryLog/FactoryLogPreFilter";
+import FactoryLogPreFilter from "../Components/modd/FactoryLog/FactoryLogPreFilter";
 import Loading from "../Components/Loading";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { type FactoryLogPreData } from "../Components/modd/Table/FactoryLog/FactoryLogDataType";
+import { type FactoryLogPreData } from "../Components/modd/FactoryLog/types/factoryLogDataType";
 export default function FactoryLog() {
   const [preDataLoaded, setPreDataLoaded] = useState(false);
   const [preData, setPreData] = useState<FactoryLogPreData["preData"] | null>(
     null,
   );
-  const api = process.env.REACT_APP_FACTORY_LOG_URL;
+  const api = import.meta.env.VITE_FACTORY_LOG_URL;
 
   useEffect(() => {
     const fetchPreData = async () => {

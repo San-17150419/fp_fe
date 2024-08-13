@@ -102,11 +102,11 @@ export default function Input({
     }
   };
 
-  const handleOnBlur: FocusEventHandler<HTMLInputElement> = (e) => {
+  const handleOnBlur: FocusEventHandler<HTMLInputElement> = () => {
     if (inputValue !== "") setLabelMessage("");
   };
 
-  const handleOnFocus: FocusEventHandler<HTMLInputElement> = (e) => {
+  const handleOnFocus: FocusEventHandler<HTMLInputElement> = () => {
     setLabelMessage(placeholder);
   };
 

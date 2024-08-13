@@ -43,6 +43,9 @@ export default function usePreFilterSelect(
     factoryLogPreFilterReducer,
     factoryLogPreFilterInitialState,
   );
+  
+  console.log(preData)
+
   const {
     selectedFactory,
     selectedDateType,

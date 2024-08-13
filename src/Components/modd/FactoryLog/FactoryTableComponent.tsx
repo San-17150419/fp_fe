@@ -7,7 +7,7 @@ import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/FactoryProductCharts";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 import { isToday } from "date-fns";
-import { type Factory, type Department } from "./FactoryLogDataType";
+import { type Factory, type Department } from "./types/factoryLogDataType";
 const colors100 = [
   "bg-[#fee2e2]",
   "bg-[#fef9c3]",

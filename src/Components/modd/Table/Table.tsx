@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import {  useRef } from "react";
 import { SimpleObject, TableData } from "./type";
 import Td from "./TableTd";
 import { useReactToPrint } from "react-to-print";
@@ -27,20 +27,12 @@ type TableProps = {
 };
 
 const loadFont = () => {
-  return import("../../../assets/fonts/NotoSansTC-Regular-normal");
+  return require("../../../../public/fonts/NotoSansTC-Regular-normal.js");
 };
 
 function Table({ data, header }: TableProps) {
-  const [tableData, setTableData] = useState<TableData>(data);
-  const [isPrinting, setIsPrinting] = useState(false);
-  const promiseResolveRef = useRef<((value: null) => void) | null>(null);
   const target = useRef<HTMLTableElement>(null);
-  useEffect(() => {
-    if (isPrinting && promiseResolveRef.current) {
-      // Resolves the Promise, letting `react-to-print` know that the DOM updates are completed
-      promiseResolveRef.current(null);
-    }
-  }, [isPrinting]);
+
 
   const handlePrintWithWindow = () => {
     window.print();
@@ -118,8 +110,6 @@ function Table({ data, header }: TableProps) {
         console.dir(data);
         console.log(data.doc.getStyle());
         // Add page number
-        const pageCount = doc.internal.pages;
-        console.log(data.table.pageCount);
         const pageSize = doc.internal.pageSize;
         const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
         const pageHeight = pageSize.height
@@ -149,14 +139,13 @@ function Table({ data, header }: TableProps) {
   //   return () => document.removeEventListener("keydown", pressEnterAndPrint);
   // }, [handlePrint]);
 
-  console.log(tableData);
   // if (!Array.isArray(tableData) || tableData.length === 0) {
   //   return <Loading />;
   // }
 
-  const titles = header || Object.keys(tableData[0]);
-  const pageStyle = `@page{size: 500mm 500mm; margin: 0;}
-  @bottom-left{content: counter(page);}`;
+  const titles = header || Object.keys(data[0]);
+  // const pageStyle = `@page{size: 500mm 500mm; margin: 0;}
+  // @bottom-left{content: counter(page);}`;
   return (
     <>
       <button
@@ -205,7 +194,7 @@ function Table({ data, header }: TableProps) {
           </tr>
         </thead>
         <tbody>
-          {tableData.map((item: SimpleObject, rowIndex: number) => (
+          {data.map((item: SimpleObject, rowIndex: number) => (
             <tr key={`row-${rowIndex}`}>
               <Td>{rowIndex + 1}</Td>
 

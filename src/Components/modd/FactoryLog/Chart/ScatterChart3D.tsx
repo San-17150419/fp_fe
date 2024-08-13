@@ -4,7 +4,7 @@ import Highcharts from "highcharts";
 import Highcharts3d from "highcharts/highcharts-3d";
 import HC_more from "highcharts/highcharts-more";
 import BrokenAxis from "highcharts/modules/broken-axis";
-import { FactoryEventReponse } from "../FactoryLogDataType";
+import { FactoryEventReponse } from "../types/factoryLogDataType";
 
 Highcharts3d(Highcharts);
 HC_more(Highcharts);

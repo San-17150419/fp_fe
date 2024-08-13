@@ -16,22 +16,6 @@ type SeriesData = {
   color: string;
 };
 
-const getEvenWeekTicks = () => {
-  const ticks = [];
-  const startDate = new Date(Date.UTC(2000, 0, 1)); // start from January 1, 2000
-  for (let i = 1; i <= 52; i += 2) {
-    ticks.push(Date.UTC(startDate.getUTCFullYear(), 0, i * 7));
-  }
-  return ticks;
-};
-
-function getWeekNumber(d: Date) {
-  // Get the first day of the year
-  const start = new Date(d.getFullYear(), 0, 1);
-  const diff = d.getTime() - start.getTime();
-  const oneWeek = 1000 * 60 * 60 * 24 * 7;
-  return Math.floor(diff / oneWeek) + 1;
-}
 const HighStockTest = ({
   data,
   title,

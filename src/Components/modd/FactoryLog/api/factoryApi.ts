@@ -2,8 +2,7 @@ import axios, { type AxiosProgressEvent } from "axios";
 import {
   type FactoryLogRawData,
   type PostDataParams,
-} from "../FactoryLogDataType";
-import { transformData } from "../formatFactoryData";
+} from "../types/factoryLogDataType";
 
 const factoryLogURL = process.env.FACTORY_LOG_URL as string;
 

@@ -28,13 +28,11 @@ export default function ProductList({ data }: ProductListProps) {
   const [productDetails, setProductDetails] = useState<ProductDetails[] | null>(
     null,
   );
-  const [type, setType] = useState("01");
 
   const options = data.map((item) => {
     return { id: item.id_item, value: item.item };
   });
 
-  console.log("options", options);
 
   async function postRequest(id_item: number) {
     try {
@@ -42,7 +40,7 @@ export default function ProductList({ data }: ProductListProps) {
         "http://192.168.123.240:9000/api/modd/line-chart/",
         {
           id_item,
-          type: type,
+          type: "01",
         },
       );
       setProductDetails(response.data); // Assuming the response contains the product details

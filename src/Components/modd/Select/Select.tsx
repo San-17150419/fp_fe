@@ -7,7 +7,7 @@ import {
 import { PiCaretDownBold } from "react-icons/pi";
 import { useSelect } from "./useSelect";
 import { SelectOption, DetailOption } from "./selectType";
-import { useEffect, useCallback } from "react";
+import { useEffect} from "react";
 import { useTranslation } from "react-i18next";
 import cn from "../../../util/cn";
 import clsx from "clsx";

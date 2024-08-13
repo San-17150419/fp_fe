@@ -1,9 +1,9 @@
 import React from "react";
-import { useAuthContext } from "../Components/modd/Table/FactoryLog/AuthContext";
+import { useAuthContext } from "../stores/AuthContext";
 import Input from "../Components/modd/Input/Input";
 import { useNavigate, useLocation } from "react-router-dom";
 export default function LoginPage() {
-  const { setToken, setUsername, login } = useAuthContext();
+  const {  setUsername, login } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

@@ -1,4 +1,4 @@
-import  { useRef, useEffect, useState } from "react";
+import  { useRef } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 // import Highcharts from "highcharts/highstock";
@@ -22,7 +22,6 @@ export default function ColumnChart({
 }: ColumnChartProps) {
   const { t } = useTranslation();
   const chartRef = useRef<HighchartsReact.RefObject>(null);
-  const [chartWidth, setChartWidth] = useState(1500);
   const { width } = useWindowDimensions();
   function generateColumnData(rawData: { [key: string]: any }) {
     const data: [string, number][] = [];
@@ -37,16 +36,6 @@ export default function ColumnChart({
     return data;
   }
 
-  useEffect(() => {
-    function calculateChartWidth() {
-      const columnData = generateColumnData(allData);
-      const minColumnWidth = 50;
-      const baseWidth = width / 3;
-      return columnData.length * minColumnWidth + baseWidth;
-    }
-    const calculatedWidth = calculateChartWidth();
-    setChartWidth(calculatedWidth);
-  }, [width, allData]);
   // TODO: I need to make sure the datalabel is visible in the chart in every window size
   const columnData = generateColumnData(allData);
   const options: Highcharts.Options = {

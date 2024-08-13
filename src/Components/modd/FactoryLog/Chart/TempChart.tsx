@@ -9,7 +9,7 @@ import HighchartsExporting from "highcharts/modules/exporting";
 import HighchartsFullScreen from "highcharts/modules/full-screen";
 import { useTranslation } from "react-i18next";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
-import { type FactoryEventReponse } from "../FactoryLogDataType";
+import { type FactoryEventReponse } from "../types/factoryLogDataType";
 
 type ColumnChartProps = {
   department: string;
@@ -68,7 +68,6 @@ export default function TempChart({ department, rawData }: ColumnChartProps) {
   }, [width, rawData]);
 
   // TODO: I need to make sure the datalabel is visible in the chart in every window size
-  const columnData = generateColumnData(rawData);
   const options: Highcharts.Options = {
     chart: {
       type: "column",

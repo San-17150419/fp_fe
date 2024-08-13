@@ -2,7 +2,7 @@ import FactoryTableComponent from "./FactoryTableComponent";
 import {
   type FactoryLogRawData,
   type DepartmentMap,
-} from "./FactoryLogDataType";
+} from "./types/factoryLogDataType";
 import { transformData } from "./formatFactoryData";
 import { useEffect, useState } from "react";
 type FactoryLogTableProps = {
@@ -13,7 +13,6 @@ export default function FactoryLogTable({ logData }: FactoryLogTableProps) {
   //   useFactoryLogContext();
   const [postData, setPostData] = useState<Record<string, any> | null>(null);
   useEffect(() => {
-    const formData = transformData(logData.data);
     setPostData(transformData(logData.data));
   }, [logData.data]);
 

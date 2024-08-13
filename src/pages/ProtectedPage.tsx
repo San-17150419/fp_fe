@@ -1,4 +1,4 @@
-import { useAuthContext } from "../Components/modd/Table/FactoryLog/AuthContext";
+import { useAuthContext } from "../stores/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 export default function ProtectedPage() {
   const { token } = useAuthContext();

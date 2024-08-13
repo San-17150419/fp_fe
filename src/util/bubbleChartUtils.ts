@@ -1,4 +1,4 @@
-import { type FactoryEventReponseMoldData } from "../Components/modd/Table/FactoryLog/FactoryLogDataType";
+import { type FactoryEventReponseMoldData } from "../Components/modd/FactoryLog/types/factoryLogDataType";
 
 /**
  * Formats a number into a hexadecimal string with a leading zero if necessary.

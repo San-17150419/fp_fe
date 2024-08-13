@@ -1,10 +1,9 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts, { SeriesBubbleOptions } from "highcharts";
 import HC_more from "highcharts/highcharts-more";
-import { FactoryEventReponse } from "../FactoryLogDataType";
+import { FactoryEventReponse } from "../types/factoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
-import { useState } from "react";
 import {
   findMedian,
   formatMoldDataForBubbleChart,
@@ -24,10 +23,6 @@ HC_more(Highcharts);
 BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
   const { width } = useWindowDimensions();
-  const [series, setSeries] = useState<
-    [x: number, y: number, z: number, name?: string, color?: string][]
-  >([]);
-  console.dir(eventData);
 
   const bubbleData = formatMoldDataForBubbleChart({
     data_mold: eventData.data_mold,
@@ -72,7 +67,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         x: 0.5,
       },
     };
-    Object.keys(separateData).map((key, index) => {
+    Object.keys(separateData).map((key) => {
       const numericKey = Number(key);
       series.push({
         ...defaultConfig,

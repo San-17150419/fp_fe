@@ -4,7 +4,7 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { Factory, type FactoryEventReponse } from "../FactoryLogDataType";
+import { Factory, type FactoryEventReponse } from "../types/factoryLogDataType";
 import BubbleChart from "./BubbleChart";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 type ProductChartProps = {

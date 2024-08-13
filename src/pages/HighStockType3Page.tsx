@@ -13,7 +13,6 @@ const API_URL = "http://192.168.123.240:9000/api/modd/line-chart";
 export default function TestPage() {
   const [items, setItems] = useState<ItemPreData[]>([]);
   const [chartSeriesData, setChartSeriesData] = useState<Type3ChartData[]>([]);
-  const [pageTitle, setPageTitle] = useState("");
   const [selectedProperty, setSelectedProperty] =
     useState<keyof Type3RawData>("ar");
   const [rawChartData, setRawChartData] = useState<Type3RawData[]>([]); // Store raw chart data

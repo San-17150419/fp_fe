@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Loading from "../../Loading";
 import ProductList from "./ProductList";
-type HighChartType = "01" | "02" | "03";
 
 type ProductInfo = {
   id_item: number;
@@ -14,8 +13,6 @@ type ProductInfo = {
 
 export default function HighChartsDataFetcher() {
   // default highchart type is 01
-  const [type, setType] = useState<HighChartType>("01");
-  const [itemId, setItemId] = useState<number>(0);
   const [data, setData] = useState<ProductInfo[] | null>(null);
   const [error, setError] = useState<string>("");
   const [isLoading, setIsoading] = useState<boolean>(true);
@@ -32,6 +29,7 @@ export default function HighChartsDataFetcher() {
         console.log(response.data.preData);
       } catch (error) {
         console.error(error);
+        setError("Error fetching product list");
       }
     }
     fetchProductList();
