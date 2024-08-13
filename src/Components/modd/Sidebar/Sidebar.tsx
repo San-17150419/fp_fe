@@ -10,20 +10,20 @@ export default function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const links: [string, string][] = [
     ["工廠日誌", "/"],
-    ["數據表", "/table-dialog"],
+    // ["數據表", "/table-dialog"],
     // ["數據表", "/data-table"],
-    ["表單", "/test"],
-    ["下拉選單", "/select"],
-    ["按鈕", "/button"],
-    ["標籤", "/tab"],
-    ["圖表", "/highcharts"],
-    ["圖表2", "/highstock-type-1"],
-    ["圖表3", "/highstock-type-2"],
-    ["圖表4", "/highstock-type-3"],
-    ["輸入", "/input"],
-    ["佈局", "/layout-test"],
-    ["登入", "/login"],
-    ["保護頁面", "/protected"],
+    // ["表單", "/test"],
+    // ["下拉選單", "/select"],
+    // ["按鈕", "/button"],
+    // ["標籤", "/tab"],
+    // ["圖表", "/highcharts"],
+    // ["圖表2", "/highstock-type-1"],
+    // ["圖表3", "/highstock-type-2"],
+    // ["圖表4", "/highstock-type-3"],
+    // ["輸入", "/input"],
+    // ["佈局", "/layout-test"],
+    // ["登入", "/login"],
+    // ["保護頁面", "/protected"],
   ];
   const [isOpen, setIsOpen] = useState(false);
   const [lastVisited, setLastVisited] = useState<string | null>(null);
@@ -85,7 +85,7 @@ export default function Sidebar() {
             !isOpen && "hidden w-0",
           )}
         >
-          {links.map(([text, path], index: number) => (
+          {links.map(([text, path]) => (
             <NavLink
               key={text}
               to={path}
@@ -93,6 +93,7 @@ export default function Sidebar() {
                 cn(
                   "block rounded-full px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200",
                   isActive && "bg-yellow-200", // Highlight last visited link
+                  lastVisited === path && "bg-yellow-200",
                 )
               }
               onClick={() => {
