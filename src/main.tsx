@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AuthProvider from "./Components/modd/Table/FactoryLog/AuthContext";
+import AuthProvider from "./stores/AuthContext";
 import "./i18n";
 import { ErrorPage, FactoryLogPage, Loading } from "./pages";
 
