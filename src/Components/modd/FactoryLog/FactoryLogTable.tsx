@@ -23,7 +23,6 @@ export default function FactoryLogTable({ logData }: FactoryLogTableProps) {
         No data available <h2>This should not happen</h2>
       </div>
     );
-  console.log(postData);
   return (
     <div>
       {postData &&
