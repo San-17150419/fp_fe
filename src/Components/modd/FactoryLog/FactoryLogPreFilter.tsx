@@ -9,6 +9,8 @@ import FactoryLogTable from "./FactoryLogTable";
 import FactoryButtons from "./FactoryButtons";
 import FactoryPreFilterSelect from "./FactoryPreFilterSelect";
 import usePreFilterSelect from "./hooks/usePreFilterSelect";
+import clsx from "clsx";
+import { useTheme } from "../../../stores/ThemeContext";
 
 export default function FactoryLogPreFilter({
   preData,
@@ -22,6 +24,8 @@ export default function FactoryLogPreFilter({
     factoryLogRawData,
     dispatch,
   } = usePreFilterSelect(preData);
+
+  const { isSemiBold, isTextBase } = useTheme();
 
   const { t } = useTranslation();
 
@@ -124,7 +128,11 @@ export default function FactoryLogPreFilter({
             })}
             <div className="flex w-full flex-col">
               <label
-                className="ml-1 mt-2 text-xs desktop:text-sm"
+                className={clsx(
+                  "ml-1 mt-2",
+                  isSemiBold ? "font-semibold" : "font-normal",
+                  isTextBase ? "text-base" : "text-sm",
+                )}
                 htmlFor="date"
               >
                 {t("當期開始")}
@@ -134,7 +142,12 @@ export default function FactoryLogPreFilter({
                 defaultValue={dateStart}
                 name="date"
                 id="date"
-                className="font-normal shadow shadow-slate-300"
+                className={clsx(
+                  "shadow shadow-slate-300",
+                  isSemiBold ? "font-semibold" : "font-normal",
+                  isTextBase ? "text-base" : "text-sm",
+                )}
+         
                 onChange={(e) =>
                   dispatch({ type: "setDateStart", payload: e.target.value })
                 }

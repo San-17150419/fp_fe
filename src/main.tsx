@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "./stores/AuthContext";
 import "./i18n";
 import { ErrorPage, FactoryLogPage, Loading } from "./pages";
+import { ThemeProvider } from "./stores/ThemeContext";
 
 const router = createBrowserRouter([
   {
@@ -161,9 +162,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router}></RouterProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );
 

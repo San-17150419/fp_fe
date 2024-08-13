@@ -8,6 +8,8 @@ import ProductChart from "./Chart/FactoryProductCharts";
 import HiddenRowsToggle from "./ToggleHiddenRow";
 import { isToday } from "date-fns";
 import { type Factory, type Department } from "./types/factoryLogDataType";
+import { useTheme } from "../../../stores/ThemeContext";
+import clsx from "clsx";
 const colors100 = [
   "bg-[#fee2e2]",
   "bg-[#fef9c3]",
@@ -36,6 +38,7 @@ export default function FactoryTableComponent({
   const [visibleRows, setVisibleRows] = useState<string[]>([]);
   const [incompleteRows, setIncompleteRows] = useState<string[]>([]);
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
+  const { isSemiBold, isTextBase } = useTheme();
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
       sysData[system][point].includes(0),
@@ -81,7 +84,13 @@ export default function FactoryTableComponent({
       </Modal>
 
       <Table id={department} className="mb-20 mt-12 table-fixed text-center">
-        <Table.TableCaption className="my-10 font-semibold">
+        <Table.TableCaption
+          className={clsx(
+            "my-10",
+            isTextBase ? "text-xl" : "text-lg",
+            isSemiBold ? "font-semibold" : "font-normal",
+          )}
+        >
           <div className="relative flex flex-col justify-center">
             <span className="absolute left-1/2 -translate-x-1/2 text-slate-700 drop-shadow-lg">
               {t(department)} {t("達成率")}
@@ -107,14 +116,26 @@ export default function FactoryTableComponent({
             </button> */}
           </div>
         </Table.TableCaption>
-        <Table.TableHeader className="">
+        <Table.TableHeader>
           <Table.TableRow className="bg-white">
-            <Table.TableCell className="w-[12%] border-y border-black text-xs">
+            <Table.TableCell
+              className={clsx(
+                "w-[12%] border-y border-black",
+                isSemiBold ? "font-semibold" : "font-normal",
+                isTextBase ? "text-base" : "text-sm",
+              )}
+            >
               {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
             {/* <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl"> */}
-            <Table.TableCell className="w-2/12 border-y border-black text-xs">
+            <Table.TableCell
+              className={clsx(
+                "w-2/12 text-center border-y border-black",
+                isSemiBold ? "font-semibold" : "font-normal",
+                isTextBase ? "text-base" : "text-sm",
+              )}
+            >
               {t("系列")}
             </Table.TableCell>
 
@@ -122,7 +143,11 @@ export default function FactoryTableComponent({
               .toReversed()
               .map((date: { date_start: string; date_end: string }, index) => (
                 <Table.TableCell
-                  className="border-y border-black text-xs"
+                  className={clsx(
+                    "border-y border-black",
+                    isSemiBold ? "font-semibold" : "font-normal",
+                    isTextBase ? "text-base" : "text-sm",
+                  )}
                   key={`${department}-table-header-cell-${index}`}
                 >
                   {t("區間") + " " + (index + 1)}
@@ -158,7 +183,11 @@ export default function FactoryTableComponent({
             </Table.TableCell> */}
             <Table.TableCell
               colspan={2}
-              className="border-y border-black text-xs"
+              className={clsx(
+                "w-[18%] border-y border-black text-base",
+                isSemiBold ? "font-semibold" : "font-normal",
+                isTextBase ? "text-base" : "text-sm",
+              )}
             >
               {t("比較其他區間")}
             </Table.TableCell>
@@ -176,7 +205,11 @@ export default function FactoryTableComponent({
             >
               {index === 0 && (
                 <Table.TableCell
-                  className={`text-xs ${colors100[tableNumber % colors100.length]}`}
+                  className={clsx(
+                    `${colors100[tableNumber % colors100.length]}`,
+                    isSemiBold ? "font-semibold" : "font-normal",
+                    isTextBase ? "text-base" : "text-sm",
+                  )}
                   rowspan={visibleRows.length}
                 >
                   <button
@@ -202,12 +235,20 @@ export default function FactoryTableComponent({
               </Table.TableCell>
               {sysData[sysName][point].map((arValue: number, index: number) => (
                 <Table.TableCell
-                  className="w-2/12 border-gray-600 text-xs"
+                  className={clsx(
+                    "w-2/12 border-gray-600 text-base",
+                    isSemiBold ? "font-semibold" : "font-normal",
+                    isTextBase ? "text-base" : "text-sm",
+                  )}
                   // className="w-2/12 border-gray-600 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
                   key={`${sysName}-${index}`}
                 >
                   <span
-                    className={`text-xs ${arValue < 0.85 ? "text-red-400" : ""}`}
+                    className={clsx(
+                      ` ${arValue < 0.85 ? "text-red-400" : ""}`,
+                      isSemiBold ? "font-semibold" : "font-normal",
+                      isTextBase ? "text-base" : "text-sm",
+                    )}
                     // className={`text-xs desktop:text-base ${arValue < 0.85 ? "text-red-500" : ""}`}
                   >
                     {arValue !== 0 ? `${(arValue * 100).toFixed(2)}%` : ""}

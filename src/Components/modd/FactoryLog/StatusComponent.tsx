@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+// import { useTheme } from "../../../stores/ThemeContext";
+import clsx from "clsx";
 type StatusComponentProps = {
   value: number[];
 };
@@ -16,7 +18,7 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
     numberOfConsecutiveLowerThanStandard,
     setNumberOfConsecutiveLowerThanStandard,
   ] = useState(0);
-
+  // const { isSemiBold, isTextBase } = useTheme();
   useEffect(() => {
     function findLastNonZeroValue(data: number[]) {
       for (let i = data.length - 1; i >= 0; i--) {
@@ -62,13 +64,36 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       {/* TODO: Extract this to a separate component */}
       {isLowest && (
         <p
-          className={`${isLowerThanStandard ? "bg-amber-500 shadow-amber-700" : "bg-green-500 shadow-green-700"} rounded-full px-2 py-1 text-xs font-normal text-white shadow`}
+          className={clsx(
+            "rounded-full px-2 py-1 text-sm text-white font-normal shadow",
+            isLowerThanStandard
+              ? "bg-amber-500 shadow-amber-700"
+              : "bg-green-500 shadow-green-700",
+          )}
+          // className={clsx(
+          //   "rounded-full px-2 py-1 text-white shadow",
+          //   isLowerThanStandard
+          //     ? "bg-amber-500 shadow-amber-700"
+          //     : "bg-green-500 shadow-green-700",
+          //   isSemiBold ? "font-semibold" : "font-normal",
+          //   isTextBase ? "text-base" : "text-sm",
+          // )}
         >
           {t("最低達成率")}
         </p>
       )}
       {isLowerThanStandardConsecutively && (
-        <p className="rounded-full bg-red-500 px-2 py-1 text-xs font-normal text-white shadow shadow-red-700">
+        <p
+          className={clsx(
+            "rounded-full bg-red-500 px-2 py-1 text-sm text-white shadow font-normal shadow-red-700",
+            // isTextBase ? "text-base" : "text-sm",
+          )}
+          // className={clsx(
+          //   "rounded-full bg-red-500 px-2 py-1  text-white shadow shadow-red-700",
+          //   isSemiBold ? "font-semibold" : "font-normal",
+          //   isTextBase ? "text-base" : "text-sm",
+          // )}
+        >
           {t("連續低於標準")}
           {numberOfConsecutiveLowerThanStandard > 1 &&
             ` (${numberOfConsecutiveLowerThanStandard})`}

@@ -7,6 +7,8 @@ import axios from "axios";
 import { Factory, type FactoryEventReponse } from "../types/factoryLogDataType";
 import BubbleChart from "./BubbleChart";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
+import { useTheme } from "../../../../stores/ThemeContext";
+import clsx from "clsx";
 type ProductChartProps = {
   factory: Factory;
   duration: { date_start: string; date_end: string }[];
@@ -28,6 +30,7 @@ export default function ProductChart({
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const data = postData[sysName];
+  const { isSemiBold, isTextBase } = useTheme();
   function setCategories() {
     const dateRange = duration.toReversed();
     const categories: string[] = [];
@@ -198,7 +201,11 @@ export default function ProductChart({
     <span>
       <button
         type="button"
-        className="cursor-pointer text-xs underline shadow-sm hover:shadow-md focus:text-red-500"
+        className={clsx(
+          "cursor-pointer underline shadow-sm hover:shadow-md focus:text-red-500",
+          isSemiBold ? "font-semibold" : "font-normal",
+          isTextBase ? "text-base" : "text-sm",
+        )}
         onClick={() => {
           setIsOpen(true);
           fetchEventData();
@@ -211,11 +218,11 @@ export default function ProductChart({
         <div className="flex flex-col items-center justify-center gap-4 px-1 py-2">
           <div className="flex w-[95%] justify-center border border-gray-200">
             {/* <div className="flex w-[95%] justify-center border border-black"> */}
-          <HighchartsReact
-            highcharts={Highcharts}
-            constructorType={"chart"}
-            options={options}
-          />
+            <HighchartsReact
+              highcharts={Highcharts}
+              constructorType={"chart"}
+              options={options}
+            />
           </div>
           <hr />
           {/* <div>

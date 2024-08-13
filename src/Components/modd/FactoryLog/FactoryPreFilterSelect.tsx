@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Select from "../Select/Select";
+import { useTheme } from "../../../stores/ThemeContext";
+import clsx from "clsx";
 type FactoryPreFilterSelectProps = {
   text: string;
   options: {
@@ -15,9 +17,18 @@ export default function FactoryPreFilterSelect({
   onSelect,
 }: FactoryPreFilterSelectProps) {
   const { t } = useTranslation();
+
+  const { isSemiBold, isTextBase } = useTheme();
   return (
     <div key={`${text}-container`} className="flex w-full flex-col">
-      <label className="ml-1 mt-2 text-xs desktop:text-sm" htmlFor={text}>
+      <label
+        className={clsx(
+          "ml-1 mt-2",
+          isTextBase ? "text-base" : "text-sm",
+          isSemiBold ? "font-semibold" : "font-normal",
+        )}
+        htmlFor={text}
+      >
         {t(text)}
       </label>
       <Select

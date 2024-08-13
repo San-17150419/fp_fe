@@ -26,7 +26,7 @@ function App() {
         <Sidebar />
         {/* TODO: Extract buttons to a component */}
         <div className="relative w-full overflow-hidden border">
-          <div className="absolute left-10 top-4 flex w-full gap-4 text-xs">
+          <div className="absolute left-10 top-4 flex w-full gap-4 text-base">
             <h2 className="my-auto text-xl underline">{username}</h2>
             {location.pathname !== "/login" && (
               <button
@@ -39,7 +39,7 @@ function App() {
               </button>
             )}
           </div>
-          <div className="absolute right-10 top-4 flex gap-4 text-xs">
+          <div className="absolute right-10 top-4 flex gap-4 text-base">
             <button
               type="button"
               aria-description="change language to traditional chinese"
