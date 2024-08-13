@@ -1,6 +1,5 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
-import Select from "../../Select/Select";
+import Select from "../Select/Select";
 type FactoryPreFilterSelectProps = {
   text: string;
   options: {

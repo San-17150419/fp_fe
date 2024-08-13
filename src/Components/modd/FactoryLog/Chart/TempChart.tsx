@@ -8,7 +8,7 @@ import Highcharts from "highcharts";
 import HighchartsExporting from "highcharts/modules/exporting";
 import HighchartsFullScreen from "highcharts/modules/full-screen";
 import { useTranslation } from "react-i18next";
-import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
+import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 import { type FactoryEventReponse } from "../FactoryLogDataType";
 
 type ColumnChartProps = {

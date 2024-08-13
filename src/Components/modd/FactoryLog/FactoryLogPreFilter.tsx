@@ -1,14 +1,14 @@
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { PostDataParams, FactoryLogRawData } from "./FactoryLogDataType";
-import InputBase from "../../Input/InputBase";
+import InputBase from "../Input/InputBase";
 import axios, { isAxiosError } from "axios";
-import Loading from "../../../Loading";
+import Loading from "../../Loading";
 import { type FactoryLogPreFilterProps } from "./FactoryLogDataType";
 import FactoryLogTable from "./FactoryLogTable";
 import FactoryButtons from "./FactoryButtons";
 import FactoryPreFilterSelect from "./FactoryPreFilterSelect";
-import usePreFilterSelect from "../../../../hooks/usePreFilterSelect";
+import usePreFilterSelect from "../../../hooks/usePreFilterSelect";
 
 export default function FactoryLogPreFilter({
   preData,

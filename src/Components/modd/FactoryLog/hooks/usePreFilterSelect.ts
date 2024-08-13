@@ -2,7 +2,7 @@ import {
   type FactoryLogPreData,
   type FactoryLogPreFilterAction,
   type FactoryLogPreFilterState,
-} from "../Components/modd/Table/FactoryLog/FactoryLogDataType";
+} from "../types/factoryLogDataType";
 import { useReducer } from "react";
 function factoryLogPreFilterReducer(
   state: FactoryLogPreFilterState,

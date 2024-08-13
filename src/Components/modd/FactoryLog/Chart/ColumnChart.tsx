@@ -5,7 +5,7 @@ import Highcharts from "highcharts";
 import HighchartsExporting from "highcharts/modules/exporting";
 import { useTranslation } from "react-i18next";
 import highcharts3d from "highcharts/highcharts-3d";
-import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
+import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 // TODO: I need to think about how to make this component more reusable. I don't think I should put data proccessing logic here.
 type ColumnChartProps = {
   title: string;

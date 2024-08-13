@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Table from "../TableTest/Table";
-import Modal from "../../Modal/NonDialogModal";
+import Table from "../Table/TableTest/Table";
+import Modal from "../Modal/NonDialogModal";
 import StatusComponent from "./StatusComponent";
 import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/FactoryProductCharts";
@@ -31,7 +31,6 @@ export default function FactoryTableComponent({
   point?: "ar" | "pamt_p";
   index: number;
 }) {
-  console.log(sysData);
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [visibleRows, setVisibleRows] = useState<string[]>([]);

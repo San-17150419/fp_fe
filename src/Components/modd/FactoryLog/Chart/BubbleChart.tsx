@@ -3,7 +3,7 @@ import Highcharts, { SeriesBubbleOptions } from "highcharts";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../FactoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
-import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
+import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 import { useState } from "react";
 import {
   findMedian,
@@ -11,7 +11,7 @@ import {
   separateByZValue,
   generateColors,
   findAverage,
-} from "../../../../../util/bubbleChartUtils";
+} from "../../../../util/bubbleChartUtils";
 
 // TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
 // TODO:https://jsfiddle.net/menXU/1/ label collision

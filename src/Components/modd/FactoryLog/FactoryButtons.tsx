@@ -3,7 +3,7 @@ import { GrSearch, GrDownload } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import clsx from "clsx";
-import Loading from "../../../Loading";
+import Loading from "../../Loading";
 
 type FactoryButtonsProps = {
   factory?: string;

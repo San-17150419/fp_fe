@@ -1,12 +1,12 @@
 import { useState } from "react";
-import Modal from "../../../Modal/NonDialogModal";
+import Modal from "../../Modal/NonDialogModal";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Factory, type FactoryEventReponse } from "../FactoryLogDataType";
 import BubbleChart from "./BubbleChart";
-import useWindowDimensions from "../../../../../hooks/useWindowDimensions";
+import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 type ProductChartProps = {
   factory: Factory;
   duration: { date_start: string; date_end: string }[];

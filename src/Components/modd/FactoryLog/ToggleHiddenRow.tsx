@@ -1,5 +1,5 @@
-import  { useState, useRef } from "react";
-import useCloseAndEscape from "../../../../hooks/useCloseAndEscape";
+import { useState, useRef } from "react";
+import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import clsx from "clsx";
 
 type HiddenRowsToggleProps = {
@@ -30,7 +30,7 @@ const HiddenRowsToggle = ({
     <div ref={dropdownRef} className="relative mt-2 w-full max-w-fit">
       <button
         type="button"
-        className="block rounded-md hover:bg-gray-300 bg-gray-200 px-2 py-1 text-xs shadow shadow-slate-400 "
+        className="block rounded-md bg-gray-200 px-2 py-1 text-xs shadow shadow-slate-400 hover:bg-gray-300"
         onClick={() => setOpen((prev) => !prev)}
       >
         顯示隱藏系列
@@ -48,23 +48,20 @@ const HiddenRowsToggle = ({
             },
           )}
         >
-          <li className="flex gap-2 py-2 pl-3 pr-4 rounded-md hover:bg-gray-100">
+          <li className="flex gap-2 rounded-md py-2 pl-3 pr-4 hover:bg-gray-100">
             <input
               type="checkbox"
               checked={allHiddenToggled}
               id="toggle-all"
               onChange={toggleAllVisibility}
             />
-            <label
-              className="w-full text-left text-xs "
-              htmlFor="toggle-all"
-            >
+            <label className="w-full text-left text-xs" htmlFor="toggle-all">
               {!allHiddenToggled ? "Show all" : "Hide all"}
             </label>
           </li>
           {hiddenRows.map((row, index) => (
             <li
-              className="flex gap-2 py-2 pl-3 rounded-md pr-4 hover:bg-gray-100"
+              className="flex gap-2 rounded-md py-2 pl-3 pr-4 hover:bg-gray-100"
               key={index}
             >
               <input
@@ -74,7 +71,7 @@ const HiddenRowsToggle = ({
                 onChange={() => toggleVisibility(row)}
               />
               <label
-                className="w-full text-left text-xs "
+                className="w-full text-left text-xs"
                 htmlFor={`${row}-${index}`}
               >
                 {row}

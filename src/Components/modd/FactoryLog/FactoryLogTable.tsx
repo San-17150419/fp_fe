@@ -1,4 +1,3 @@
-import Loading from "../../../Loading";
 import FactoryTableComponent from "./FactoryTableComponent";
 import {
   type FactoryLogRawData,
