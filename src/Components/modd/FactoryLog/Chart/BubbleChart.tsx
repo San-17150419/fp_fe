@@ -1,19 +1,10 @@
 import HighchartsReact from "highcharts-react-official";
-import Highcharts, { SeriesBubbleOptions } from "highcharts";
+import Highcharts from "highcharts";
 import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../types/factoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
-import {
-  findMedian,
-  formatMoldDataForBubbleChart,
-  separateByZValue,
-  generateColors,
-  findAverage,
-} from "../../../../util/bubbleChartUtils";
-
-// TODO: Add some type of something to indicate certain data is abnormal. Such as ar or cpamt is null when they should be a number. I am not sure how to deal with this using typescript. In theory, those data should not be null. If I want to enhance type safety, I should use union type to include null and undefined. But if I do this, I will need to add a lot of null and undefined check in the code.
-// TODO:https://jsfiddle.net/menXU/1/ label collision
+import { generateBubbleChartConfig } from "../utils/bubbleChartUtils";
 
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
@@ -23,92 +14,16 @@ BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
   const { width } = useWindowDimensions();
 
-  // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
   const filteredData = eventData.data_mold.filter((event) => !!event["ar"]);
-
-  const bubbleData = formatMoldDataForBubbleChart({
-    data_mold: filteredData,
-    xKey: "ar",
-    yKey: "mamt",
-    zKey: "count_repaired",
-    nameKey: "sn_num",
-  });
-
   const sysName = eventData.post.sys;
-  const { dataByZValue: separateData, maxZValue } =
-    separateByZValue(bubbleData);
-  const yArray = filteredData
-    .filter((event) => !!event["ar"])
-    .map((event) => event["mamt"]);
-  const yAverage = findAverage(yArray);
-  const yMedian = findMedian(yArray);
-  const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
-  const xMin = Math.min(...filteredData.map((event) => event["ar"])) * 100;
-
-  const xMax = Math.max(...filteredData.map((event) => event["ar"])) * 100;
-
-  const generateSeries = () => {
-    const series: SeriesBubbleOptions[] = [
-      // An invisible series for maintaining visual consistency. In bubble charts, the size of the bubble is relative to the z value. Bubbles that have the lowsest z value have the smallest size which is `minSize`. If in chart A, the lowest z value is 2, then bubbles with z values of 2 will be the smallest. In chart B, the lowest z value is 0, then bubbles with z values of 0 will be the smallest. If you caompare chart A and chart B, it will looks like bubbles with z values of 2 in chart A have the same size as bubbles with z values of 0 in chart B. Visually, it can be misleading. By adding an invisible series that garantees the lowest z value is always 0, it maintains the visual consistency across charts.
-    ];
-    // Have to cast the default config as SeriesBubbleOptions. Otherwise, when mapping through the `separateData` object, typescript will throw an error.
-    const defaultConfig: SeriesBubbleOptions = {
-      type: "bubble",
-
-      maxSize: maxZValue * 10 + 10,
-
-      minSize: 10,
-
-      sizeBy: "width",
-
-      dataGrouping: {
-        enabled: false,
-      },
-
-      jitter: {
-        x: 0.5,
-      },
-    };
-    Object.keys(separateData).map((key) => {
-      const numericKey = Number(key);
-      series.push({
-        ...defaultConfig,
-        data: separateData[numericKey] as Highcharts.PointOptionsObject[],
-        color: colorsArray[numericKey],
-        legendIndex: numericKey,
-        name: `維修次數: ${numericKey}`,
-        dataLabels: {
-          align: "center",
-
-          verticalAlign: "top",
-
-          enabled: true,
-
-          allowOverlap: false,
-
-          y: -15,
-          zIndex: 9,
-          // zIndex: 9 + index,
-
-          style: {
-            color: "black",
-
-            fontWeight: "bold",
-
-            fontSize: "0.5rem",
-          },
-        },
-      });
-    });
-    return series;
-  };
+  const { xMin, xMax, yAverage, yMedian, generateSeries } =
+    generateBubbleChartConfig(filteredData);
 
   Highcharts.setOptions({
     lang: {
       thousandsSep: ",",
     },
   });
-
   const options: Highcharts.Options = {
     exporting: {
       buttons: {
@@ -125,25 +40,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       zooming: {
         type: "xy",
       },
-      // TODO: Handle null values
-      events: {
-        // load: function () {
-        //   this.series.forEach((series) => {
-        //     staggerDataLabels(series);
-        //   });
-        // },
-        // redraw: function () {
-        //   const series = this.series[0];
-        //   this.series.forEach((series) => {
-        //     series.points.forEach((point) => {
-        //       console.log(point);
-        //     });
-        //   });
-        //   setTimeout(() => {
-        //     staggerDataLabels(series);
-        //   }, 1000);
-        // },
-      },
     },
     subtitle: {
       text: `${eventData.post.date_start} ~ ${eventData.post.date_end}`,
@@ -151,7 +47,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         color: "#666666",
         padding: "15px",
         margin: "15px",
-
         top: "10px",
       },
       align: "center",
@@ -171,6 +66,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       },
       max: xMax + 5 <= 100 ? 100 : xMax + 5,
       min: xMin - 5,
+      lineColor: "black",
+      lineWidth: 1,
       labels: {
         format: "{value} %",
       },
@@ -192,7 +89,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       ],
     },
     yAxis: {
-      // type: "logarithmic",
       startOnTick: false,
       endOnTick: false,
       title: {
@@ -222,7 +118,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
               fontStyle: "italic",
             },
             text: "中間值",
-            // text: "平均值",
           },
           zIndex: 8,
         },
@@ -235,14 +130,12 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             style: {
               fontStyle: "italic",
             },
-            // text: "中間值",
             text: "平均值",
           },
           zIndex: 8,
         },
       ],
     },
-
     tooltip: {
       borderWidth: 0,
       padding: 0,
@@ -257,7 +150,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
         return `<div style="text-align:left; padding: 0.5rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● 唯一碼: ${this.point.name}</p> <br> <p>● 達成率: ${this.point.x.toFixed(2)} % </p><br> <p>● 總模次: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● 維修次數: ${this.point.options.z} 次</p></div>`;
       },
     },
-
     plotOptions: {
       series: {
         dataLabels: {
@@ -274,8 +166,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
   };
 
   return (
-    <div className="flex w-[95%] justify-center border border-gray-200 ">
-      {/* <div className="w-[95%] border border-black flex justify-center"> */}
+    <div className="flex w-[95%] justify-center border border-gray-200">
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
