@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Table from "../Table/TableTest/Table";
 import Modal from "../Modal/NonDialogModal";
-import StatusComponent from "./StatusComponent";
+import ProductStatus from "./ProductStatus";
 import ColumnChart from "./Chart/ColumnChart";
 import ProductChart from "./Chart/FactoryProductCharts";
 import HiddenRowsToggle from "./ToggleHiddenRow";
@@ -18,7 +18,7 @@ const colors100 = [
   "bg-[#f3e8ff]",
 ];
 
-export default function FactoryTableComponent({
+export default function FactoryTable({
   factory,
   department,
   sysData,
@@ -131,7 +131,7 @@ export default function FactoryTableComponent({
             {/* <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl"> */}
             <Table.TableCell
               className={clsx(
-                "w-2/12 text-center border-y border-black",
+                "w-2/12 border-y border-black text-center",
                 isSemiBold ? "font-semibold" : "font-normal",
                 isTextBase ? "text-base" : "text-sm",
               )}
@@ -256,7 +256,7 @@ export default function FactoryTableComponent({
                 </Table.TableCell>
               ))}
               <Table.TableCell colspan={2}>
-                <StatusComponent value={sysData[sysName][point]} />
+                <ProductStatus value={sysData[sysName][point]} />
               </Table.TableCell>
             </Table.TableRow>
           ))}

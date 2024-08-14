@@ -15,7 +15,7 @@ export type PostDataParams = {
   date_type: "half-year" | "quarter";
   date_start: string;
   // right now, we do not need to specify point. I only include it for completeness
-  point: "ar" | "pamt_p";
+  point: "ar" | "pamt_h";
 };
 
 export type LogData = {
@@ -162,6 +162,7 @@ export type FactoryLogPreFilterState = {
   progress: number;
   isLoading: boolean;
   factoryLogRawData: FactoryLogRawData | null;
+  preData: PreData;
 };
 
 export type FactoryLogPreFilterAction =

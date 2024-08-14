@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 // import { useTheme } from "../../../stores/ThemeContext";
 import clsx from "clsx";
-type StatusComponentProps = {
+type ProductStatusProps = {
   value: number[];
 };
 
-const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
+const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
   const { t } = useTranslation();
   const [isLowest, setIsLowest] = useState(false);
   const [isLowerThanStandard, setIsLowerThanStandard] = useState(false);
@@ -65,7 +65,7 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       {isLowest && (
         <p
           className={clsx(
-            "rounded-full px-2 py-1 text-sm text-white font-normal shadow",
+            "rounded-full px-2 py-1 text-sm font-normal text-white shadow",
             isLowerThanStandard
               ? "bg-amber-500 shadow-amber-700"
               : "bg-green-500 shadow-green-700",
@@ -85,7 +85,7 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
       {isLowerThanStandardConsecutively && (
         <p
           className={clsx(
-            "rounded-full bg-red-500 px-2 py-1 text-sm text-white shadow font-normal shadow-red-700",
+            "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-white shadow shadow-red-700",
             // isTextBase ? "text-base" : "text-sm",
           )}
           // className={clsx(
@@ -103,4 +103,4 @@ const StatusComponent: React.FC<StatusComponentProps> = ({ value }) => {
   );
 };
 
-export default StatusComponent;
+export default ProductStatus;

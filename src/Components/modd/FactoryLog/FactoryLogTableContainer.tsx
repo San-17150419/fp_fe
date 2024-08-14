@@ -1,14 +1,16 @@
-import FactoryTableComponent from "./FactoryTableComponent";
+import FactoryTable from "./FactoryTable";
 import {
   type FactoryLogRawData,
   type DepartmentMap,
 } from "./types/factoryLogDataType";
 import { transformData } from "./formatFactoryData";
 import { useEffect, useState } from "react";
-type FactoryLogTableProps = {
+type FactoryLogTableContainerProps = {
   logData: FactoryLogRawData;
 };
-export default function FactoryLogTable({ logData }: FactoryLogTableProps) {
+export default function FactoryLogTableContainer({
+  logData,
+}: FactoryLogTableContainerProps) {
   // const { postData, duration, isRequestMade, isTableDataReady } =
   //   useFactoryLogContext();
   const [postData, setPostData] = useState<Record<string, any> | null>(null);
@@ -27,7 +29,7 @@ export default function FactoryLogTable({ logData }: FactoryLogTableProps) {
     <div>
       {postData &&
         Object.keys(postData).map((department: string, index) => (
-          <FactoryTableComponent
+          <FactoryTable
             factory={logData.post.factory}
             // TODO: modify type definition to enable type checking
             department={
