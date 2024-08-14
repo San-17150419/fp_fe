@@ -7,7 +7,7 @@
   "HP": "HP",
   "DL": "DL",
   "ar": "ar",
-  "pamt_h": "pamt/h",
+  "pamt_h": "pamt_h",
   "half-year": "half-year",
   "quarter": "quarter",
   "INJ": "INJ",
@@ -31,7 +31,7 @@
   "金筆廠": "HP",
   "斗六廠": "DL",
   "達成率": "ar",
-  "機均產出": "pamt/h",
+  "機均產出": "pamt_h",
   "半年度": "half-year",
   "自然季度": "quarter",
   "注塑課": "INJ",
@@ -74,6 +74,6 @@
   "Department": "Department",
   "部門": "Department",
   "部门": "部门",
-  "加载需35秒到40秒": "it might take 35-40 seconds to load",
-  "下載需35秒到40秒": "it might take 35-40 seconds to load"
+  "加载需要35秒到40秒": "it might take 35-40 seconds to load",
+  "下載需要35秒到40秒": "it might take 35-40 seconds to load"
 }

@@ -47,6 +47,18 @@
   "department": "部門",
   "部门": "部門",
   "Loading": "下載中",
-  "加载需35秒到40秒": "下載需35秒到40秒",
-  "it might take 35-40 seconds to load": "下載需35秒到40秒"
+  "加载需要35秒到40秒": "下載需要35秒到40秒",
+  "it might take 35-40 seconds to load": "下載需要35秒到40秒",
+  "METAL_MECH": "加工課",
+  "登录": "登入",
+  "login": "登入",
+  "Login": "登入",
+  "Logout": "登出",
+  "logout": "登出",
+  "register": "註冊",
+  "Register": "註冊",
+  "Username": "使用者名稱",
+  "username": "使用者名稱",
+  "Password": "密碼",
+  "password": "密碼"
 }
