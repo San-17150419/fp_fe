@@ -1,5 +1,6 @@
-import { type FactoryEventReponseMoldData } from "../Components/modd/FactoryLog/types/factoryLogDataType";
-
+import { type FactoryEventReponseMoldData } from "../types";
+import Highcharts, { type SeriesBubbleOptions } from "highcharts";
+import { type FactoryEventReponse } from "../types";
 /**
  * Formats a number into a hexadecimal string with a leading zero if necessary.
  *
@@ -287,3 +288,70 @@ export {
   staggerDataLabels,
   isLabelOnLabel,
 };
+
+export function generateBubbleChartConfig(
+  moldData: FactoryEventReponseMoldData[],
+) {
+  // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
+  const bubbleData = formatMoldDataForBubbleChart({
+    data_mold: moldData,
+    xKey: "ar",
+    yKey: "mamt",
+    zKey: "count_repaired",
+    nameKey: "sn_num",
+  });
+
+  const { dataByZValue: separateData, maxZValue } =
+    separateByZValue(bubbleData);
+  const yArray = moldData.map((event) => event["mamt"]);
+  const yAverage = findAverage(yArray);
+  const yMedian = findMedian(yArray);
+  const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
+  const xMin = Math.min(...moldData.map((event) => event["ar"])) * 100;
+  const xMax = Math.max(...moldData.map((event) => event["ar"])) * 100;
+
+  const generateSeries = () => {
+    const series: SeriesBubbleOptions[] = [];
+    const defaultConfig: SeriesBubbleOptions = {
+      type: "bubble",
+      maxSize: maxZValue * 10 + 10,
+      minSize: 10,
+      sizeBy: "width",
+      dataGrouping: { enabled: false },
+      jitter: { x: 0.5 },
+    };
+
+    Object.keys(separateData).map((key) => {
+      const numericKey = Number(key);
+      series.push({
+        ...defaultConfig,
+        data: separateData[numericKey] as Highcharts.PointOptionsObject[],
+        color: colorsArray[numericKey],
+        legendIndex: numericKey,
+        name: `維修次數: ${numericKey}`,
+        dataLabels: {
+          align: "center",
+          verticalAlign: "top",
+          enabled: true,
+          allowOverlap: false,
+          y: -15,
+          zIndex: 9,
+          style: {
+            color: "black",
+            fontWeight: "bold",
+            fontSize: "0.5rem",
+          },
+        },
+      });
+    });
+    return series;
+  };
+
+  return {
+    xMin,
+    xMax,
+    yAverage,
+    yMedian,
+    generateSeries,
+  };
+}
