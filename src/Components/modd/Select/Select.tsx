@@ -49,14 +49,14 @@ export default function Select({
       name={name}
       defaultValue={selectedOption}
       as="div"
-      className={cn("relative my-2 mr-1 flex h-7 w-full pr-2", className)}
+      className={cn("box-border flex h-9 w-full", className)}
     >
       {({ open }) => (
         <>
           <ListboxButton
             id={name}
             className={clsx(
-              "flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-0 text-left shadow shadow-slate-300 hover:border-sky-300 focus:border-2 focus:border-sky-400 desktop:px-3 desktop:py-4",
+              "box-border flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-1 text-left shadow shadow-slate-300 hover:border-sky-300 focus:border-2 focus:border-sky-400 desktop:px-3 desktop:py-4",
               open ? "border-blue-300" : "border-gray-300",
               isSemiBold ? "font-semibold" : "font-normal",
               isTextBase ? "text-base" : "text-sm",
