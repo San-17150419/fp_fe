@@ -14,6 +14,7 @@ export default function useCloseAndEscape(
   ref: React.RefObject<HTMLElement>,
   onClose: () => void,
   isOpen: boolean,
+  returnFocusOnClose: boolean = true,
 ) {
   const triggerRef = useRef<HTMLElement | null>(null);
 
@@ -22,7 +23,9 @@ export default function useCloseAndEscape(
       if (ref.current && !ref.current.contains(event.target as Node)) {
         // This is for preventing element other than the trigger element from being focused when closing
         // Without this, the focus would be lost when clicking outside of the element
-        event.preventDefault();
+        if (returnFocusOnClose) {
+          event.preventDefault();
+        }
         event.stopPropagation();
         onClose();
       }
