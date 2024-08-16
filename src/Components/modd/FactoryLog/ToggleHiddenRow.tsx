@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import clsx from "clsx";
 import { useTheme } from "../../../stores/ThemeContext";
-
+import ToggleLi from "./ToggleLi";
 type HiddenRowsToggleProps = {
   hiddenRows: string[];
   visibleRows: string[];
@@ -22,6 +22,7 @@ const HiddenRowsToggle = ({
   toggleAllVisibility,
   position = "bottom-left",
 }: HiddenRowsToggleProps) => {
+  // TODO: fix a issure where all options are toggled but toggle all is not toggled and text is not updated to "全部隱藏"
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
@@ -43,61 +44,36 @@ const HiddenRowsToggle = ({
       >
         顯示隱藏系列
       </button>
-
       {open && (
         <ul
           className={clsx(
             "absolute z-50 flex w-fit flex-col rounded-md bg-white shadow shadow-slate-400",
             {
-              "right-1 top-full ": position === "bottom-right",
-              "left-3 top-full ": position === "bottom-left",
-              "bottom-full right-1 ": position === "top-right",
-              "bottom-full left-1 ": position === "top-left",
+              "right-1 top-full": position === "bottom-right",
+              "left-3 top-full": position === "bottom-left",
+              "bottom-full right-1": position === "top-right",
+              "bottom-full left-1": position === "top-left",
             },
           )}
         >
-          <li className="flex gap-2 rounded-md hover:bg-gray-100">
-            <label
-              className={clsx(
-                "mt-1 w-full",
-                isSemiBold ? "font-semibold" : "font-normal",
-                isTextBase ? "text-base" : "text-sm",
-              )}
-              htmlFor="toggle-all"
-            >
-              <span className="mx-3 flex w-full gap-2">
-                <input
-                  type="checkbox"
-                  checked={allHiddenToggled}
-                  id="toggle-all"
-                  onChange={toggleAllVisibility}
-                  aria-label="Toggle all hiddenRows"
-                />
-                {!allHiddenToggled ? "Show all" : "Hide all"}
-              </span>
-            </label>
-          </li>
+          <ToggleLi
+            id="toggle-all"
+            checked={allHiddenToggled}
+            onChange={toggleAllVisibility}
+            ariaLabel="Toggle all hiddenRows"
+          >
+            {allHiddenToggled ? "取消全部隱藏" : "全部隱藏"}
+          </ToggleLi>
+
           {hiddenRows.map((row, index) => (
-            <li key={index} className="rounded-md hover:bg-gray-100">
-              <label
-                className={clsx(
-                  "mt-1 w-full",
-                  isSemiBold ? "font-semibold" : "font-normal",
-                  isTextBase ? "text-base" : "text-sm",
-                )}
-                htmlFor={`${row}-${index}`}
-              >
-                <span className="mx-3 flex w-full gap-2">
-                  <input
-                    type="checkbox"
-                    id={`${row}-${index}`}
-                    checked={visibleRows.includes(row)}
-                    onChange={() => toggleVisibility(row)}
-                  />
-                  {row}
-                </span>
-              </label>
-            </li>
+            <ToggleLi
+              key={index}
+              id={`${row}-${index}`}
+              checked={visibleRows.includes(row)}
+              onChange={() => toggleVisibility(row)}
+              label={row}
+              ariaLabel={`Toggle ${row} in hiddenRows`}
+            ></ToggleLi>
           ))}
         </ul>
       )}

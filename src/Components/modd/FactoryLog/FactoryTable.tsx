@@ -39,6 +39,8 @@ export default function FactoryTable({
   const [incompleteRows, setIncompleteRows] = useState<string[]>([]);
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
+  
+  // most likely will only called once since the data is static
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
       sysData[system][point].includes(0),
@@ -50,6 +52,15 @@ export default function FactoryTable({
     setIncompleteRows(updatedIncompleteRows);
     setVisibleRows(updatedVisibleRows);
   }, [sysData, point]);
+
+  useEffect(() => {
+    if (visibleRows.length === Object.keys(sysData).length) {
+      setAllHiddenToggled(true);
+    }
+    if (visibleRows.length !== Object.keys(sysData).length) {
+      setAllHiddenToggled(false);
+    }
+  }, [visibleRows, sysData]);
 
   const handleToggleVisibility = (label: string) => {
     setVisibleRows((prevRows) =>
@@ -74,7 +85,7 @@ export default function FactoryTable({
   };
 
   return (
-    <div className="rounded-md bg-white shadow shadow-gray-500">
+    <div className="mb-20 rounded-md bg-white shadow shadow-gray-500">
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <ColumnChart
           allData={sysData}
@@ -83,7 +94,7 @@ export default function FactoryTable({
         />
       </Modal>
 
-      <Table id={department} className="mb-20 mt-12 table-fixed text-center">
+      <Table id={department} className="table-fixed text-center">
         <Table.TableCaption
           className={clsx(
             "my-10",
@@ -99,21 +110,13 @@ export default function FactoryTable({
 
           <div className="mr-4 flex justify-end">
             <HiddenRowsToggle
+              key={department}
               hiddenRows={incompleteRows}
               visibleRows={visibleRows}
               toggleVisibility={handleToggleVisibility}
               allHiddenToggled={allHiddenToggled}
               toggleAllVisibility={handleToggleAllVisibility}
             />
-            {/* <button
-              type="button"
-              title="Download Excel"
-              key={`download-${department}`}
-              onClick={() => downloadExcel(department)}
-              className="mx-2 block aspect-square rounded-md border px-2 hover:bg-gray-500 hover:text-gray-100"
-            >
-              <GrDownload />
-            </button> */}
           </div>
         </Table.TableCaption>
         <Table.TableHeader>
@@ -125,10 +128,9 @@ export default function FactoryTable({
                 isTextBase ? "text-base" : "text-sm",
               )}
             >
-              {/* <Table.TableCell className="w-2/12 text-xs tabletL:text-xs tabletP:text-xs desktop:text-2xl"> */}
               {t("部門")}
             </Table.TableCell>
-            {/* <Table.TableCell className="w-2/12 text-base tabletL:text-sm tabletP:text-sm desktop:text-2xl"> */}
+
             <Table.TableCell
               className={clsx(
                 "w-2/12 border-y border-black text-center",
@@ -148,7 +150,7 @@ export default function FactoryTable({
                     isSemiBold ? "font-semibold" : "font-normal",
                     isTextBase ? "text-base" : "text-sm",
                   )}
-                  key={`${department}-table-header-cell-${index}`}
+                  key={`${factory}-${department}-table-header-cell-${index}`}
                 >
                   {t("區間") + " " + (index + 1)}
                   <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
@@ -158,29 +160,6 @@ export default function FactoryTable({
                   </div>
                 </Table.TableCell>
               ))}
-            {/* {Array.from({ length: 3 }).map((_, index) => (
-              <Table.TableCell
-                className="border-y border-black text-xs"
-                // className="tablet:text-base text-xs desktop:text-lg"
-                key={`${department}-table-header-cell-${index}`}
-              >
-                {t("區間") + " " + (index + 1)}
-                <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
-                  {duration[3 - index].date_start || ""}
-                  <span className="whitespace-pre-wrap">到</span>
-                  {duration[3 - index].date_end || ""}
-                </div>
-              </Table.TableCell>
-            ))} */}
-
-            {/* <Table.TableCell className="border-y border-black text-xs">
-              <span>{t("區間") + " " + 4}</span>
-              <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-gray-700">
-                {duration[0].date_start}
-                <span className="whitespace-pre-wrap">到</span>
-                <span className="whitespace-pre">至今</span>
-              </div>
-            </Table.TableCell> */}
             <Table.TableCell
               colspan={2}
               className={clsx(
@@ -216,7 +195,6 @@ export default function FactoryTable({
                     onClick={() => setIsOpen(true)}
                     type="button"
                     className="text-wrap rounded-md p-1 hover:opacity-90"
-                    // className="hover rounded-md p-1 text-xs hover:shadow-lg lg:text-sm desktop:text-xl"
                   >
                     {t(department)}
                   </button>
@@ -224,7 +202,6 @@ export default function FactoryTable({
               )}
 
               <Table.TableCell>
-                {/* <Table.TableCell className="focus-within:bg-sky-100"> */}
                 <ProductChart
                   title={sysName}
                   department={department}
@@ -240,8 +217,7 @@ export default function FactoryTable({
                     isSemiBold ? "font-semibold" : "font-normal",
                     isTextBase ? "text-base" : "text-sm",
                   )}
-                  // className="w-2/12 border-gray-600 text-xs tabletL:text-xs tabletP:text-xs desktop:text-lg"
-                  key={`${sysName}-${index}`}
+                  key={`${factory}-${sysName}-${index}`}
                 >
                   <span
                     className={clsx(
@@ -249,7 +225,6 @@ export default function FactoryTable({
                       isSemiBold ? "font-semibold" : "font-normal",
                       isTextBase ? "text-base" : "text-sm",
                     )}
-                    // className={`text-xs desktop:text-base ${arValue < 0.85 ? "text-red-500" : ""}`}
                   >
                     {arValue !== 0 ? `${(arValue * 100).toFixed(2)}%` : ""}
                   </span>
