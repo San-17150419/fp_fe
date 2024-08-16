@@ -1,20 +1,24 @@
 import Loading from "../../Loading";
-import { type FactoryLogPreFilterProps } from "./types/factoryLogDataType";
-import FactoryLogTableContainer from "./FactoryLogTableContainer";
+import { type FactoryLogPreFilterProps, type DepartmentMap } from "./types";
+import FactoryTable from "./FactoryTable";
 import FactoryButtons from "./FactoryButtons";
 import FactoryPreFilterItem from "./FactoryFilterItem";
-import useFilterState from "./hooks/useFactoryFilter";
+import useFactoryFilter from "./hooks/useFactoryFilter";
 
 export default function FactoryLogFilter({
   preData,
 }: FactoryLogPreFilterProps) {
-  const { isLoading, handleSubmit, filterConfig, factoryLogRawData } =
-    useFilterState(preData);
+  const { isLoading, handleSubmit, filterConfig, logData, error } =
+    useFactoryFilter(preData);
+  const data = logData?.data;
+  const factory = logData?.factory;
+  const duration = logData?.duration;
+
   return (
     <>
-      <section className="min-h-[100px] border-b border-black">
+      <section className="border-b border-black pb-5">
         <form id="form" onSubmit={handleSubmit} className="flex w-full">
-          <div className="flex w-full flex-grow gap-4">
+          <div className="flex w-full flex-grow flex-wrap items-end gap-3">
             {Object.entries(filterConfig).map(([key, config]) => {
               return config.type === "input" &&
                 config.defaultValue !== undefined ? (
@@ -35,17 +39,29 @@ export default function FactoryLogFilter({
                 />
               ) : null;
             })}
+            <FactoryButtons factory={factory} duration={duration} />
           </div>
-          <FactoryButtons
-            factory={factoryLogRawData?.post.factory}
-            duration={factoryLogRawData?.duration}
-          />
         </form>
       </section>
-      {/* Show loading indicator when a request is made but data is not yet loaded */}
-      {isLoading && !factoryLogRawData && <Loading />}
+      {/* An indicator that a request is in progress */}
+      {isLoading && <Loading />}
+      {error && <p>{error}</p>}
       {/* Only show table when data is loaded */}
-      {factoryLogRawData && <FactoryLogTableContainer logData={factoryLogRawData} />}
+
+      {data &&
+        factory &&
+        duration &&
+        Object.keys(data).map((department: string, index) => (
+          <FactoryTable
+            factory={factory}
+            // TODO: modify type definition to enable type checking
+            department={department as DepartmentMap[typeof factory]}
+            sysData={data[department]}
+            duration={duration}
+            key={`${factory}-table-${department}-${index}`}
+            index={index}
+          />
+        ))}
     </>
   );
 }

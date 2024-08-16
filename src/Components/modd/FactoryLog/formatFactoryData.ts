@@ -1,5 +1,7 @@
 import {
-  LogData,
+  Duration,
+  Factory,
+  type FactoryLogRawData,
 } from "./types/factoryLogDataType";
 type FormattedData = {
   [key: string]: any;
@@ -10,10 +12,14 @@ type FormattedData = {
  * @param {LogData[]} data - The array of LogData to be transformed
  * @return {FormattedData} The formatted data structure
  */
-export const transformData = (data: LogData[]): FormattedData => {
+export const transformData = (
+  rawData: FactoryLogRawData,
+): { data: FormattedData; duration: Array<Duration>; factory: Factory } => {
+  const data = rawData.data;
+  const factory = rawData.post.factory;
+  const duration = rawData.duration;
   const finalDataFormat: FormattedData = {};
   const totalIntervals = 4; // Assuming there are always 4 intervals
-
   data.forEach((item) => {
     const { dep, data: dateRanges } = item;
 
@@ -52,6 +58,6 @@ export const transformData = (data: LogData[]): FormattedData => {
       });
     });
   });
-
-  return finalDataFormat;
+  console.log(finalDataFormat);
+  return { data: finalDataFormat, factory, duration };
 };

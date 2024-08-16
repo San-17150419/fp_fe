@@ -194,3 +194,14 @@ export type FactoryLogPreFilterAction =
 export type FactoryLogPreFilterProps = {
   preData: PreData;
 };
+
+export type Duration = {
+  date_start: string;
+  date_end: string;
+};
+
+export type FactoryTableData = {
+  data: Record<string, any>;
+  duration: Duration[];
+  factory: Factory;
+};

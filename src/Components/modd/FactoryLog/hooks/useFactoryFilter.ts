@@ -6,7 +6,10 @@ import {
   type PostDataParams,
   type FactoryLogRawData,
   type FilterConfig,
+  type FactoryTableData,
 } from "../types";
+
+import { transformData } from "../formatFactoryData";
 
 const api = import.meta.env.VITE_FACTORY_LOG_URL;
 
@@ -25,8 +28,7 @@ export default function useFilterState(
     defaultDateStart ||
       new Date(Date.now() - 86400000 * 7).toISOString().split("T")[0],
   );
-  const [factoryLogRawData, setFactoryLogRawData] =
-    useState<FactoryLogRawData | null>(null);
+  const [logData, setLogData] = useState<FactoryTableData | null>(null);
 
   const memoizedFactoryOptions = useMemo(() => {
     return Object.entries(preData).reduce(
@@ -50,9 +52,6 @@ export default function useFilterState(
     }
     setIsLoading(true);
     setError(null);
-    // TODO: If I don't set factoryLogRawData to null, it will cause an error. Fetching data for the first time does not cause an error. But fetching data the second time, just right after receiving the response, before updating the state, there is a gap where the latest factoryLogRawData is not available. Then FactoryTable will try to access a data that does not exist.
-    setFactoryLogRawData(null);
-
     const params: PostDataParams = {
       date_start: dateStart,
       factory: factory,
@@ -66,12 +65,25 @@ export default function useFilterState(
     ): Promise<FactoryLogRawData | undefined> => {
       try {
         const response = await axios.post<FactoryLogRawData>(url, params);
+        setError(null);
+        setLogData(transformData(response.data));
         return response.data;
       } catch (error) {
         console.error(error);
-        isAxiosError(error) &&
-          error.response &&
-          setError(error.response.data.detail);
+        // TODO: Need to find a more elegant way to show error message
+        if (isAxiosError(error)) {
+          const errorHTML = error.response?.data;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(errorHTML, "text/html");
+          const summary = (doc.querySelector("#summary h1") as HTMLElement)
+            ?.innerText;
+          const exceptionMessage = (
+            doc.querySelector(".exception_value") as HTMLElement
+          ).innerText;
+
+          setError(`Error: ${summary} - ${exceptionMessage}`);
+        }
+
         // return undefined indicating that the request failed
         return undefined;
       }
@@ -80,13 +92,7 @@ export default function useFilterState(
     fetchFactoryLogRawData(
       "http://192.168.123.240:9000/api/fj/raw-data/",
       params,
-    ).then((data) => {
-      if (data) {
-        setError(null);
-        setFactoryLogRawData(data);
-      }
-      setIsLoading(false);
-    });
+    ).then(() => setIsLoading(false));
   };
 
   const filterConfig: {
@@ -121,8 +127,8 @@ export default function useFilterState(
   return {
     isLoading,
     error,
+    logData,
     handleSubmit,
-    factoryLogRawData,
     filterConfig,
   };
 }
