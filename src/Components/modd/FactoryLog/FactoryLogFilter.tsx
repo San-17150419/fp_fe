@@ -1,9 +1,10 @@
 import Loading from "../../Loading";
 import { type FactoryLogPreFilterProps, type DepartmentMap } from "./types";
 import FactoryTable from "./FactoryTable";
-import FactoryButtons from "./FactoryButtons";
 import FactoryPreFilterItem from "./FactoryFilterItem";
 import useFactoryFilter from "./hooks/useFactoryFilter";
+import FactorySearchButton from "./FactorySearchButton";
+import DownloadExcelButton from "./DownloadExcelButton";
 
 export default function FactoryLogFilter({
   preData,
@@ -39,7 +40,8 @@ export default function FactoryLogFilter({
                 />
               ) : null;
             })}
-            <FactoryButtons factory={factory} duration={duration} />
+            <FactorySearchButton formId="form" />
+            <DownloadExcelButton factory={factory} duration={duration} />
           </div>
         </form>
       </section>
