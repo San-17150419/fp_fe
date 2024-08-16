@@ -19,29 +19,36 @@ export default function FactoryLogFilter({
     <>
       <section className="border-b border-black pb-5">
         <form id="form" onSubmit={handleSubmit} className="flex w-full">
-          <div className="flex w-full flex-grow flex-wrap items-end gap-3">
+          <div className="lg:grid-cols-54 xl:grid-cols-52 p grid w-full grid-flow-row-dense grid-cols-9 items-end gap-x-2 lg:gap-0 lg:space-x-2">
             {Object.entries(filterConfig).map(([key, config]) => {
               return config.type === "input" &&
                 config.defaultValue !== undefined ? (
-                <FactoryPreFilterItem
-                  key={key}
-                  text={key}
-                  type={config.type}
-                  onChange={config.onChange}
-                  defaultValue={config.defaultValue}
-                />
+                <div className="col-span-4 lg:col-span-12" key={key}>
+                  <FactoryPreFilterItem
+                    text={key}
+                    type={config.type}
+                    onChange={config.onChange}
+                    defaultValue={config.defaultValue}
+                  />
+                </div>
               ) : config.type === "select" && config.options !== undefined ? (
-                <FactoryPreFilterItem
-                  key={key}
-                  text={key}
-                  type={config.type}
-                  onChange={config.onChange}
-                  options={config.options}
-                />
+                <div className="col-span-4 lg:col-span-12" key={key}>
+                  <FactoryPreFilterItem
+                    text={key}
+                    type={config.type}
+                    onChange={config.onChange}
+                    options={config.options}
+                  />
+                </div>
               ) : null;
             })}
-            <FactorySearchButton formId="form" />
-            <DownloadExcelButton factory={factory} duration={duration} />
+            <div className="col-span-1 lg:col-span-3 xl:col-span-2">
+              {/* <div className="mt-auto place-self-center"> */}
+              <FactorySearchButton formId="form" />
+            </div>
+            <div className="col-span-1 lg:col-span-3 xl:col-span-2">
+              <DownloadExcelButton factory={factory} duration={duration} />
+            </div>
           </div>
         </form>
       </section>

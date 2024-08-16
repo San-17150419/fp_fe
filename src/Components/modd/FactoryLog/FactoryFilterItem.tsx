@@ -19,7 +19,7 @@ export default function FactoryFilterItem({
   return (
     <div
       key={`${text}-container`}
-      className="flex min-w-[160px] max-w-[22%] flex-grow flex-col"
+      className="flex min-w-[120px] flex-grow flex-col"
     >
       <label
         className={clsx(

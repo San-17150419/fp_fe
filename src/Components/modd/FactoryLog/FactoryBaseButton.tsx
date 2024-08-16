@@ -8,7 +8,7 @@ export default function FactoryBaseButton({
     <button
       {...props}
       className={cn(
-        "ml-auto flex h-9 w-9 items-center justify-center rounded bg-gray-400 text-xs shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800",
+        "flex h-9 w-9 items-center justify-center rounded bg-gray-400 text-sm shadow shadow-gray-500 hover:bg-gray-500 hover:text-white hover:shadow-gray-800",
         props.className,
       )}
     >
