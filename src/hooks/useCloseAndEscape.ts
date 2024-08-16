@@ -58,5 +58,5 @@ export default function useCloseAndEscape(
         triggerRef.current.focus();
       }
     };
-  }, [ref, onClose, isOpen]);
+  }, [ref, onClose, isOpen, returnFocusOnClose]);
 }
