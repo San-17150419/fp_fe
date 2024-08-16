@@ -30,7 +30,7 @@ const HiddenRowsToggle = ({
 
   return (
     <div
-      className="relative mt-2 w-full max-w-fit bg-white p-3"
+      className="relative mt-2 w-full max-w-fit  p-3"
       ref={dropdownRef}
     >
       <button
@@ -38,7 +38,7 @@ const HiddenRowsToggle = ({
         className={clsx(
           "block rounded-md bg-gray-200 px-2 py-1 shadow shadow-slate-400 hover:bg-gray-300",
           isSemiBold ? "font-semibold" : "font-normal",
-          isTextBase ? "text-base" : "text-sm",
+          isTextBase ? "text-sm" : "text-xs",
         )}
         onClick={() => setOpen((prev) => !prev)}
       >

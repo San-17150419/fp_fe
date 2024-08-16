@@ -39,7 +39,7 @@ export default function FactoryTable({
   const [incompleteRows, setIncompleteRows] = useState<string[]>([]);
   const [allHiddenToggled, setAllHiddenToggled] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
-  
+
   // most likely will only called once since the data is static
   useEffect(() => {
     const updatedIncompleteRows = Object.keys(sysData).filter((system) =>
@@ -97,18 +97,13 @@ export default function FactoryTable({
       <Table id={department} className="table-fixed text-center">
         <Table.TableCaption
           className={clsx(
-            "my-10",
+            "relative my-10 py-5",
             isTextBase ? "text-xl" : "text-lg",
             isSemiBold ? "font-semibold" : "font-normal",
           )}
         >
-          <div className="relative flex flex-col justify-center">
-            <span className="absolute left-1/2 -translate-x-1/2 text-slate-700 drop-shadow-lg">
-              {t(department)} {t("達成率")}
-            </span>
-          </div>
-
-          <div className="mr-4 flex justify-end">
+          {t(department)} {t("達成率")}
+          <div className="absolute right-0 mr-4 top-10 flex justify-end">
             <HiddenRowsToggle
               key={department}
               hiddenRows={incompleteRows}
