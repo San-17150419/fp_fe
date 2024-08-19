@@ -19,7 +19,7 @@ export default function FactoryLogFilter({
     <>
       <section className="border-b border-black pb-5">
         <form id="form" onSubmit={handleSubmit} className="flex w-full">
-          <div className="lg:grid-cols-54 xl:grid-cols-52 p grid w-full grid-flow-row-dense grid-cols-9 items-end gap-x-2 lg:gap-0 lg:space-x-2">
+          <div className="p grid w-full grid-flow-row-dense grid-cols-9 items-end gap-x-2 lg:grid-cols-54 lg:gap-0 lg:space-x-2 xl:grid-cols-52">
             {Object.entries(filterConfig).map(([key, config]) => {
               return config.type === "input" &&
                 config.defaultValue !== undefined ? (
@@ -53,7 +53,7 @@ export default function FactoryLogFilter({
         </form>
       </section>
       {/* An indicator that a request is in progress */}
-      {isLoading && <Loading />}
+      {isLoading && <Loading text="Loading..." />}
       {error && <p>{error}</p>}
       {/* Only show table when data is loaded */}
 

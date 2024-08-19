@@ -47,11 +47,7 @@ export default function DownloadExcelButton({
       >
         <GrDownload />
       </FactoryBaseButton>
-      {isLoading && (
-        <Loading>
-          <h2>{t("下載需要35秒到40秒")}</h2>
-        </Loading>
-      )}
+      {isLoading && <Loading text={t("檔案生成中，請稍後一分鐘")} />}
     </>
   );
 }
