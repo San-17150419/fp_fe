@@ -1,16 +1,20 @@
 import React from "react";
-import Modal from "../../Modal/NonDialogModal";
 import cn from "../../../../util/cn";
 
-const Table: React.FC<{ children: React.ReactNode; className?: string }> & {
+const Table: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+}> & {
   TableHeader: typeof TableHeader;
   TableBody: typeof TableBody;
   TableRow: typeof TableRow;
   TableCell: typeof TableCell;
   TableCaption: typeof TableCaption;
-} = ({ children, className }) => {
+} = ({ children, className, id }) => {
   return (
     <table
+      id={id}
       className={cn(
         "relative w-full table-auto border-separate border-spacing-0 text-nowrap align-middle",
         className,
@@ -27,9 +31,7 @@ const TableHeader: React.FC<{
   sticky?: boolean;
 }> = ({ children, className, sticky = false }) => {
   return (
-    <thead
-      className={cn("bg-gray-300 text-xs", className, sticky && "sticky top-0")}
-    >
+    <thead className={cn("bg-gray-300", className, sticky && "sticky top-0")}>
       {children}
     </thead>
   );
@@ -45,11 +47,7 @@ const TableRow: React.FC<{
   children?: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => {
-  return (
-    <tr className={cn("p-2 text-xs hover:bg-gray-500", className)}>
-      {children}
-    </tr>
-  );
+  return <tr className={cn("p-2", className)}>{children}</tr>;
 };
 
 const TableCell: React.FC<{
@@ -62,7 +60,7 @@ const TableCell: React.FC<{
     <td
       colSpan={colspan || 1}
       rowSpan={rowspan || 1}
-      className={cn("p-2 text-center text-xs font-semibold", className)}
+      className={cn("p-2 text-center", className)}
     >
       {children}
     </td>
