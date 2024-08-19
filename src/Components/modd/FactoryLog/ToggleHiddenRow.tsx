@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import clsx from "clsx";
 import { useTheme } from "../../../stores/ThemeContext";
+import { useTranslation } from "react-i18next";
 import ToggleLi from "./ToggleLi";
 type HiddenRowsToggleProps = {
   hiddenRows: string[];
@@ -26,6 +27,7 @@ const HiddenRowsToggle = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
+  const { t } = useTranslation();
   useCloseAndEscape(dropdownRef, () => setOpen(false), open, false);
 
   return (
@@ -42,7 +44,7 @@ const HiddenRowsToggle = ({
         )}
         onClick={() => setOpen((prev) => !prev)}
       >
-        顯示隱藏系列
+        {t("顯示隱藏系列")}
       </button>
       {open && (
         <ul
