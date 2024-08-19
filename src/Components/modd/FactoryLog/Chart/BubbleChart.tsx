@@ -4,6 +4,7 @@ import HC_more from "highcharts/highcharts-more";
 import { FactoryEventReponse } from "../types/factoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
+import { useTranslation } from "react-i18next";
 import { generateBubbleChartConfig } from "../utils/bubbleChartUtils";
 
 type BubbleChartProps = {
@@ -13,7 +14,7 @@ HC_more(Highcharts);
 BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
   const { width } = useWindowDimensions();
-
+  const { t } = useTranslation();
   const filteredData = eventData.data_mold.filter((event) => !!event["ar"]);
   const sysName = eventData.post.sys;
   const { xMin, xMax, yAverage, yMedian, generateSeries } =
@@ -37,6 +38,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       plotBorderWidth: 1,
       height: 600,
       width: width * 0.64,
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
       zooming: {
         type: "xy",
       },
@@ -58,11 +61,11 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       enabled: true,
     },
     title: {
-      text: `${sysName} (達成率/總模次/維修次數) `,
+      text: `${t(sysName)} ${t("達成率")}/${t("總模次")}/${t("維修次數")} `,
     },
     xAxis: {
       title: {
-        text: "達成率",
+        text: t("達成率"),
       },
       max: xMax + 5 <= 100 ? 100 : xMax + 5,
       min: xMin - 5,
@@ -97,7 +100,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           fontWeight: "bold",
           color: "#000000",
         },
-        text: "總模次",
+        text: t("總模次"),
         margin: 40,
         rotation: 0,
       },
@@ -117,7 +120,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             style: {
               fontStyle: "italic",
             },
-            text: "中間值",
+            text: t("中間值"),
           },
           zIndex: 8,
         },
@@ -130,7 +133,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
             style: {
               fontStyle: "italic",
             },
-            text: "平均值",
+            text: t("平均值"),
           },
           zIndex: 8,
         },
@@ -147,7 +150,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       // the type definition of formatter doesn't include the z index
       formatter: function () {
         // thousandsSep somehow does not work here. I am not sure why. Maybe because I am using html? Or formatter?
-        return `<div style="text-align:left; padding: 0.5rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● 唯一碼: ${this.point.name}</p> <br> <p>● 達成率: ${this.point.x.toFixed(2)} % </p><br> <p>● 總模次: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● 維修次數: ${this.point.options.z} 次</p></div>`;
+        return `<div style="text-align:left; padding: 0.25rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● ${t("唯一碼")}: ${this.point.name}</p> <br> <p>● ${t("達成率")}: ${this.point.x.toFixed(2)} % </p><br> <p>● ${t("總模次")}: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● ${t("維修次數")}: ${this.point.options.z} 次</p></div>`;
       },
     },
     plotOptions: {
@@ -166,8 +169,8 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
   };
 
   return (
-    <div className="flex w-[95%] justify-center border border-gray-200">
-      <HighchartsReact highcharts={Highcharts} options={options} />
-    </div>
+    // <div className="flex w-[95%] justify-center border border-gray-200">
+    <HighchartsReact highcharts={Highcharts} options={options} />
+    // </div>
   );
 }

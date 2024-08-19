@@ -1,4 +1,4 @@
-import  { useRef } from "react";
+import { useRef } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 // import Highcharts from "highcharts/highstock";
@@ -6,7 +6,6 @@ import HighchartsExporting from "highcharts/modules/exporting";
 import { useTranslation } from "react-i18next";
 import highcharts3d from "highcharts/highcharts-3d";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
-// TODO: I need to think about how to make this component more reusable. I don't think I should put data proccessing logic here.
 type ColumnChartProps = {
   title: string;
   allData: { [key: string]: any };
@@ -37,9 +36,15 @@ export default function ColumnChart({
     return data;
   }
 
-  // TODO: I need to make sure the datalabel is visible in the chart in every window size
   const columnData = generateColumnData(allData);
   const options: Highcharts.Options = {
+    exporting: {
+      buttons: {
+        contextButton: {
+          menuItems: ["downloadPNG"],
+        },
+      },
+    },
     chart: {
       type: "column",
       // The width of the chart in pixels. It is calculated based on the number of data points in the chart and current window size. The exact formula is not fully clear yet.
@@ -60,8 +65,8 @@ export default function ColumnChart({
         minWidth: 700,
         scrollPositionX: 1,
       },
-      borderWidth: 2,
-      borderColor: "#000",
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
       marginTop: 100,
       // Change the position of the title
       spacingTop: 50,
@@ -77,10 +82,8 @@ export default function ColumnChart({
         depth: 50,
       },
     },
-    // TODO: Add responsive feature. I am not sure how would I approach this yet. The callback function has access to the chart object. But I don't know what data is in the chart. I might refactor the calculateChartWidth function to dynamicly calculate maxPointWidth, minPointWidth and baseWidth based on the window size(Maybe more). But I haven't figured out the correct fomula yet.
-
     title: {
-      text: `${t(title)} 產品達成率`,
+      text: `${t(title)} (${t("產品達成率")})`,
       style: {
         fontSize: "1.5rem",
         fontFamily: "Verdana, sans-serif",
@@ -115,7 +118,7 @@ export default function ColumnChart({
       // label on the y axis
       title: {
         align: "high",
-        text: "達成率",
+        text: t("達成率"),
         margin: 40,
         style: {
           fontSize: "1.2rem",
@@ -133,7 +136,7 @@ export default function ColumnChart({
     series: [
       {
         type: "column",
-        name: "達成率",
+        name: t("達成率"),
         maxPointWidth: width < 1200 ? 30 : 50,
         minPointLength: 10,
         colorByPoint: true,
@@ -157,9 +160,6 @@ export default function ColumnChart({
 
   return (
     <div className="relative isolate flex justify-center">
-      {/* TODO: I want to add a drop down menu to allow user to select which interval they want to see */}
-      {/* It might not be easy to do that */}
-      {/* <Select className="z-[100] w-20" name="select" options={[1, 2, 3, 4]} /> */}
       <HighchartsReact
         ref={chartRef}
         highcharts={Highcharts}
