@@ -1,6 +1,5 @@
 import { type FactoryEventReponseMoldData } from "../types";
 import Highcharts, { type SeriesBubbleOptions } from "highcharts";
-import { type FactoryEventReponse } from "../types";
 /**
  * Formats a number into a hexadecimal string with a leading zero if necessary.
  *
@@ -183,8 +182,6 @@ function separateByZValue(bubbleData: BubbleData[]): {
     }
   }
 
-  // sorting the data first should help data label positioning. But I am not sure which order it should be sorted.
-  // TODO: figure out the correct order.
   Object.keys(dataByZValue).forEach((key) => {
     const numericKey = Number(key);
     dataByZValue[numericKey] = dataByZValue[numericKey].sort(

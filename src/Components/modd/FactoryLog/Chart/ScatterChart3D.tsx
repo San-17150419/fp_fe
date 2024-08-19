@@ -84,7 +84,6 @@ export default function ScatterChart3D({ eventData }: ScatterChart3DProps) {
     },
     yAxis: {
       type: "logarithmic",
-      // TODO:It seems like 3d scatter chart cannot add plotlines
     },
     xAxis: {
       // type: "logarithmic",

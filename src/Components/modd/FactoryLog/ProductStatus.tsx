@@ -61,23 +61,17 @@ const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
 
   return (
     <div className="flex flex-wrap justify-center gap-2">
-      {/* TODO: Extract this to a separate component */}
       {isLowest && (
         <p
           className={clsx(
-            "rounded-full px-2 py-1 text-sm font-normal text-white shadow",
+            "rounded-full px-2 py-1 text-sm  text-black font-semibold shadow",
+            // "rounded-full px-2 py-1 text-sm font-normal text-gray-50 shadow",
+            // "rounded-full px-2 py-1 text-sm font-normal text-white shadow",
             isLowerThanStandard
               ? "bg-amber-500 shadow-amber-700"
               : "bg-green-500 shadow-green-700",
           )}
-          // className={clsx(
-          //   "rounded-full px-2 py-1 text-white shadow",
-          //   isLowerThanStandard
-          //     ? "bg-amber-500 shadow-amber-700"
-          //     : "bg-green-500 shadow-green-700",
-          //   isSemiBold ? "font-semibold" : "font-normal",
-          //   isTextBase ? "text-base" : "text-sm",
-          // )}
+       
         >
           {t("最低達成率")}
         </p>
@@ -85,14 +79,11 @@ const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
       {isLowerThanStandardConsecutively && (
         <p
           className={clsx(
-            "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-white shadow shadow-red-700",
+            "rounded-full bg-red-500 px-2 py-1 text-sm  text-black font-semibold shadow shadow-red-700",
+            // "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-gray-50 shadow shadow-red-700",
+            // "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-white shadow shadow-red-700",
             // isTextBase ? "text-base" : "text-sm",
           )}
-          // className={clsx(
-          //   "rounded-full bg-red-500 px-2 py-1  text-white shadow shadow-red-700",
-          //   isSemiBold ? "font-semibold" : "font-normal",
-          //   isTextBase ? "text-base" : "text-sm",
-          // )}
         >
           {t("連續低於標準")}
           {numberOfConsecutiveLowerThanStandard > 1 &&

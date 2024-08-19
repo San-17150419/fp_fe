@@ -13,7 +13,6 @@ import { type FactoryEventReponse } from "../types/factoryLogDataType";
 
 type ColumnChartProps = {
   department: string;
-  //TODO: Add type for rawData
   rawData: FactoryEventReponse;
 };
 

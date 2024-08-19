@@ -16,8 +16,7 @@ function App() {
       </Navbar>
       <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
-        {/* TODO: Extract buttons to a component */}
-        <div className="relative w-full overflow-hidden border ">
+        <div className="relative w-full overflow-hidden border">
           <ButtonsGroup />
           <Suspense fallback={<Loading />}>
             <Outlet />

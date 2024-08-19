@@ -35,7 +35,6 @@ export default function ProgressBar({
     <div className="my-2 flex flex-col gap-1 px-4">
       <div className="flex justify-between">
         <h2 className="text-base font-bold">{title || "項目"}</h2>
-        {/* TODO: I am not sure wether this should display the target or the achieved */}
         <p className="text-xs">{achieved}</p>
       </div>
       <div className={`flex gap-2 rounded bg-gray-200`}>
