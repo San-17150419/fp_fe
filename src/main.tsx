@@ -30,26 +30,6 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "/table-dialog",
-        lazy: async () => {
-          let { default: DataTablePage } = await import(
-            "./pages/DataTablePage"
-          );
-          return {
-            Component: DataTablePage,
-          };
-        },
-      },
-      {
-        path: "/select",
-        lazy: async () => {
-          let { default: SelectPage } = await import("./pages/SelectPage");
-          return {
-            Component: SelectPage,
-          };
-        },
-      },
-      {
         path: "/tab",
         lazy: async () => {
           let { default: TabPage } = await import("./pages/TabPage");
@@ -117,18 +97,6 @@ const router = createBrowserRouter([
           let { default: InputPage } = await import("./pages/InputPage");
           return {
             Component: InputPage,
-          };
-        },
-      },
-      {
-        path: "layout-test",
-        // element: <LayoutTestPage />,
-        lazy: async () => {
-          let { default: LayoutTestPage } = await import(
-            "./pages/LayoutTestPage"
-          );
-          return {
-            Component: LayoutTestPage,
           };
         },
       },
