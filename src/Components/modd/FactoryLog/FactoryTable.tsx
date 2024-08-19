@@ -85,7 +85,7 @@ export default function FactoryTable({
   };
 
   return (
-    <div className="mb-20 rounded-md bg-white shadow shadow-gray-500">
+    <div className="mb-20 rounded-md caret-transparent bg-white px-10 pb-10 shadow-lg shadow-gray-500">
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <ColumnChart
           allData={sysData}
@@ -103,7 +103,7 @@ export default function FactoryTable({
           )}
         >
           {t(department)} {t("達成率")}
-          <div className="absolute right-0 mr-4 top-10 flex justify-end">
+          <div className="absolute right-0 top-10 mr-4 flex justify-end">
             <HiddenRowsToggle
               key={department}
               hiddenRows={incompleteRows}
@@ -171,9 +171,9 @@ export default function FactoryTable({
           {visibleRows.map((sysName: string, index: number) => (
             <Table.TableRow
               className={`${
-                index % 2 !== 0
-                  ? "bg-gray-200 hover:bg-gray-300"
-                  : "bg-gray-100 hover:bg-gray-300"
+                index % 2 === 1
+                  ? "bg-gray-100 hover:bg-gray-300"
+                  : "bg-gray-200 hover:bg-gray-300"
               }`}
               key={`row-${sysName}-${index}`}
             >

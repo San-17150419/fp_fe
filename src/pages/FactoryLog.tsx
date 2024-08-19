@@ -1,4 +1,4 @@
-import FactoryLogPreFilter from "../Components/modd/FactoryLog/FactoryLogPreFilter";
+import FactoryLogPreFilter from "../Components/modd/FactoryLog/FactoryLogFilter";
 import Loading from "../Components/Loading";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -27,7 +27,7 @@ export default function FactoryLog() {
     fetchPreData();
   }, []);
   return (
-    <div className="flex h-full flex-col gap-4 overflow-auto px-64 pt-20">
+    <div className="flex h-full flex-col gap-4 overflow-auto p-32 pt-20 lg:px-36 desktop:px-52">
       {/* <div className="flex gap-2">
         <button
           type="button"
