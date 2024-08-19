@@ -4,16 +4,11 @@ import { GoSidebarCollapse } from "react-icons/go";
 import { NavLink, useLocation } from "react-router-dom";
 import cn from "../../../util/cn";
 
-// The behavior I want is after clicking the link, the sidebar remain open while the mouse is still hovering over the link. As soons as the mouse leaves the link, the sidebar closes.
-// TODO: I need to think about this behavior. One is close the sidebar whenever the mouse leaves, the other is only close the sidebar after the mouse leaves the sidebar immediately after clicking a link (or a certain amount of time, like 300ms).
 export default function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const links: [string, string][] = [
     ["工廠日誌", "/"],
-    // ["數據表", "/table-dialog"],
-    // ["數據表", "/data-table"],
     // ["表單", "/test"],
-    // ["下拉選單", "/select"],
     // ["按鈕", "/button"],
     // ["標籤", "/tab"],
     // ["圖表", "/highcharts"],
@@ -21,7 +16,6 @@ export default function Sidebar() {
     // ["圖表3", "/highstock-type-2"],
     // ["圖表4", "/highstock-type-3"],
     // ["輸入", "/input"],
-    // ["佈局", "/layout-test"],
     // ["登入", "/login"],
     // ["保護頁面", "/protected"],
   ];
