@@ -16,7 +16,7 @@
     "@types/file-saver": "^2.0.7",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.5",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
