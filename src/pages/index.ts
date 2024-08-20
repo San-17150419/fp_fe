@@ -12,3 +12,4 @@ export { default as TestPage } from "./Test";
 export { default as LoginPage } from "./LoginPage";
 export { default as ProtectedPage } from "./ProtectedPage";
 export { default as EngineerDepartmentPage } from "./EngineerDepartment";
+export { default as ModelOverview } from "./ModelOverview"

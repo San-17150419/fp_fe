@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "./stores/AuthContext";
 import "./i18n";
-import { ErrorPage, FactoryLogPage, Loading } from "./pages";
+import { ErrorPage, FactoryLogPage, Loading, ModelOverview } from "./pages";
 import { ThemeProvider } from "./stores/ThemeContext";
 
 const router = createBrowserRouter([
