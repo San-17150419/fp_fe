@@ -11,3 +11,4 @@ export { default as FactoryLogPage } from "./FactoryLog";
 export { default as TestPage } from "./Test";
 export { default as LoginPage } from "./LoginPage";
 export { default as ProtectedPage } from "./ProtectedPage";
+export { default as EngineerDepartmentPage } from "./EngineerDepartment";

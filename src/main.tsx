@@ -120,7 +120,29 @@ const router = createBrowserRouter([
           };
         },
       },
+      {
+        path: "/EngineerDepartment",
+        lazy: async () => {
+          let { default: EngineerDepartment } = await import(
+            "./pages/EngineerDepartment"
+          );
+          return {
+            Component: EngineerDepartment,
+          };
+        },
+        children: [
+          {
+            index: true,
+            element: <ModelOverview />,
+          },
+        ],
+      },
     ],
+  },
+
+  {
+    path: "*",
+    element: <ErrorPage />,
   },
 ]);
 

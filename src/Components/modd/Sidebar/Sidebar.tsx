@@ -8,6 +8,7 @@ export default function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const links: [string, string][] = [
     ["工廠日誌", "/"],
+    ["工程部", "/EngineerDepartment"],
     // ["表單", "/test"],
     // ["按鈕", "/button"],
     // ["標籤", "/tab"],
