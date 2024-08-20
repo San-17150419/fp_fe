@@ -9,7 +9,7 @@ export default function ButtonsGroup() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex px-20 pt-6">
+    <div className="flex pt-6 px-24">
       <div className="flex w-full gap-4 text-sm lg:text-base">
         <h2 className="my-auto text-xl underline">{username}</h2>
         {location.pathname !== "/login" && (

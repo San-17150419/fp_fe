@@ -27,7 +27,7 @@ export default function FactoryLog() {
     fetchPreData();
   }, []);
   return (
-    <div className="flex h-full flex-col gap-4 overflow-auto p-32 pt-20 lg:px-36 desktop:px-52">
+    <div className=" ">
       {/* <div className="flex gap-2">
         <button
           type="button"

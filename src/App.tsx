@@ -16,11 +16,13 @@ function App() {
       </Navbar>
       <div className="flex h-full overflow-auto bg-zinc-100">
         <Sidebar />
-        <div className="relative w-full overflow-hidden border">
+        <div className="relative w-full overflow-hidden">
           <ButtonsGroup />
-          <Suspense fallback={<Loading />}>
-            <Outlet />
-          </Suspense>
+          <div className="flex h-full flex-col gap-4 overflow-auto px-32 pt-10 lg:px-36 desktop:px-48">
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          </div>
         </div>
       </div>
     </>
