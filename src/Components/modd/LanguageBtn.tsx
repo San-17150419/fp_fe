@@ -31,7 +31,7 @@ export default function LanguageBtn() {
         anchor="bottom"
       >
         {Object.entries(languageConfig).map(([key, value]) => (
-          <MenuItem>
+          <MenuItem key={key}>
             <button
               type="button"
               className={clsx(
