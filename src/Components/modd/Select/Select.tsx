@@ -18,6 +18,7 @@ type SelectProps = {
   name: string;
   className?: string;
   onSelect?: (option: string) => void;
+  placeholder?: string;
 };
 
 export default function Select({
@@ -25,9 +26,13 @@ export default function Select({
   className,
   onSelect,
   name,
+  placeholder,
 }: SelectProps) {
   const { t } = useTranslation();
-  const { allOptions, selectedOption, setSelectedOption } = useSelect(options);
+  const { allOptions, selectedOption, setSelectedOption } = useSelect(
+    options,
+    placeholder,
+  );
   const { isSemiBold, isTextBase } = useTheme();
   useEffect(() => {
     if (onSelect) {
