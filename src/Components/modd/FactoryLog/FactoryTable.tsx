@@ -23,14 +23,14 @@ export default function FactoryTable({
   department,
   sysData,
   duration,
-  point = "ar",
+  point,
   index: tableNumber = 0,
 }: {
   factory: Factory;
   department: Department<Factory>;
   sysData: any;
   duration: { date_start: string; date_end: string }[];
-  point?: "ar" | "pamt_p";
+  point: "ar" | "pamt_h";
   index: number;
 }) {
   const { t } = useTranslation();
@@ -85,7 +85,7 @@ export default function FactoryTable({
   };
 
   return (
-    <div className="mb-20 rounded-md caret-transparent bg-white px-10 pb-10 shadow-lg shadow-gray-500">
+    <div className="mt-20 rounded-md bg-white px-10 pb-10 caret-transparent shadow-lg shadow-gray-500">
       <Modal onClose={() => setIsOpen(false)} isOpen={isOpen}>
         <ColumnChart
           allData={sysData}
@@ -102,7 +102,8 @@ export default function FactoryTable({
             isSemiBold ? "font-semibold" : "font-normal",
           )}
         >
-          {t(department)} {t("達成率")}
+          {/* {t(department)} {t("達成率")} */}
+          {t(department)} {point === "ar" ? t("達成率") : t("機均產出")}
           <div className="absolute right-0 top-10 mr-4 flex justify-end">
             <HiddenRowsToggle
               key={department}
@@ -205,7 +206,7 @@ export default function FactoryTable({
                   duration={duration}
                 />
               </Table.TableCell>
-              {sysData[sysName][point].map((arValue: number, index: number) => (
+              {sysData[sysName][point].map((value: number, index: number) => (
                 <Table.TableCell
                   className={clsx(
                     "w-2/12 border-gray-600 text-base",
@@ -216,17 +217,22 @@ export default function FactoryTable({
                 >
                   <span
                     className={clsx(
-                      ` ${arValue < 0.85 ? "text-red-400" : ""}`,
+                      ` ${value < 0.85 ? "text-red-400" : ""}`,
                       isSemiBold ? "font-semibold" : "font-normal",
                       isTextBase ? "text-base" : "text-sm",
                     )}
                   >
-                    {arValue !== 0 ? `${(arValue * 100).toFixed(2)}%` : ""}
+                    {point === "pamt_h" && value !== 0
+                      ? `${Number((value * 100).toFixed(0)).toLocaleString()}`
+                      : ""}
+                    {point === "ar" && value !== 0
+                      ? `${(value * 100).toFixed(2)}%`
+                      : ""}
                   </span>
                 </Table.TableCell>
               ))}
               <Table.TableCell colspan={2}>
-                <ProductStatus value={sysData[sysName][point]} />
+                <ProductStatus value={sysData[sysName][point]} point={point} />
               </Table.TableCell>
             </Table.TableRow>
           ))}

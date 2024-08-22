@@ -13,6 +13,7 @@ export default function FactoryLogFilter({
     useFactoryFilter(preData);
   const data = logData?.data;
   const factory = logData?.factory;
+  const point = logData?.point;
   const duration = logData?.duration;
 
   return (
@@ -56,21 +57,24 @@ export default function FactoryLogFilter({
       {isLoading && <Loading text="Loading..." />}
       {error && <p>{error}</p>}
       {/* Only show table when data is loaded */}
-
-      {data &&
-        factory &&
-        duration &&
-        Object.keys(data).map((department: string, index) => (
-          <FactoryTable
-            factory={factory}
-            // TODO: modify type definition to enable type checking
-            department={department as DepartmentMap[typeof factory]}
-            sysData={data[department]}
-            duration={duration}
-            key={`${factory}-table-${department}-${index}`}
-            index={index}
-          />
-        ))}
+      <section className="mb-20">
+        {data &&
+          factory &&
+          duration &&
+          point &&
+          Object.keys(data).map((department: string, index) => (
+            <FactoryTable
+              factory={factory}
+              // TODO: modify type definition to enable type checking
+              department={department as DepartmentMap[typeof factory]}
+              sysData={data[department]}
+              duration={duration}
+              key={`${factory}-table-${department}-${index}`}
+              index={index}
+              point={point}
+            />
+          ))}
+      </section>
     </>
   );
 }

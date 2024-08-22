@@ -204,4 +204,5 @@ export type FactoryTableData = {
   data: Record<string, any>;
   duration: Duration[];
   factory: Factory;
+  point: "ar" | "pamt_h";
 };

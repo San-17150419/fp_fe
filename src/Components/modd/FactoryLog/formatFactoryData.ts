@@ -14,10 +14,12 @@ type FormattedData = {
  */
 export const transformData = (
   rawData: FactoryLogRawData,
-): { data: FormattedData; duration: Array<Duration>; factory: Factory } => {
+): { data: FormattedData; duration: Array<Duration>; factory: Factory; point: "ar" | "pamt_h" } => {
   const data = rawData.data;
   const factory = rawData.post.factory;
   const duration = rawData.duration;
+  const point = rawData.post.point;
+
   const finalDataFormat: FormattedData = {};
   const totalIntervals = 4; // Assuming there are always 4 intervals
   data.forEach((item) => {
@@ -59,5 +61,5 @@ export const transformData = (
     });
   });
   console.log(finalDataFormat);
-  return { data: finalDataFormat, factory, duration };
+  return { data: finalDataFormat, factory, duration, point };
 };

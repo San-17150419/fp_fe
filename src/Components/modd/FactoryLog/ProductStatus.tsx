@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 type ProductStatusProps = {
   value: number[];
+  point: "ar" | "pamt_h";
 };
 
-const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
+const ProductStatus: React.FC<ProductStatusProps> = ({ value, point }) => {
   const { t } = useTranslation();
   const [isLowest, setIsLowest] = useState(false);
   const [isLowerThanStandard, setIsLowerThanStandard] = useState(false);
@@ -31,7 +32,7 @@ const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
     const calculateStatus = (data: number[]) => {
       const { value: current, index: startIndex } = findLastNonZeroValue(data);
       let consecutiveCount = 0;
-
+      // Technically, when point is pamt_h, I don't need this check 
       // Check for consecutive values lower than standard (85)
       for (let i = startIndex; i >= 0; i--) {
         //
@@ -64,24 +65,20 @@ const ProductStatus: React.FC<ProductStatusProps> = ({ value }) => {
       {isLowest && (
         <p
           className={clsx(
-            "rounded-full px-2 py-1 text-sm  text-black font-semibold shadow",
-            // "rounded-full px-2 py-1 text-sm font-normal text-gray-50 shadow",
-            // "rounded-full px-2 py-1 text-sm font-normal text-white shadow",
-            isLowerThanStandard
-              ? "bg-amber-500 shadow-amber-700"
+            "rounded-full px-2 py-1 text-sm font-semibold shadow",
+            point === "ar" && isLowerThanStandard
+              ? "bg-amber-500 text-white shadow-amber-700"
               : "bg-green-500 shadow-green-700",
+            point === "pamt_h" && "bg-red-500 text-white shadow-red-700",
           )}
-       
         >
-          {t("最低達成率")}
+          {point === "pamt_h" ? t("最低機均產出") : t("最低達成率")}
         </p>
       )}
-      {isLowerThanStandardConsecutively && (
+      {point === "ar" && isLowerThanStandardConsecutively && (
         <p
           className={clsx(
-            "rounded-full bg-red-500 px-2 py-1 text-sm  text-black font-semibold shadow shadow-red-700",
-            // "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-gray-50 shadow shadow-red-700",
-            // "rounded-full bg-red-500 px-2 py-1 text-sm font-normal text-white shadow shadow-red-700",
+            "rounded-full bg-red-500 px-2 py-1 text-sm font-semibold text-white shadow shadow-red-700",
             // isTextBase ? "text-base" : "text-sm",
           )}
         >
