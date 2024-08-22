@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import useCloseAndEscape from "../../../hooks/useCloseAndEscape";
 import { AnimatePresence, motion } from "framer-motion";
 
+// TODO: The min height and width is not working. Possibly because of the animation.
 type ModalProps = {
   children?: React.ReactNode;
   onClose: () => void;
@@ -55,7 +56,6 @@ export default function Modal({
           initial={{ opacity: 0 }}
           // The overlay is not reachable by pressing tab
           tabIndex={-1}
-          aria-hidden="true"
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ ease: "easeOut", duration: 0.8 }}
