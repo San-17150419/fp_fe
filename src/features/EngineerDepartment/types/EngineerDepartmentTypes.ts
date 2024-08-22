@@ -3,10 +3,47 @@ export type ENGDepartmentPreData = {
     factory: { [key: string]: string };
     maker: { list_id: string; name_big5: string }[];
     series: { [key: string]: string };
-    site: string[];
-    // site: Site[];
+    // site: string[];
+    site: Site[];
     status: Status[];
   };
+};
+
+export type ENGDepartmentPostData = {
+  post: {
+    dutydate_last: string;
+    site: Site;
+    sn_num: string;
+  };
+  data: {
+    block_num: number;
+    hole_num: number;
+    mold_amt: number;
+    mold_time: number;
+    prod_amt: number;
+    dutydate: string;
+    shift: string;
+    eqip_name: string;
+    prod_name: string;
+    mold_num: string;
+    work_time: number;
+    sn_num: string;
+  }[];
+};
+
+export type ENGDepartmentPreDataParams = {
+  site: Site | "";
+  sys: string | "";
+  sn_num: string | "";
+  property: string | "";
+  prod_name_board: string | "";
+  mold_num: string | "";
+};
+
+export type ENGDepartmentPostDataParams = {
+  sn_num: string;
+  site: Site;
+  dutydate_last: string;
 };
 
 export type Maker = ENGDepartmentPreData["preData"]["maker"][number];
