@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "../Components/Loading";
-import { type ENGDepartmentPreData } from "../features/EngineerDepartment/EngineerDepartmentTypes";
+import { type ENGDepartmentPreData } from "../features/EngineerDepartment/types/EngineerDepartmentTypes";
 import Filter from "../features/EngineerDepartment/Filter";
 export default function ModelOverview() {
   // TODO: Refactor FactoryLogFilter to make it reusable. I should consider using compound component pattern. In that way, you don't need to pre-define the number of select or input. May I need a small context

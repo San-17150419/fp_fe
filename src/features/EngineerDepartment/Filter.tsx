@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import axios, { CanceledError } from "axios";
 import Select from "../../Components/modd/Select/Select";
+import Example from "./ComboBox";
 import {
   ENGDepartmentPreData,
   ENGDepartmentFilterData,
-} from "./EngineerDepartmentTypes";
+  ENGDepartmentPreDataParams,
+  Site,
+} from "./types/EngineerDepartmentTypes";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
 const header: Record<string, string>[] = [
@@ -23,8 +26,8 @@ const header: Record<string, string>[] = [
   { dutydate_last: "最後上機" },
   { maker: "廠商代號" },
   { state: "狀態" },
-  // { spare: "備註" },
-  // { id_ms: "資料表id" },
+  { spare: "備註" },
+  { id_ms: "資料表id" },
 ];
 type FilterProps = {
   preData: ENGDepartmentPreData["preData"];
@@ -51,15 +54,13 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
   const [prod_name_board, setProd_name_board] = useState("");
   const [mold_num, setMold_num] = useState("");
   const [property, setProperty] = useState("");
-  const [site, setSite] = useState("");
-  const [data, setData] = useState<
-    { [key: string]: number | string | undefined }[]
-  >([]);
+  const [site, setSite] = useState<Site | "">("");
+  const [data, setData] = useState<ENGDepartmentFilterData["data"]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "filter-data/";
-    const params = {
+    const params: ENGDepartmentPreDataParams = {
       sys: sysDictionary[sys as keyof typeof sysDictionary] || "",
       sn_num: sn_num,
       prod_name_board: prod_name_board,
@@ -80,6 +81,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           },
         );
         setData(response.data.data);
+        console.log(response.data.data);
         // setIsLoading(false);
       } catch (error) {
         if (error instanceof CanceledError) {
@@ -91,7 +93,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
       }
     };
     // Use setTimeout to introduce artificial delay
-    //
+    // Use AbortController to cancel the request if needed
     const timer = setTimeout(() => {
       const control = new AbortController();
       fetchFilterData(control.signal).then(() => {
@@ -103,7 +105,8 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
   if (!preData) return <Loading />;
   return (
     <>
-      <form action="" className="flex gap-2">
+      <Example />
+      <form action="" className="mb-8 flex gap-2 border-b border-black pb-12">
         <div className="flex grow items-center gap-2">
           <div className="grow basis-1">
             <Select
@@ -149,7 +152,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
             <Select
               options={siteOptions}
               name="site"
-              onSelect={setSite}
+              onSelect={(option: string) => setSite(option as Site)}
               placeholder="位置"
             />
           </div>

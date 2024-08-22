@@ -10,10 +10,18 @@ import clsx from "clsx";
 import { TbCaretDownFilled } from "react-icons/tb";
 import { useTranslation } from "react-i18next";
 import Loading from "../../Components/Loading";
+import Event from "./Event";
+import {
+  type Site,
+  type ENGDepartmentFilterData,
+} from "./types/EngineerDepartmentTypes";
+import MemoCell from "./MemoCell";
+import Update from "./Update";
 // This is a temporary component for testing
 
 type TableProps = {
-  data: { [key: string]: number | string | undefined }[];
+  data: ENGDepartmentFilterData["data"];
+  // data: { [key: string]: number | string | undefined }[];
   //  header props act as a key to the data. Allow you to decide the order of the table and what to show. If the header props is an object, the key of the object will be used as key of the data and the value of the object will be used as the header
   header: Record<string, string>[];
   isLoading?: boolean;
@@ -25,6 +33,7 @@ export default function Table({ data, header, isLoading }: TableProps) {
   const headerDictionary = header.reduce((acc, curr) => {
     return { ...acc, ...curr };
   });
+  console.log(header);
   const columnsOder = header.map((h) => Object.keys(h)[0]);
   const { t } = useTranslation();
   return (
@@ -34,7 +43,7 @@ export default function Table({ data, header, isLoading }: TableProps) {
         {/* TODO: Extract this to a component */}
         {/* TODO: Add autocomplete to input based on preData */}
         {/* TODO: Can't maintain the order of the header */}
-        <form action="" id="ENGMS-form" className="mr-4 flex justify-end">
+        <form action="" id="ENGMS-form" className="mb-8 mr-4 flex justify-end">
           <Listbox multiple form="ENGMS-form">
             <ListboxButton className="my-2 h-10 cursor-pointer rounded-md border border-sky-300 bg-sky-300 p-2 hover:bg-sky-500">
               <span className="flex items-center gap-2">
@@ -82,8 +91,8 @@ export default function Table({ data, header, isLoading }: TableProps) {
             </ListboxOptions>
           </Listbox>
         </form>
-        <div className="relative h-[500px] max-w-full overflow-auto">
-          <table className="relative w-full table-auto border-separate border-spacing-0 text-center">
+        <div className="relative h-[600px] max-w-full overflow-auto">
+          <table className="relative m-2 w-full table-auto border-separate border-spacing-0 text-center">
             <thead className="sticky top-0 bg-gray-300">
               <tr>
                 {columnsOder.map((key) => (
@@ -103,7 +112,7 @@ export default function Table({ data, header, isLoading }: TableProps) {
               <tbody>
                 <tr>
                   <td
-                    className="border border-gray-200 p-2"
+                    className="border border-gray-200 p-1"
                     colSpan={header.length}
                   >
                     {t("無資料")}
@@ -113,11 +122,11 @@ export default function Table({ data, header, isLoading }: TableProps) {
             )}
             <tbody>
               {data.map((item) => (
-                <tr key={item.id_ms}>
+                <tr key={`${item.id_ms}-tr`}>
                   {columnsOder.map((key) => (
                     <td
                       className={clsx(
-                        "border border-gray-200 p-2",
+                        "border border-gray-200 p-1",
                         key === "sn_num" ? "text-blue-600" : "",
                         key === "prod_name_board" ? "text-red-600" : "",
                         key === "dutydate_last" ? "text-blue-600" : "",
@@ -133,11 +142,24 @@ export default function Table({ data, header, isLoading }: TableProps) {
                               ? "text-red-600"
                               : "text-blue-600"
                           }
+                          key={item.id_ms}
                         >
                           {t(item[key as keyof typeof item] as string)}
                         </span>
+                      ) : key === "dutydate_last" ? (
+                        <Event
+                          sn_num={item.sn_num as string}
+                          site={item.site as Site}
+                          dutydate_last={item.dutydate_last as string}
+                        />
+                      ) : key === "spare" ? (
+                        <MemoCell message={item[key] as string}></MemoCell>
+                      ) : key === "id_ms" ? (
+                        <Update id_ms={item.id_ms}></Update>
                       ) : (
-                        item[key as keyof typeof item]
+                        <span className="p-1">
+                          {item[key as keyof typeof item]}
+                        </span>
                       )}
                     </td>
                   ))}
