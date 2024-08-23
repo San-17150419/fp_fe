@@ -15,7 +15,6 @@ export default function ColumnLineChart({
   postData,
   title,
 }: ColumnLineChartProps) {
-  console.log(title);
   const { t } = useTranslation();
   const data = postData[title];
   function setCategories() {

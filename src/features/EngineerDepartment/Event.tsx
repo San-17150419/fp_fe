@@ -30,7 +30,6 @@ export default function Event({ sn_num, site, dutydate_last }: EventProps) {
     try {
       const response = await axios.post<ENGDepartmentPostData>(api, params);
       setPostData(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error(error);
       isAxiosError(error) && console.error(error.response?.data);

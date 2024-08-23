@@ -67,7 +67,6 @@ export default function useFilterState(
         const response = await axios.post<FactoryLogRawData>(url, params);
         setError(null);
         setLogData(transformData(response.data));
-        console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);

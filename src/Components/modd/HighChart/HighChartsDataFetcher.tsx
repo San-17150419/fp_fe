@@ -26,7 +26,6 @@ export default function HighChartsDataFetcher() {
         );
         setData(response.data.preData);
         setIsoading(false);
-        console.log(response.data.preData);
       } catch (error) {
         console.error(error);
         setError("Error fetching product list");
