@@ -34,20 +34,26 @@ type FilterProps = {
   sysDictionary: Record<string, string>;
 };
 export default function Filter({ preData, sysDictionary }: FilterProps) {
-  const seriesOptions = Object.keys(preData.series).map((key) => ({
-    value: key,
-    text: preData.series[key as keyof typeof preData.series],
-  }));
+  const memoizedSeriesOptions = useMemo(() => {
+    return Object.keys(preData.series).map((key) => ({
+      value: key,
+      text: preData.series[key as keyof typeof preData.series],
+    }));
+  }, [preData.series]);
 
-  const siteOptions = preData.site.map((key) => ({
-    value: key,
-    text: key,
-  }));
+  const memoizedSiteOptions = useMemo(() => {
+    return preData.site.map((key) => ({
+      value: key,
+      text: key,
+    }));
+  }, [preData.site]);
 
-  const factoryOptions = Object.keys(preData.factory).map((key) => ({
-    value: key,
-    text: preData.factory[key as keyof typeof preData.factory],
-  }));
+  const memoizedFactoryOptions = useMemo(() => {
+    return Object.keys(preData.factory).map((key) => ({
+      value: key,
+      text: preData.factory[key as keyof typeof preData.factory],
+    }));
+  }, [preData.factory]);
 
   const [sys, setSys] = useState("");
   const [sn_num, setSn_num] = useState("");
@@ -142,7 +148,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           </div>
           <div className="grow basis-1">
             <Select
-              options={factoryOptions}
+              options={memoizedFactoryOptions}
               name="factory"
               onSelect={setProperty}
               placeholder="財產歸屬"
@@ -150,7 +156,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           </div>
           <div className="grow basis-1">
             <Select
-              options={siteOptions}
+              options={memoizedSiteOptions}
               name="site"
               onSelect={(option: string) => setSite(option as Site)}
               placeholder="位置"
