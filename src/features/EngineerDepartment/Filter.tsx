@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios, { CanceledError } from "axios";
 import Select from "../../Components/modd/Select/Select";
-import Example from "./ComboBox";
+import ComboBox from "./ComboBox";
 import {
   ENGDepartmentPreData,
   ENGDepartmentFilterData,
@@ -10,6 +10,7 @@ import {
 } from "./types/EngineerDepartmentTypes";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
+import { v4 as uuidv4 } from "uuid";
 const header: Record<string, string>[] = [
   { sn_num: "唯一碼" },
   { sys: "系列" },
@@ -33,6 +34,7 @@ type FilterProps = {
   preData: ENGDepartmentPreData["preData"];
   sysDictionary: Record<string, string>;
 };
+// TODO: Fix performance issues. Either memoize them or see if setTimeout is the culprit
 export default function Filter({ preData, sysDictionary }: FilterProps) {
   const memoizedSeriesOptions = useMemo(() => {
     return Object.keys(preData.series).map((key) => ({
@@ -74,7 +76,6 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
       property: property,
       site: site,
     };
-
     const fetchFilterData = async (signal?: AbortSignal) => {
       setIsLoading(true);
 
@@ -86,8 +87,8 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
             signal: signal,
           },
         );
+        console.log(response.data);
         setData(response.data.data);
-        console.log(response.data.data);
         // setIsLoading(false);
       } catch (error) {
         if (error instanceof CanceledError) {
@@ -109,41 +110,85 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
     return () => clearTimeout(timer);
   }, [sys, sn_num, prod_name_board, mold_num, property, site]);
   if (!preData) return <Loading />;
+  function generateFilterNameBoardOptions() {
+    const temp = [
+      ...new Set(
+        data.map((d) => d.prod_name_board ?? "").filter((text) => text !== ""),
+      ),
+    ];
+    return temp.map((text) => ({
+      id: uuidv4(),
+      value: text,
+      text: text,
+    }));
+  }
+
+  function generateFilterSn_numOptions() {
+    const temp = [
+      ...new Set(data.map((d) => d.sn_num ?? "").filter((text) => text !== "")),
+    ];
+    return temp.map((text) => ({
+      id: uuidv4(),
+      value: text,
+      text: text,
+    }));
+  }
+
+  function generateFilterMold_numOptions() {
+    const temp = [
+      ...new Set(
+        data.map((d) => d.mold_num ?? "").filter((text) => text !== ""),
+      ),
+    ];
+    return temp.map((text) => ({
+      id: uuidv4(),
+      value: text,
+      text: text,
+    }));
+  }
+
+  const memoizedMold_numOptions = useMemo(() => {
+    return generateFilterMold_numOptions();
+  }, [data]);
+
+  const memoizedSn_numOptions = useMemo(() => {
+    return generateFilterSn_numOptions();
+  }, [data]);
+
+  const memoizedResult = useMemo(() => {
+    return generateFilterNameBoardOptions();
+  }, [data]);
   return (
     <>
-      <Example />
       <form action="" className="mb-8 flex gap-2 border-b border-black pb-12">
         <div className="flex grow items-center gap-2">
           <div className="grow basis-1">
             <Select
-              options={seriesOptions}
+              options={memoizedSeriesOptions}
               name="series"
               onSelect={setSys}
               placeholder="全部系列"
             />
           </div>
           <div className="grow basis-1">
-            <input
-              className="h-9 w-full rounded-md border border-gray-300 pl-3 shadow shadow-gray-300"
-              type="text"
-              placeholder="模具唯一碼"
-              onChange={(e) => setSn_num(e.target.value)}
+            <ComboBox<String>
+              options={memoizedSn_numOptions}
+              onChange={(value) => setSn_num(value.text)}
+              name="模具唯一碼"
             />
           </div>
           <div className="grow basis-1">
-            <input
-              className="h-9 w-full rounded-md border border-gray-300 pl-3 shadow shadow-gray-300"
-              type="text"
-              placeholder="名版"
-              onChange={(e) => setProd_name_board(e.target.value)}
+            <ComboBox<String>
+              options={memoizedResult}
+              onChange={(value) => setProd_name_board(value.text)}
+              name="名版"
             />
           </div>
           <div className="grow basis-1">
-            <input
-              className="h-9 w-full rounded-md border border-gray-300 pl-3 shadow shadow-gray-300"
-              type="text"
-              placeholder="模號"
-              onChange={(e) => setMold_num(e.target.value)}
+            <ComboBox<String>
+              options={memoizedMold_numOptions}
+              onChange={(value) => setMold_num(value.text)}
+              name="模號"
             />
           </div>
           <div className="grow basis-1">
