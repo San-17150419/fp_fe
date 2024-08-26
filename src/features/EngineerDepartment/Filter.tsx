@@ -11,6 +11,8 @@ import {
 import Loading from "../../Components/Loading";
 import Table from "./Table";
 import { v4 as uuidv4 } from "uuid";
+import VirtualizedTable from "./VirtualizedTable";
+import VirtualizedTable2 from "./VirtualizedTable2";
 const header: Record<string, string>[] = [
   { sn_num: "唯一碼" },
   { sys: "系列" },
@@ -78,7 +80,6 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
     };
     const fetchFilterData = async (signal?: AbortSignal) => {
       setIsLoading(true);
-
       try {
         const response = await axios.post<ENGDepartmentFilterData>(
           api,
@@ -87,13 +88,12 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
             signal: signal,
           },
         );
-        console.log(response.data);
-        setData(response.data.data);
+        setData(response.data.data.splice(0, 200));
+        // setData(response.data.data);
         // setIsLoading(false);
       } catch (error) {
         if (error instanceof CanceledError) {
           console.log("fetch aborted");
-          //   setIsLoading(false);
 
           return;
         }
@@ -209,11 +209,33 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           </div>
         </div>
       </form>
-      {data ? (
-        <Table data={data} header={header} isLoading={isLoading} />
-      ) : (
-        <Loading />
-      )}
+      <div className="flex w-full flex-col gap-12">
+        {data ? (
+          <Table data={data} header={header} isLoading={isLoading} />
+        ) : (
+          <Loading />
+        )}
+        {data ? (
+          <div className="w-full overflow-auto">
+            <VirtualizedTable
+              data={data}
+              header={header}
+              isLoading={isLoading}
+            />
+          </div>
+        ) : (
+          <Loading />
+        )}
+        {data ? (
+          <VirtualizedTable2
+            data={data}
+            header={header}
+            isLoading={isLoading}
+          />
+        ) : (
+          <Loading />
+        )}
+      </div>
     </>
   );
 }
