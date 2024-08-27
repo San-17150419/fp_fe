@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import { Table, Column, AutoSizer } from "react-virtualized";
 import "react-virtualized/styles.css";
-import { type ENGDepartmentFilterData } from "./types/EngineerDepartmentTypes";
+import { type FilterData } from "./types";
 import { useTranslation } from "react-i18next";
 import Update from "./Update";
 import Event from "./Event";
 import MemoCell from "./MemoCell";
 
 type TableProps = {
-  data: ENGDepartmentFilterData["data"];
+  data: FilterData["data"];
   header: Record<string, string>[];
   isLoading?: boolean;
 };

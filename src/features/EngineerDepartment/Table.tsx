@@ -3,17 +3,14 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import Loading from "../../Components/Loading";
 import Event from "./Event";
-import {
-  type Site,
-  type ENGDepartmentFilterData,
-} from "./types/EngineerDepartmentTypes";
+import { type Site, type FilterData } from "./types";
 import MemoCell from "./MemoCell";
 import Update from "./Update";
 import FilterForTable from "./FilterForTable";
 // This is a temporary component for testing
 
 type TableProps = {
-  data: ENGDepartmentFilterData["data"];
+  data: FilterData["data"];
   // data: { [key: string]: number | string | undefined }[];
   //  header props act as a key to the data. Allow you to decide the order of the table and what to show. If the header props is an object, the key of the object will be used as key of the data and the value of the object will be used as the header
   header: Record<string, string>[];

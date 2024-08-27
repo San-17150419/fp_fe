@@ -1,12 +1,12 @@
 import { TableVirtuoso } from "react-virtuoso";
-import { ENGDepartmentFilterData } from "./types/EngineerDepartmentTypes";
+import { FilterData } from "./types";
 import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import VirtualizedRow from "./VirtualizedRow";
 import clsx from "clsx";
 
 type TableProps = {
-  data: ENGDepartmentFilterData["data"];
+  data: FilterData["data"];
   header: Record<string, string>[];
   isLoading?: boolean;
 };

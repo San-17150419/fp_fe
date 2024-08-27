@@ -1,15 +1,14 @@
 import clsx from "clsx";
 import Update from "./Update";
 import MemoCell from "./MemoCell";
-import { type Site } from "./types/EngineerDepartmentTypes";
 import Event from "./Event";
 import { useTranslation } from "react-i18next";
 
-import { type ENGDepartmentFilterData } from "./types/EngineerDepartmentTypes";
+import { type FilterData, type Site } from "./types";
 type RowProps = {
   displayedColumns: string[];
   memoizedColumnsOder: string[];
-  data: ENGDepartmentFilterData["data"][number];
+  data: FilterData["data"][number];
 };
 
 export default function VirtualizedRow({

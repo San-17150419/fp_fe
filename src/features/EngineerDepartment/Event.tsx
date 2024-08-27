@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  type Site,
-  type ENGDepartmentPostData,
-  type ENGDepartmentPostDataParams,
-} from "./types/EngineerDepartmentTypes";
+import { type Site, type PostData, type PostDataParams } from "./types";
 import axios, { isAxiosError } from "axios";
 import Modal from "../../Components/modd/Modal/NonDialogModal";
 import { useTranslation } from "react-i18next";
@@ -16,19 +12,17 @@ type EventProps = {
 
 export default function Event({ sn_num, site, dutydate_last }: EventProps) {
   const [open, setOpen] = useState(false);
-  const [postData, setPostData] = useState<ENGDepartmentPostData | null>(null);
+  const [postData, setPostData] = useState<PostData | null>(null);
   const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "event-data/";
   const { t } = useTranslation();
-  const params: ENGDepartmentPostDataParams = {
+  const params: PostDataParams = {
     sn_num: sn_num,
     site: site,
     dutydate_last: dutydate_last,
   };
-
-  //
   const fetchPostData = async () => {
     try {
-      const response = await axios.post<ENGDepartmentPostData>(api, params);
+      const response = await axios.post<PostData>(api, params);
       setPostData(response.data);
     } catch (error) {
       console.error(error);

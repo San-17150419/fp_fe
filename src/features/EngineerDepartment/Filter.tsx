@@ -2,12 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import axios, { CanceledError } from "axios";
 import Select from "../../Components/modd/Select/Select";
 import ComboBox from "./ComboBox";
-import {
-  ENGDepartmentPreData,
-  ENGDepartmentFilterData,
-  ENGDepartmentPreDataParams,
-  Site,
-} from "./types/EngineerDepartmentTypes";
+import { PreData, FilterData, FilterDataParams, Site } from "./types";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
 import { v4 as uuidv4 } from "uuid";
@@ -33,7 +28,7 @@ const header: Record<string, string>[] = [
   { id_ms: "資料表id" },
 ];
 type FilterProps = {
-  preData: ENGDepartmentPreData["preData"];
+  preData: PreData["preData"];
   sysDictionary: Record<string, string>;
 };
 // TODO: Fix performance issues. Either memoize them or see if setTimeout is the culprit
@@ -65,12 +60,12 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
   const [mold_num, setMold_num] = useState("");
   const [property, setProperty] = useState("");
   const [site, setSite] = useState<Site | "">("");
-  const [data, setData] = useState<ENGDepartmentFilterData["data"]>([]);
+  const [data, setData] = useState<FilterData["data"]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "filter-data/";
-    const params: ENGDepartmentPreDataParams = {
+    const params: FilterDataParams = {
       sys: sysDictionary[sys as keyof typeof sysDictionary] || "",
       sn_num: sn_num,
       prod_name_board: prod_name_board,
@@ -81,14 +76,8 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
     const fetchFilterData = async (signal?: AbortSignal) => {
       setIsLoading(true);
       try {
-        const response = await axios.post<ENGDepartmentFilterData>(
-          api,
-          params,
-          {
-            signal: signal,
-          },
-        );
-        setData(response.data.data.splice(0, 200));
+        const response = await axios.post<FilterData>(api, params, {
+          signal: signal,
         // setData(response.data.data);
         // setIsLoading(false);
       } catch (error) {
