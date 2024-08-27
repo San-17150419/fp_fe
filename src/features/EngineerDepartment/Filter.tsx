@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo } from "react";
 import axios, { CanceledError } from "axios";
 import Select from "../../Components/modd/Select/Select";
 import ComboBox from "./ComboBox";
-import { PreData, FilterData, FilterDataParams, Site } from "./types";
+import { FilterData, FilterDataParams, Site } from "./types";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
 import { v4 as uuidv4 } from "uuid";
 import VirtualizedTable from "./VirtualizedTable";
-import VirtualizedTable2 from "./VirtualizedTable2";
+import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
 const header: Record<string, string>[] = [
   { sn_num: "唯一碼" },
   { sys: "系列" },
@@ -153,7 +153,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
         <div className="flex grow items-center gap-2">
           <div className="grow basis-1">
             <Select
-              options={memoizedSeriesOptions}
+              options={seriesOptions}
               name="series"
               onSelect={setSys}
               placeholder="全部系列"
@@ -182,7 +182,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           </div>
           <div className="grow basis-1">
             <Select
-              options={memoizedFactoryOptions}
+              options={factoryOptions}
               name="factory"
               onSelect={setProperty}
               placeholder="財產歸屬"
@@ -190,7 +190,7 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
           </div>
           <div className="grow basis-1">
             <Select
-              options={memoizedSiteOptions}
+              options={siteOptions}
               name="site"
               onSelect={(option: string) => setSite(option as Site)}
               placeholder="位置"
