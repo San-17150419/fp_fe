@@ -34,8 +34,9 @@ export default function ComboBox<T>({
         options.filter((item) => {
           return item.text.toLowerCase().trim().includes(query.toLowerCase());
         });
-
   // TODO: performance issue. When there is a lot of options, the combobox will be slow.
+  // TODO: Inconsistent behavior. Combobox is not always open immediately when you switch between multiple comboboxes.. I am not certain why. Need further testing. (The length of the options doesn't seem to be the problem. It's possible that the problem is outside of the combobox. Overall, the whole filter component is slow. )
+  // TODO: ESC key does not clear the displayed value.
 
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
@@ -56,6 +57,7 @@ export default function ComboBox<T>({
       value={selected}
       // open the combobox on focus
       immediate
+      name={name}
       // enable virtual scrolling.
       virtual={{ options: filteredValue }}
       onChange={(value) => {
@@ -76,6 +78,7 @@ export default function ComboBox<T>({
       <ComboboxInput
         displayValue={() => selected.text}
         placeholder={name}
+        // name={name}
         onChange={(event) => setQuery(event.target.value)}
         className={
           "h-9 w-full rounded-md border border-gray-300 p-2 shadow-sm shadow-slate-300"
@@ -83,6 +86,7 @@ export default function ComboBox<T>({
       />
       <ComboboxOptions
         anchor={{ to: "bottom", gap: "4px" }}
+        modal={false}
         className="max-h-[300px] w-[var(--input-width)] border bg-white empty:invisible"
       >
         {({ option: filteredValue }) => (
