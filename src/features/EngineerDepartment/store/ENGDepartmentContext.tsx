@@ -1,15 +1,22 @@
-import { useState, useContext, createContext, useEffect, useMemo } from "react";
+import { useState, useContext, createContext, useEffect } from "react";
 import { type PreData } from "../types";
 import axios from "axios";
-import { generateOptions } from "../utils/generateOptions";
-import { type SelectOption } from "../../../Components/modd/Select/selectType";
+import { generateFilterOptionsForENGD } from "../utils/generateOptions";
+// import { type SelectOption } from "../../../Components/modd/Select/selectType";
+// import { set } from "date-fns";
 
+type Option = {
+  text: string;
+  value: string;
+  id: string;
+};
 type ENGDepartmentContextValue = {
   states: PreData;
-  makerOptions: SelectOption[];
-  seriesOptions: SelectOption[];
-  siteOptions: SelectOption[];
-  factoryOptions: SelectOption[];
+  makerOptions: Option[];
+  seriesOptions: Option[];
+  siteOptions: Option[];
+  factoryOptions: Option[];
+  isLoading: boolean;
 } | null;
 const ENGDepartmentContext = createContext<ENGDepartmentContextValue | null>(
   null,
@@ -41,6 +48,11 @@ export const ENGDepartmentProvider = ({
   children: React.ReactNode;
 }) => {
   const [states, setStates] = useState<PreData>(initialPreData);
+  const [makerOptions, setMakerOptions] = useState<Option[]>([]);
+  const [seriesOptions, setSeriesOptions] = useState<Option[]>([]);
+  const [siteOptions, setSiteOptions] = useState<Option[]>([]);
+  const [factoryOptions, setFactoryOptions] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "pre-data/";
     const fetchPreData = async () => {
@@ -48,19 +60,27 @@ export const ENGDepartmentProvider = ({
         const response = await axios.get<PreData>(api);
         const data = response.data;
         setStates(data);
+        const { makerOptions, seriesOptions, siteOptions, factoryOptions } =
+          generateFilterOptionsForENGD(data.preData);
+        setFactoryOptions(factoryOptions);
+        setMakerOptions(makerOptions);
+        setSeriesOptions(seriesOptions);
+        setSiteOptions(siteOptions);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchPreData();
+    fetchPreData().finally(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   // This check is needed. Otherwise, it will throw an error saying that useENGDepartmentContext must be used within a ENGDepartmentProvider, even though it is inside the ENGDepartmentProvider. I don't remember having this issue before.
-  const preData = states?.preData;
-  const { makerOptions, seriesOptions, siteOptions, factoryOptions } = useMemo(
-    () => generateOptions(preData),
-    [preData],
-  );
+  // const preData = states?.preData;
+  // const { makerOptions, seriesOptions, siteOptions, factoryOptions } = useMemo(
+  //   () => generateOptions(preData),
+  //   [preData],
+  // );
   return (
     <ENGDepartmentContext.Provider
       value={{
@@ -69,6 +89,7 @@ export const ENGDepartmentProvider = ({
         seriesOptions,
         siteOptions,
         factoryOptions,
+        isLoading,
       }}
     >
       {children}

@@ -6,53 +6,20 @@ import { FilterData, FilterDataParams, Site } from "./types";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
 import { v4 as uuidv4 } from "uuid";
-import VirtualizedTable from "./VirtualizedTable";
+// import VirtualizedTable from "./VirtualizedTable";
+
+// https://github.com/radix-ui/primitives/issues/1634
 import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
-const header: Record<string, string>[] = [
-  { sn_num: "唯一碼" },
-  { sys: "系列" },
-  { property: "財產歸屬" },
-  { site: "位置" },
-  { brand: "品牌" },
-  { prod_name_board: "名板" },
-  { pnb_state: "名板狀態" },
-  { prod_name_nocolor: "定義品名" },
-  { mold_num: "模號" },
-  { hole_num: "模穴數" },
-  { block_num: "塞穴數" },
-  { dutydate_month: "開模日期" },
-  { dutydate_last: "最後上機" },
-  { maker: "廠商代號" },
-  { state: "狀態" },
-  { spare: "備註" },
-  { id_ms: "資料表id" },
-];
-type FilterProps = {
-  preData: PreData["preData"];
-  sysDictionary: Record<string, string>;
-};
+import Select2 from "../../Components/modd/Select/Select2";
+
 // TODO: Fix performance issues. Either memoize them or see if setTimeout is the culprit
-export default function Filter({ preData, sysDictionary }: FilterProps) {
-  const memoizedSeriesOptions = useMemo(() => {
-    return Object.keys(preData.series).map((key) => ({
-      value: key,
-      text: preData.series[key as keyof typeof preData.series],
-    }));
-  }, [preData.series]);
+// TODO: Combobox enhancement: It doesn't make sense to use fetched data to populate the options in combobox.  1. Fetching new data upon change might not be the best UX. Maybe only select should fecth data on change. 2. The auto suggestion in combobox should use data from the first fetched data. Theen use that data to restrict the options based on value from other comboboxes or select.
 
-  const memoizedSiteOptions = useMemo(() => {
-    return preData.site.map((key) => ({
-      value: key,
-      text: key,
-    }));
-  }, [preData.site]);
-
-  const memoizedFactoryOptions = useMemo(() => {
-    return Object.keys(preData.factory).map((key) => ({
-      value: key,
-      text: preData.factory[key as keyof typeof preData.factory],
-    }));
-  }, [preData.factory]);
+// TODO: Discuss over wether the filter component should fetch new data. If it already fetched all data when it first mounted, would't  it make more sense to simply filter the data in the table? Right now, the route I want is to fetch data on mount and then filter the data in the table. At the same time, limit the upper limit of how much rows can be shown in the table. Depend on the user requirement, I can add pagination. Because too much rows will slow down the app. If users don't really need to see all rows at once, it make more sense to add pagination, and avoid rendering all rows at once.
+export default function Filter() {
+  const { states, seriesOptions, siteOptions, factoryOptions } =
+    useENGDepartmentContext();
+  const sysDictionary = states.preData.series;
 
   const [sys, setSys] = useState("");
   const [sn_num, setSn_num] = useState("");
@@ -78,6 +45,9 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
       try {
         const response = await axios.post<FilterData>(api, params, {
           signal: signal,
+        });
+        setData(response.data.data);
+        return response.data;
         // setData(response.data.data);
         // setIsLoading(false);
       } catch (error) {
@@ -90,15 +60,20 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
     };
     // Use setTimeout to introduce artificial delay
     // Use AbortController to cancel the request if needed
+    // const control = new AbortController();
+    // fetchFilterData(control.signal).then((response) => {
+    //   console.log(response);
+    //   setIsLoading(false);
+    // });
     const timer = setTimeout(() => {
       const control = new AbortController();
-      fetchFilterData(control.signal).then(() => {
+      fetchFilterData(control.signal).then((response) => {
         setIsLoading(false);
       });
     }, 500);
     return () => clearTimeout(timer);
   }, [sys, sn_num, prod_name_board, mold_num, property, site]);
-  if (!preData) return <Loading />;
+  if (!states) return <Loading />;
   function generateFilterNameBoardOptions() {
     const temp = [
       ...new Set(
@@ -147,83 +122,61 @@ export default function Filter({ preData, sysDictionary }: FilterProps) {
   const memoizedResult = useMemo(() => {
     return generateFilterNameBoardOptions();
   }, [data]);
+
+  const memoizedResult2 = useMemo(() => {
+    return seriesOptions;
+  }, [data]);
+
   return (
     <>
-      <form action="" className="mb-8 flex gap-2 border-b border-black pb-12">
-        <div className="flex grow items-center gap-2">
-          <div className="grow basis-1">
-            <Select
-              options={seriesOptions}
-              name="series"
-              onSelect={setSys}
-              placeholder="全部系列"
-            />
-          </div>
-          <div className="grow basis-1">
-            <ComboBox<String>
-              options={memoizedSn_numOptions}
-              onChange={(value) => setSn_num(value.text)}
-              name="模具唯一碼"
-            />
-          </div>
-          <div className="grow basis-1">
-            <ComboBox<String>
-              options={memoizedResult}
-              onChange={(value) => setProd_name_board(value.text)}
-              name="名版"
-            />
-          </div>
-          <div className="grow basis-1">
-            <ComboBox<String>
-              options={memoizedMold_numOptions}
-              onChange={(value) => setMold_num(value.text)}
-              name="模號"
-            />
-          </div>
-          <div className="grow basis-1">
-            <Select
-              options={factoryOptions}
-              name="factory"
-              onSelect={setProperty}
-              placeholder="財產歸屬"
-            />
-          </div>
-          <div className="grow basis-1">
-            <Select
-              options={siteOptions}
-              name="site"
-              onSelect={(option: string) => setSite(option as Site)}
-              placeholder="位置"
-            />
-          </div>
+      <form
+        action=""
+        className="mb-8 flex flex-wrap gap-2 border-b border-black pb-12"
+      >
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <Select2 options={memoizedResult2} name="series" onSelect={setSys} />
+        </div>
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <ComboBox<String>
+            options={memoizedSn_numOptions}
+            onChange={(value) => setSn_num(value.text)}
+            name="模具唯一碼"
+          />
+        </div>
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <ComboBox<String>
+            options={memoizedResult}
+            onChange={(value) => setProd_name_board(value.text)}
+            name="名版"
+          />
+        </div>
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <ComboBox<String>
+            options={memoizedMold_numOptions}
+            onChange={(value) => setMold_num(value.text)}
+            name="模號"
+          />
+        </div>
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <Select
+            options={factoryOptions}
+            name="factory"
+            onSelect={setProperty}
+            placeholder="財產歸屬"
+          />
+        </div>
+        <div className="flex flex-1 basis-[150px] items-center gap-4">
+          <Select
+            options={siteOptions}
+            name="site"
+            onSelect={(option: string) => setSite(option as Site)}
+            placeholder="位置"
+          />
         </div>
       </form>
-      <div className="flex w-full flex-col gap-12">
-        {data ? (
-          <Table data={data} header={header} isLoading={isLoading} />
-        ) : (
-          <Loading />
-        )}
-        {data ? (
-          <div className="w-full overflow-auto">
-            <VirtualizedTable
-              data={data}
-              header={header}
-              isLoading={isLoading}
-            />
-          </div>
-        ) : (
-          <Loading />
-        )}
-        {data ? (
-          <VirtualizedTable2
-            data={data}
-            header={header}
-            isLoading={isLoading}
-          />
-        ) : (
-          <Loading />
-        )}
+
+      <div className="flex w-full flex-col gap-1">
+        {data ? <Table data={data} isLoading={isLoading} /> : <Loading />}
       </div>
     </>
   );
