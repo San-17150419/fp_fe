@@ -223,7 +223,7 @@ export default function FactoryTable({
                     )}
                   >
                     {point === "pamt_h" && value !== 0
-                      ? `${Number((value * 100).toFixed(0)).toLocaleString()}`
+                      ? `${Number(value.toFixed(0)).toLocaleString()}`
                       : ""}
                     {point === "ar" && value !== 0
                       ? `${(value * 100).toFixed(2)}%`
