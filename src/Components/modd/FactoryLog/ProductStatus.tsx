@@ -7,10 +7,7 @@ type ProductStatusProps = {
   point: "ar" | "pamt_h";
 };
 
-const ProductStatus: React.FC<ProductStatusProps> = ({
-  value,
-  point,
-}) => {
+const ProductStatus: React.FC<ProductStatusProps> = ({ value, point }) => {
   const { t } = useTranslation();
   const [isLowest, setIsLowest] = useState(false);
   const [isLowerThanStandard, setIsLowerThanStandard] = useState(false);
@@ -82,7 +79,11 @@ const ProductStatus: React.FC<ProductStatusProps> = ({
         </p>
       )}
       {point === "ar" && isLowerThanStandardConsecutively && (
-        <p className={getStatusClassNames(point)}>
+        <p
+          className={clsx(
+            "rounded-full bg-red-500 px-2 py-1 shadow-red-700 text-sm font-semibold text-white shadow",
+          )}
+        >
           {t("連續低於標準")}
           {numberOfConsecutiveLowerThanStandard > 1 &&
             ` (${numberOfConsecutiveLowerThanStandard})`}
