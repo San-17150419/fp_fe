@@ -1,7 +1,7 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import { type PreData } from "../types";
 import axios from "axios";
-import { generateFilterOptionsForENGD } from "../utils/generateOptions";
+import { createEngineerFilterOptions } from "../utils/generateOptions";
 // import { type SelectOption } from "../../../Components/modd/Select/selectType";
 // import { set } from "date-fns";
 
@@ -61,7 +61,7 @@ export const ENGDepartmentProvider = ({
         const data = response.data;
         setStates(data);
         const { makerOptions, seriesOptions, siteOptions, factoryOptions } =
-          generateFilterOptionsForENGD(data.preData);
+          createEngineerFilterOptions(data.preData);
         setFactoryOptions(factoryOptions);
         setMakerOptions(makerOptions);
         setSeriesOptions(seriesOptions);
