@@ -1,4 +1,4 @@
-import { useState, useMemo, memo, useCallback, useRef } from "react";
+import { useState, useMemo, memo, useCallback } from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import Loading from "../../Components/Loading";
@@ -10,9 +10,14 @@ type TableProps = {
   // data: { [key: string]: number | string | undefined }[];
   //  header props act as a key to the data. Allow you to decide the order of the table and what to show. If the header props is an object, the key of the object will be used as key of the data and the value of the object will be used as the header
   isLoading?: boolean;
+  visibleList: string[];
 };
 // Memoized Table Component
-const memoizedTable = memo(function Table({ data, isLoading }: TableProps) {
+const memoizedTable = memo(function Table({
+  data,
+  isLoading,
+  visibleList,
+}: TableProps) {
   const header: Record<string, string>[] = [
     { sn_num: "唯一碼" },
     { sys: "系列" },
@@ -66,6 +71,15 @@ const memoizedTable = memo(function Table({ data, isLoading }: TableProps) {
   );
   const { t } = useTranslation();
 
+  const memoizedTableRows = useMemo(() => {
+    const tableRows: Record<string, JSX.Element> = {};
+    data.forEach((row) => {
+      tableRows[row.sn_num] = (
+        <TableRow data={row} key={row.id_ms} visibleColumns={visibleColumns} />
+      );
+    });
+    return tableRows;
+  }, [data, visibleColumns]);
   return (
     <>
       {isLoading && <Loading />}
@@ -95,13 +109,18 @@ const memoizedTable = memo(function Table({ data, isLoading }: TableProps) {
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
+            {visibleList?.length > 0 &&
+              visibleList.map(
+                (key) =>
+                  memoizedTableRows[key as keyof typeof memoizedTableRows],
+              )}
+            {/* {data.map((row) => (
               <TableRow
                 key={row.sn_num}
                 data={row}
                 visibleColumns={visibleColumns}
               />
-            ))}
+            ))} */}
           </tbody>
         </table>
       </div>
