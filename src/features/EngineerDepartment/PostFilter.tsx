@@ -1,10 +1,10 @@
-import { useState, useReducer, useMemo } from "react";
+import { useState } from "react";
 import ComboBox from "./ComboBox";
 import { type FilterData } from "./types";
 import Loading from "../../Components/Loading";
 import Table from "./Table";
-import clsx from "clsx";
 
+// TODO
 // TODO: Centrailize type
 type OptionDictionary = {
   [key: string]: { text: string; value: string; id: string };
@@ -30,146 +30,41 @@ type PostFilterProps = {
   };
 };
 
-function reducer(state: InitialStateType, action: any) {
-  switch (action.type) {
-    case "SET_MOLD_NUM":
-      return {
-        ...state,
-        visibleSnNum:
-          action.payload === ""
-            ? state.defaultVisibleSnNum
-            : state.data.moldNumToId[action.payload].reduce(
-                (acc: { [key: string]: boolean }, cur) => {
-                  acc[cur] = true;
-                  return acc;
-                },
-                {},
-              ),
-      };
-    case "SET_PROD_NAME_BOARD":
-      return {
-        ...state,
-        visibleSnNum:
-          action.payload === ""
-            ? state.allSnNum.reduce((acc: { [key: string]: boolean }, cur) => {
-                acc[cur] = true;
-                return acc;
-              }, {})
-            : state.data.boardNameToId[action.payload].reduce(
-                (acc: { [key: string]: boolean }, cur) => {
-                  acc[cur] = true;
-                  return acc;
-                },
-                {},
-              ),
-      };
-    case "SET_SN_NUM":
-      return {
-        ...state,
-        visibleSnNum:
-          action.payload === ""
-            ? state.allSnNum.reduce((acc: { [key: string]: boolean }, cur) => {
-                acc[cur] = true;
-                return acc;
-              }, {})
-            : (() => {
-                const temp = state.visibleSnNum;
-                state["allSnNum"].forEach((key) => {
-                  if (key === action.payload) {
-                    temp[key] = true;
-                  } else {
-                    temp[key] = false;
-                  }
-                });
-                return temp;
-              })(),
-      };
-    default:
-      return state;
-  }
-}
-
-type InitialStateType = {
-  data: {
-    allData: {
-      [key: string]: FilterData["data"][number];
-    };
-    moldNumToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-    boardNameToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-  };
-  allSnNum: string[];
-  visibleSnNum: { [key: string]: boolean };
-  defaultVisibleSnNum: { [key: string]: boolean };
-};
-
-const initFunction = (data: InitialStateType["data"]): InitialStateType => {
-  return {
-    data: data,
-    allSnNum: Object.keys(data.allData),
-    visibleSnNum: (() => {
-      const temp: { [key: string]: boolean } = {};
-      Object.keys(data.allData).forEach((key) => {
-        temp[key] = true;
-      });
-      return temp;
-    })(),
-    defaultVisibleSnNum: (() => {
-      const temp: { [key: string]: boolean } = {};
-      Object.keys(data.allData).forEach((key) => {
-        temp[key] = true;
-      });
-      return temp;
-    })(),
-  };
-};
-
 export default function PostFilter({
   data,
   isLoading,
   postFilterOptions,
 }: PostFilterProps) {
-  const [state, dispatch] = useReducer<
-    React.Reducer<InitialStateType, any>,
-    InitialStateType["data"]
-  >(reducer, data, initFunction);
   const { moldNumOptions, boardNameOptions, snNumOptions } = postFilterOptions;
+  const [currentBoardName, setCurrentBoardName] = useState<string>("");
+  const [currentMoldNum, setCurrentMoldNum] = useState<string>("");
+  const [currentSnNum, setCurrentSnNum] = useState<string>("");
 
   const handleMoldNumChange = (selectedMoldNum: string) => {
-    dispatch({
-      type: "SET_MOLD_NUM",
-      payload: selectedMoldNum,
-    });
+    setCurrentMoldNum(selectedMoldNum);
   };
 
   const handleProdNameBoardChange = (selectedProdNameBoard: string) => {
-    console.log(selectedProdNameBoard);
-    dispatch({
-      type: "SET_PROD_NAME_BOARD",
-      payload: selectedProdNameBoard,
-    });
+    setCurrentBoardName(selectedProdNameBoard);
   };
 
   const handleSnNumChange = (selectedSnNum: string) => {
+    setCurrentSnNum(selectedSnNum);
     console.log(selectedSnNum);
-    dispatch({
-      type: "SET_SN_NUM",
-      payload: selectedSnNum,
-    });
   };
 
-  const visibleList = useMemo(() => {
-    return Object.keys(state.visibleSnNum).filter(
-      (key) => state.visibleSnNum[key],
+  const visibleList: Array<string> = (() => {
+    if (currentSnNum !== "") return [currentSnNum];
+    const nameBoardSet = new Set(
+      data["boardNameToId"][currentBoardName === "" ? "all" : currentBoardName],
     );
-  }, [state.visibleSnNum]);
 
-  const filteredData = useMemo(() => {
-    return visibleList.map((curr) => state.data.allData[curr]);
-  }, [visibleList, state.data.allData]);
+    const moldNumSet = new Set(
+      data["moldNumToId"][currentMoldNum === "" ? "all" : currentMoldNum],
+    );
+    const intersection = nameBoardSet.intersection(moldNumSet);
+    return Array.from(intersection);
+  })();
 
   return (
     <>
@@ -196,11 +91,9 @@ export default function PostFilter({
         />
       </div>
       <div className="order-last flex h-full min-w-full flex-shrink flex-col">
-        {data &&
-        Object.keys(state.data.allData).length > 0 &&
-        visibleList.length > 0 ? (
+        {data && Object.keys(data.allData).length > 0 ? (
           <Table
-            data={Object.values(state.data.allData)}
+            data={Object.values(data.allData)}
             visibleList={visibleList}
             isLoading={isLoading}
           />
