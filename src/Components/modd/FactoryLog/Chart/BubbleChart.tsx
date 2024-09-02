@@ -15,7 +15,14 @@ BrokenAxis(Highcharts);
 export default function BubbleChart({ eventData }: BubbleChartProps) {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  const filteredData = eventData.data_mold.filter((event) => !!event["ar"]);
+  const filteredData = eventData.data_mold
+    .filter((event) => !!event["ar"])
+    .map((event) => {
+      return {
+        ...event,
+        mamt: Math.trunc(event.mamt),
+      };
+    });
   const sysName = eventData.post.sys;
   const { xMin, xMax, yAverage, yMedian, generateSeries } =
     generateBubbleChartConfig(filteredData);
@@ -101,6 +108,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
           color: "#000000",
         },
         text: t("總模次"),
+
         margin: 40,
         rotation: 0,
       },
