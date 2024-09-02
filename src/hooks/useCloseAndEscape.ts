@@ -23,9 +23,7 @@ export default function useCloseAndEscape(
       if (ref.current && !ref.current.contains(event.target as Node)) {
         // This is for preventing element other than the trigger element from being focused when closing
         // Without this, the focus would be lost when clicking outside of the element
-        if (returnFocusOnClose) {
-          event.preventDefault();
-        }
+        event.preventDefault();
         event.stopPropagation();
         onClose();
       }
@@ -52,11 +50,6 @@ export default function useCloseAndEscape(
     return () => {
       window.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("keydown", handleEscape);
-
-      // Restore focus to the trigger element
-      if (triggerRef.current) {
-        triggerRef.current.focus();
-      }
     };
   }, [ref, onClose, isOpen, returnFocusOnClose]);
 }
