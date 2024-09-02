@@ -24,14 +24,24 @@ export default function ComboBox<T>({
   onChange,
   name,
 }: ComboBoxProps<T>) {
-  const defaultValue = { id: 1, text: "", value: {} as T };
+  const defaultValue = { id: 1, text: "", value: "" as T };
   const [selected, setSelected] = useState<Option<T>>(defaultValue);
   const [query, setQuery] = useState<string>("");
+
+  const optionsWithNoDuplicateText = [
+    // remove options with duplicate text
+    ...new Map(options.map((option) => [option.text, option])).values(),
+  ]
+    // remove options with empty text (localeCompare can't compare empty strings)
+    .filter((option) => option.text)
+    // do sorting last to avoid unnessary operations
+    .toSorted((a, b) => a.text.localeCompare(b.text));
+
   const filteredValue =
     query === ""
-      ? options
+      ? optionsWithNoDuplicateText
       : // ? [defaultValue, ...options]
-        options.filter((item) => {
+        optionsWithNoDuplicateText.filter((item) => {
           return item.text.toLowerCase().trim().includes(query.toLowerCase());
         });
   // TODO: performance issue. When there is a lot of options, the combobox will be slow.
@@ -42,7 +52,7 @@ export default function ComboBox<T>({
     const onEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setQuery("");
-        setSelected(defaultValue);
+        setSelected(defaultValue.value as Option<T>);
         onChange(defaultValue);
       }
     };
