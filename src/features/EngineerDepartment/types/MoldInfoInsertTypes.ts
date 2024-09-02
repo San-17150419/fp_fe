@@ -37,20 +37,21 @@ export type MoldInfoInsertParams = {
 
 export type MoldInfoInsertResponse =
   | MoldInfoInsertSuccessResponse
-  | MoldInfoInsertErrorResponse;
+  | MoldInfoInsertErrorResponse
+
+type InfoCheck = {
+  status: boolean;
+  detail: string;
+};
 
 export type MoldInfoInsertMissingKeyErrorResponse = {
   post: MoldInfoInsertParams;
-  check: {
-    status: boolean;
-    detail: string;
-  };
+  info_check: InfoCheck;
 };
 export type MoldInfoInsertSuccessResponse = {
   post: MoldInfoInsertParams;
-  info_check: {
+  info_check: InfoCheck & {
     status: true;
-    detail: string;
   };
   info_insert: {
     lastInsertedId: number;
