@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import SelectComponent from "../Select/Select";
+import SelectComponent, { type Option } from "../Select/Select";
 import { useTheme } from "../../../stores/ThemeContext";
 import clsx from "clsx";
 import { ChangeEvent } from "react";
@@ -36,8 +36,8 @@ export default function FactoryFilterItem({
           key={`key-${text}`}
           name={text}
           className="mt-1"
-          onSelect={onChange}
-          options={options!} // TypeScript knows `options` exists here
+          onSelect={(option: Option) => onChange(option.value as string)}
+          options={options} // TypeScript knows `options` exists here
         />
       ) : (
         <InputBase

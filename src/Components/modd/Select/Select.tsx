@@ -5,9 +5,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { PiCaretDownBold } from "react-icons/pi";
-import { useSelect } from "./useSelect";
-import { SelectOption, DetailOption } from "./selectType";
-import { useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import cn from "../../../util/cn";
 import clsx from "clsx";
@@ -24,12 +22,17 @@ import clsx from "clsx";
 // const Select = <T,>({ options, name, onSelect, placeholder }: SelectProps<T>) => {
 //   // ...
 // };
+
+export type Option = {
+  text: string;
+  value: string | number;
+  id: string | number;
+};
 type SelectProps = {
-  options: SelectOption[];
+  options: Option[];
   name: string;
   className?: string;
-  onSelect?: (option: string) => void;
-  placeholder?: string;
+  onSelect?: (option: Option) => void;
 };
 
 export default function Select({
@@ -37,24 +40,16 @@ export default function Select({
   className,
   onSelect,
   name,
-  placeholder,
 }: SelectProps) {
   const { t } = useTranslation();
-  const { allOptions, selectedOption, setSelectedOption } = useSelect(
-    options,
-    placeholder,
-  );
-  useEffect(() => {
-    if (onSelect) {
-      onSelect(selectedOption.value as string);
-    }
-  }, [onSelect, selectedOption]);
+  // If user wish to add a placeholder, add it to options.
+  const [selectedOption, setSelectedOption] = useState<Option>(options[0]);
 
-  const handleSelect = (option: DetailOption) => {
-    setSelectedOption(option);
+  const handleSelect = (option: Option) => {
     if (onSelect) {
-      onSelect(option.value as string);
+      onSelect(option);
     }
+    setSelectedOption(option);
   };
 
   return (
@@ -87,7 +82,7 @@ export default function Select({
               "z-[100] w-[var(--button-width)] origin-top rounded-md bg-white transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0",
             )}
           >
-            {allOptions.map((option) => (
+            {options.map((option) => (
               <ListboxOption
                 key={option.id}
                 value={option}

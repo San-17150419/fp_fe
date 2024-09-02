@@ -1,7 +1,9 @@
 export type FilterConfig<T> = {
   type: T;
   onChange: (value: string) => void;
-  options?: T extends "select" ? { value: string; text: string }[] : never;
+  options?: T extends "select"
+    ? { value: string; text: string; id: string }[]
+    : never;
   defaultValue?: T extends "input" ? string : never;
 };
 
@@ -17,6 +19,6 @@ export type FactoryPreFilterItemProps =
       type: "select";
       text: string;
       onChange: (value: string) => void;
-      options: { value: string; text: string }[]; // Required when type is "select"
+      options: { value: string; text: string; id: string }[]; // Required when type is "select"
       defaultValue?: never; // Not allowed when type is "select"
     };

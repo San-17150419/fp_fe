@@ -8,6 +8,7 @@ import {
   type FilterConfig,
   type FactoryTableData,
 } from "../types";
+import { v4 as uuidv4 } from "uuid";
 
 import { transformData } from "../formatFactoryData";
 
@@ -37,10 +38,11 @@ export default function useFilterState(
         acc[key] = Object.entries(value).map(([key, value]) => ({
           value: key,
           text: value,
+          id: uuidv4(),
         }));
         return acc;
       },
-      {} as { [key: string]: { value: string; text: string }[] },
+      {} as { [key: string]: { value: string; text: string; id: string }[] },
     );
   }, [preData]);
 
