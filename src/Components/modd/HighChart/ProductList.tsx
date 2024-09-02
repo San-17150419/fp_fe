@@ -30,9 +30,8 @@ export default function ProductList({ data }: ProductListProps) {
   );
 
   const options = data.map((item) => {
-    return { id: item.id_item, value: item.item };
+    return { id: item.id_item, value: item.item, text: item.item };
   });
-
 
   async function postRequest(id_item: number) {
     try {
