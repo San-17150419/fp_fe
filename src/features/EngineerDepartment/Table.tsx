@@ -109,11 +109,16 @@ const memoizedTable = memo(function Table({
             </tr>
           </thead>
           <tbody>
-            {visibleList?.length > 0 &&
+            {visibleList?.length > 0 ? (
               visibleList.map(
                 (key) =>
                   memoizedTableRows[key as keyof typeof memoizedTableRows],
-              )}
+              )
+            ) : (
+              <tr>
+                <td colSpan={memoizedColumnsOrder.length}>{t("No Data")}</td>
+              </tr>
+            )}
             {/* {data.map((row) => (
               <TableRow
                 key={row.sn_num}

@@ -91,7 +91,7 @@ export default function PostFilter({
         />
       </div>
       <div className="order-last flex h-full min-w-full flex-shrink flex-col">
-        {data && Object.keys(data.allData).length > 0 ? (
+        {data ? (
           <Table
             data={Object.values(data.allData)}
             visibleList={visibleList}
