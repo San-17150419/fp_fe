@@ -5,7 +5,7 @@ import usePreFilter from "./hooks/usePreFilter";
 import { Site } from "./types";
 // https://github.com/radix-ui/primitives/issues/1634
 import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
-import Select2 from "../../Components/modd/Select/Select2";
+import Select from "../../Components/modd/Select/Select";
 import PostFilterSkeleton from "./PostFilterSkeleton";
 import PostFilter from "./PostFilter";
 
@@ -28,20 +28,27 @@ export default function Filter() {
     <div className="flex flex-wrap justify-around gap-4">
       <>
         <div className="h-10 flex-grow basis-[100px]">
-          <Select2 options={seriesOptions} name="series" onSelect={setSys} />
+          <Select
+            options={seriesOptions}
+            name="series"
+            onSelect={(option) => setSys(option.value as string)}
+          />
         </div>
+
         <div className="h-10 flex-grow basis-[100px]">
-          <Select2
+          <Select
             options={factoryOptions}
             name="factory"
-            onSelect={setProperty}
+            onSelect={(option) => {
+              setProperty(option.value as string);
+            }}
           />
         </div>
         <div className="h-10 flex-grow basis-[100px]">
-          <Select2
+          <Select
             options={siteOptions}
             name="site"
-            onSelect={(option: string) => setSite(option as Site)}
+            onSelect={(option) => setSite(option.value as Site)}
           />
         </div>
         {!dataLoaded ? (
@@ -53,24 +60,6 @@ export default function Filter() {
             postFilterOptions={postFilterOptions}
           />
         )}
-        {/* {isLoading ? (
-          <PostFilterSkeleton />
-        ) : (
-          <PostFilter
-            data={data}
-            isLoading={isLoading}
-            postFilterOptions={postFilterOptions}
-          />
-        )} */}
-        {/* {Object.keys(data.allData).length === 0 ? (
-          <PostFilterSkeleton />
-        ) : (
-          <PostFilter
-            data={data}
-            isLoading={isLoading}
-            postFilterOptions={postFilterOptions}
-          />
-        )} */}
       </>
     </div>
   );
