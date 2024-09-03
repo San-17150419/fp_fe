@@ -1,14 +1,6 @@
 export type FactoryLogPreData = {
   preData: PreData;
 };
-// export type FactoryLogPreData = {
-//   preData: {
-//     factory: GenericObject;
-//     point: GenericObject;
-//     date_type: GenericObject;
-//     dep: { [key: string]: GenericObject };
-//   };
-// };
 
 export type PostDataParams = {
   factory: "GD" | "HP" | "DL";
@@ -35,7 +27,7 @@ export type FactoryLogRawData = {
     factory: Factory;
     date_type: "half-year" | "quarter";
     date_start: string;
-    point: "ar" | "pamt_p" | null;
+    point: "ar" | "pamt_h";
   };
 };
 // export type FactoryLogRawData<F extends Factory> = {
