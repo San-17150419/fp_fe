@@ -60,6 +60,5 @@ export const transformData = (
       });
     });
   });
-  console.log(finalDataFormat);
   return { data: finalDataFormat, factory, duration, point };
 };
