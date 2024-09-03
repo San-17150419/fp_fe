@@ -15,13 +15,14 @@ import {
   type DutydateMonth,
   type Spare,
   type Brand,
+  type MoldStatus
 } from "./CommonTypes";
 
 export type MoldInfoUpdateParams = {
   id_ms: IdMs; // Not sure if it is string or number. From filterData, it should be a number. This is also the only required field.
   sn_num: SnNum | null;
   site: Site | null;
-  state: Site | null;
+  state: MoldStatus | null;
   sys: Sys | null;
   property: Property | null;
   brand: Brand | null;
