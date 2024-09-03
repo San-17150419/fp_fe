@@ -12,8 +12,12 @@ import PostFilter from "./PostFilter";
 // const PostFilter = lazy(() => import("./PostFilter"));
 
 export default function Filter() {
-  const { states, seriesOptions, siteOptions, factoryOptions } =
-    useENGDepartmentContext();
+  const {
+    states,
+    seriesOptions,
+    siteOptions,
+    propertyOptions,
+  } = useENGDepartmentContext();
   const {
     isLoading,
     setSys,
@@ -37,8 +41,8 @@ export default function Filter() {
 
         <div className="h-10 flex-grow basis-[100px]">
           <Select
-            options={factoryOptions}
-            name="factory"
+            options={propertyOptions}
+            name="property"
             onSelect={(option) => {
               setProperty(option.value as string);
             }}

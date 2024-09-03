@@ -15,8 +15,9 @@ type ENGDepartmentContextValue = {
   makerOptions: Option[];
   seriesOptions: Option[];
   siteOptions: Option[];
-  factoryOptions: Option[];
+  propertyOptions: Option[];
   isLoading: boolean;
+  statusOptions: Option[];
 } | null;
 const ENGDepartmentContext = createContext<ENGDepartmentContextValue | null>(
   null,
@@ -51,7 +52,8 @@ export const ENGDepartmentProvider = ({
   const [makerOptions, setMakerOptions] = useState<Option[]>([]);
   const [seriesOptions, setSeriesOptions] = useState<Option[]>([]);
   const [siteOptions, setSiteOptions] = useState<Option[]>([]);
-  const [factoryOptions, setFactoryOptions] = useState<Option[]>([]);
+  const [propertyOptions, setPropertyOptions] = useState<Option[]>([]);
+  const [statusOptions, setStatusOptions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "pre-data/";
@@ -60,9 +62,15 @@ export const ENGDepartmentProvider = ({
         const response = await axios.get<PreData>(api);
         const data = response.data;
         setStates(data);
-        const { makerOptions, seriesOptions, siteOptions, factoryOptions } =
-          createEngineerFilterOptions(data.preData);
-        setFactoryOptions(factoryOptions);
+        const {
+          makerOptions,
+          statusOptions,
+          seriesOptions,
+          siteOptions,
+          propertyOptions,
+        } = createEngineerFilterOptions(data.preData);
+        setStatusOptions(statusOptions);
+        setPropertyOptions(propertyOptions);
         setMakerOptions(makerOptions);
         setSeriesOptions(seriesOptions);
         setSiteOptions(siteOptions);
@@ -75,20 +83,16 @@ export const ENGDepartmentProvider = ({
     });
   }, []);
 
-  // This check is needed. Otherwise, it will throw an error saying that useENGDepartmentContext must be used within a ENGDepartmentProvider, even though it is inside the ENGDepartmentProvider. I don't remember having this issue before.
-  // const preData = states?.preData;
-  // const { makerOptions, seriesOptions, siteOptions, factoryOptions } = useMemo(
-  //   () => generateOptions(preData),
-  //   [preData],
-  // );
+
   return (
     <ENGDepartmentContext.Provider
       value={{
         states,
+        statusOptions,
         makerOptions,
         seriesOptions,
         siteOptions,
-        factoryOptions,
+        propertyOptions,
         isLoading,
       }}
     >
