@@ -1,32 +1,32 @@
-import { useState } from "react";
 import { type FilterData } from "./types";
-import { useTranslation } from "react-i18next";
 import Modal from "../../Components/modd/Modal/NonDialogModal";
-import Select from "../../Components/modd/Select/Select";
+import Select, { type Option } from "../../Components/modd/Select/Select";
+import Input from "../../Components/modd/Input/InputBase";
 import clsx from "clsx";
 import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
+import { ReactNode } from "react";
+import useUpdate from "./hooks/useUpdate";
 type UpdateProps = {
   data: FilterData["data"][number];
 };
 
-const header: Record<string, string | boolean>[] = [
-  { prod_name_board: "名板", readonly: false },
-  { prod_name_nocolor: "定義品名", readonly: false }, //在原來的是機種
-  { sys: "系列", readonly: true },
-  { sn_num: "唯一碼", readonly: true },
-  { mold_num: "模號", readonly: true },
-  { hole_num: "模穴數", readonly: true },
-  { site: "位置", readonly: false },
-  { property: "財產歸屬", readonly: false },
-  { state: "狀態", readonly: false },
-  { maker: "廠商代號", readonly: false },
-  { dutydate_month: "開模日期", readonly: false },
-];
-
 export default function Update({ data }: UpdateProps) {
-  const { makerOptions } = useENGDepartmentContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { t } = useTranslation();
+  const { makerOptions, propertyOptions, siteOptions, statusOptions } =
+    useENGDepartmentContext();
+  const {
+    handleUpdateMoldInfo,
+    inputConfig,
+    selectConfig,
+    handleChange,
+    isModalOpen,
+    setIsModalOpen,
+  } = useUpdate({
+    data,
+    makerOptions,
+    propertyOptions,
+    siteOptions,
+    statusOptions,
+  });
 
   return (
     <>
@@ -38,42 +38,133 @@ export default function Update({ data }: UpdateProps) {
         更新
       </button>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="min-h-full">
-          {data?.id_ms}
-          <form
-            action=""
-            className="m-auto grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
-          >
-            {header.map((h) => (
-              <div
-                key={Object.keys(h)[0]}
-                className="flex h-full items-center justify-between gap-4 p-2"
-              >
-                <label htmlFor={Object.keys(h)[0]}>
-                  {t(Object.keys(h)[0])}
-                </label>
-                <input
-                  type="text"
-                  id={Object.keys(h)[0]}
-                  className={clsx(
-                    "rounded-md px-2 py-1",
-                    h.readonly
-                      ? "bg-white"
-                      : "border border-gray-100/50 bg-gray-100",
-                  )}
-                  disabled={h.readonly ? true : false}
-                  defaultValue={
-                    data[Object.keys(h)[0] as keyof typeof data] || ""
-                  }
-                />
-              </div>
-            ))}
-            <div className="flex h-full items-center justify-between gap-4 p-2">
-              <Select name="maker" options={makerOptions} />
-            </div>
-          </form>
-        </div>
+        <form
+          className="m-auto grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
+          onSubmit={(e) => handleUpdateMoldInfo(e)}
+        >
+          {inputConfig.map(({ name, text, readOnly }) => (
+            <InputField
+              key={text}
+              name={name}
+              text={text}
+              data={data}
+              readOnly={readOnly}
+              onChange={(data) => handleChange(name, data)}
+            />
+          ))}
+          {selectConfig.map(({ text, options, name }) => (
+            <SelectField
+              key={text}
+              name={name}
+              text={text}
+              options={options}
+              data={data}
+              onSelect={(option) => handleChange(name, option.value as string)}
+            />
+          ))}
+
+          <InputField
+            text="開模日期"
+            name="dutydate_month"
+            data={data}
+            readOnly={false}
+            type="date"
+            onChange={(data) => handleChange("dutydate_month", data)}
+          />
+          <div className="col-span-2">
+            <button
+              type="submit"
+              className="col-span-2 ml-auto block rounded-md bg-blue-600 p-2 text-white"
+            >
+              更新
+            </button>
+          </div>
+        </form>
       </Modal>
     </>
+  );
+}
+
+type FieldProps = {
+  text: string;
+  children?: ReactNode;
+};
+
+function Field({ text, children }: FieldProps) {
+  // When input or select is inside of a label, their association is implicit. This way, we do not need to set the htmlFor prop explicitly. Therefore, avoid unintended interaction if other tag happened to have the same id.
+  return (
+    <label className="grid h-full grid-cols-3 items-center justify-start gap-8 p-2 text-lg">
+      <span className="w-1/4 min-w-fit text-left font-medium">{text}</span>
+      <span className="col-span-2 w-3/4">{children}</span>
+    </label>
+  );
+}
+
+type SelectFieldProps = {
+  name: keyof FilterData["data"][number];
+  options: Option[];
+  data: FilterData["data"][number];
+  onSelect?: (option: Option) => void;
+  text: string;
+};
+
+function SelectField({
+  name,
+  text,
+  options,
+  data,
+  onSelect,
+}: SelectFieldProps) {
+  return (
+    <Field text={text}>
+      <Select
+        name={name}
+        className="font-normal"
+        options={options}
+        defaultValue={
+          options.find((option) => option.value === data[name]) ?? undefined
+        }
+        onSelect={onSelect}
+      />
+    </Field>
+  );
+}
+
+type InputFieldProps = {
+  name: keyof FilterData["data"][number];
+  text: string;
+  readOnly?: boolean;
+  data: FilterData["data"][number];
+  type?: "text" | "date";
+  onChange?: (value: string) => void;
+};
+
+function InputField({
+  name,
+  text,
+  data,
+  readOnly,
+  type,
+  onChange,
+}: InputFieldProps) {
+  return (
+    <Field text={text}>
+      <Input
+        className={clsx(
+          readOnly
+            ? "cursor-default border-none bg-white text-center shadow-none"
+            : "",
+        )}
+        onChange={(e) => {
+          if (onChange) {
+            onChange(e.target.value);
+          }
+        }}
+        type={type}
+        name={name}
+        defaultValue={data?.[name]}
+        readOnly={readOnly}
+      />
+    </Field>
   );
 }
