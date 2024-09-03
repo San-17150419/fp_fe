@@ -316,6 +316,9 @@ export function generateBubbleChartConfig(
       sizeBy: "width",
       dataGrouping: { enabled: false },
       jitter: { x: 0.5 },
+      accessibility: {
+        enabled: false,
+      },
     };
 
     Object.keys(separateData).map((key) => {
