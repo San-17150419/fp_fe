@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { type FilterData } from "./types";
 import Update from "./Update";
 import MemoCell from "./MemoCell";
-import EventContainer from "./EventContainer";
+import Event from "./Event";
 import cn from "../../util/cn";
 type TableRowProps = {
   data: FilterData["data"][number];
@@ -84,18 +84,20 @@ export default function TableRow({ data, visibleColumns }: TableRowProps) {
           key={`dutydate_last-${data.id_ms}`}
           className="text-sm text-blue-400"
         >
-          <EventContainer
-            dutydate_last={data.dutydate_last}
-            site={data.site}
-            sn_num={data.sn_num}
-          />
+          {!data.dutydate_last ? null : (
+            <Event
+              dutydate_last={data.dutydate_last}
+              site={data.site}
+              sn_num={data.sn_num}
+            />
+          )}
         </TableCell>
       ),
       maker: <TableCell key={`maker-${data.id_ms}`}>{data.maker}</TableCell>,
       state: <TableCell key={`state-${data.id_ms}`}>{data.state}</TableCell>,
       spare: (
         <TableCell key={`spare-${data.id_ms}`}>
-          <MemoCell message={data.spare} />
+          <MemoCell  data={data} />
         </TableCell>
       ),
       id_ms: (
