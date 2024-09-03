@@ -1,11 +1,28 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Modal from "../../Components/modd/Modal/NonDialogModal";
+import { type FilterData } from "./types";
+import axios from "axios";
 
 type MemoCellProps = {
-  message: string;
+  data: FilterData["data"][number];
 };
-export default function MemoCell({ message }: MemoCellProps) {
+const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-update/";
+export default function MemoCell({ data }: MemoCellProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState<string>(data.spare);
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(api, {
+        ...data,
+        spare: message,
+      });
+      setIsModalOpen(false);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <>
       <button
@@ -17,17 +34,26 @@ export default function MemoCell({ message }: MemoCellProps) {
       </button>
       {
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <form action="" className="w-full border border-red-400 p-4 outline">
+          <form
+            className="flex w-full flex-col border border-red-400 p-4 outline"
+            onSubmit={onSubmit}
+          >
             <textarea
               name=""
               placeholder="請輸入備註"
               id=""
               cols={30}
               rows={10}
+              defaultValue={message}
               className="w-full border border-black p-2"
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <button
+              className="my-4 ml-auto block rounded-md bg-blue-400 p-2"
+              type="submit"
             >
-              {message}
-            </textarea>
+              儲存
+            </button>
           </form>
         </Modal>
       }
