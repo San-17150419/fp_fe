@@ -10,40 +10,18 @@ import { useTranslation } from "react-i18next";
 import cn from "../../../util/cn";
 import clsx from "clsx";
 
-// TODO: Make it more generic.
-// For example:
-// interface SelectProps<T> {
-//   options: T[];
-//   name: string;
-//   onSelect: (value: T) => void;
-//   placeholder: string;
-// }
-
-// const Select = <T,>({ options, name, onSelect, placeholder }: SelectProps<T>) => {
-//   // ...
-// };
-
-export type Option = {
-  text: string;
-  value: string | number;
-  id: string | number;
-};
-type SelectProps = {
-  options: Option[];
-  name: string;
-  className?: string;
-  onSelect?: (option: Option) => void;
-};
-
 export default function Select({
   options,
   className,
   onSelect,
   name,
+  defaultValue,
 }: SelectProps) {
   const { t } = useTranslation();
   // If user wish to add a placeholder, add it to options.
-  const [selectedOption, setSelectedOption] = useState<Option>(options[0]);
+  const [selectedOption, setSelectedOption] = useState<Option>(
+    defaultValue || options[0],
+  );
 
   const handleSelect = (option: Option) => {
     if (onSelect) {
@@ -56,17 +34,17 @@ export default function Select({
     <Listbox
       value={selectedOption}
       onChange={handleSelect}
+      defaultValue={defaultValue}
       name={name}
-      defaultValue={selectedOption}
       as="div"
-      className={cn("box-border flex h-9 w-full", className)}
+      className={cn("box-border flex h-9 w-full font-semibold", className)}
     >
       {({ open }) => (
         <>
           <ListboxButton
             id={name}
             className={clsx(
-              "box-border flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-1 text-left font-semibold shadow shadow-slate-300 hover:border-sky-300 focus:border-2 focus:border-sky-400 desktop:px-3 desktop:py-4",
+              "box-border flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-1 text-left shadow shadow-slate-300 hover:border-sky-300 focus:border-2 focus:border-sky-400 desktop:px-3 desktop:py-4",
               open ? "border-blue-300" : "border-gray-300",
             )}
           >
@@ -88,7 +66,7 @@ export default function Select({
                 value={option}
                 className="border-l-4 border-transparent p-2 text-left data-[selected]:border-sky-400 data-[focus]:bg-sky-200"
               >
-                <p className={clsx("font-semibold")}>{t(option.text)}</p>
+                <p>{t(option.text)}</p>
               </ListboxOption>
             ))}
           </ListboxOptions>
@@ -97,3 +75,16 @@ export default function Select({
     </Listbox>
   );
 }
+
+export type Option = {
+  text: string;
+  value: string | number;
+  id: string | number;
+};
+type SelectProps = {
+  options: Option[];
+  name: string;
+  className?: string;
+  onSelect?: (option: Option) => void;
+  defaultValue?: Option;
+};
