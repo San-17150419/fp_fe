@@ -4,10 +4,13 @@ import Update from "./Update";
 import MemoCell from "./MemoCell";
 import Event from "./Event";
 import cn from "../../util/cn";
+import withPreData from "./WithPreData";
 type TableRowProps = {
   data: FilterData["data"][number];
   visibleColumns: Record<string, boolean>;
 };
+
+const UpdateWithPreData = withPreData(Update);
 
 export default function TableRow({ data, visibleColumns }: TableRowProps) {
   const order = [
@@ -97,12 +100,12 @@ export default function TableRow({ data, visibleColumns }: TableRowProps) {
       state: <TableCell key={`state-${data.id_ms}`}>{data.state}</TableCell>,
       spare: (
         <TableCell key={`spare-${data.id_ms}`}>
-          <MemoCell  data={data} />
+          <MemoCell data={data} />
         </TableCell>
       ),
       id_ms: (
         <TableCell key={`id_ms-${data.id_ms}`}>
-          <Update data={data} />
+          <UpdateWithPreData data={data} />
         </TableCell>
       ),
     };

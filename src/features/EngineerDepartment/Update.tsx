@@ -3,16 +3,20 @@ import Modal from "../../Components/modd/Modal/NonDialogModal";
 import Select, { type Option } from "../../Components/modd/Select/Select";
 import Input from "../../Components/modd/Input/InputBase";
 import clsx from "clsx";
-import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
+import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import { ReactNode } from "react";
 import useUpdate from "./hooks/useUpdate";
 type UpdateProps = {
   data: FilterData["data"][number];
-};
+} & PreFilterData;
 
-export default function Update({ data }: UpdateProps) {
-  const { makerOptions, propertyOptions, siteOptions, statusOptions } =
-    useENGDepartmentContext();
+export default function Update({
+  data,
+  makerOptions,
+  propertyOptions,
+  siteOptions,
+  statusOptions,
+}: UpdateProps) {
   const {
     handleUpdateMoldInfo,
     inputConfig,

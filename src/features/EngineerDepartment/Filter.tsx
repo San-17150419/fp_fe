@@ -4,20 +4,19 @@ import usePreFilter from "./hooks/usePreFilter";
 // TODO: I don't think Loading component block the whole page. Might be a problem.
 import { Site } from "./types";
 // https://github.com/radix-ui/primitives/issues/1634
-import { useENGDepartmentContext } from "./store/ENGDepartmentContext";
-import Select from "../../Components/modd/Select/Select";
+import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import PostFilterSkeleton from "./PostFilterSkeleton";
-import PostFilter from "./PostFilter";
+import Loading from "../../Components/Loading";
+import { lazy } from "react";
+const PostFilter = lazy(() => import("./PostFilter"));
+const Select = lazy(() => import("../../Components/modd/Select/Select"));
 
-// const PostFilter = lazy(() => import("./PostFilter"));
-
-export default function Filter() {
-  const {
-    states,
-    seriesOptions,
-    siteOptions,
-    propertyOptions,
-  } = useENGDepartmentContext();
+export default function Filter({
+  seriesOptions,
+  siteOptions,
+  propertyOptions,
+  states,
+}: PreFilterData) {
   const {
     isLoading,
     setSys,
@@ -55,6 +54,7 @@ export default function Filter() {
             onSelect={(option) => setSite(option.value as Site)}
           />
         </div>
+        {!dataLoaded ? <Loading /> : null}
         {!dataLoaded ? (
           <PostFilterSkeleton />
         ) : (
