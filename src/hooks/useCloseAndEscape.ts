@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 /**
  * A custom hook that adds event listeners to the window for both click and escape key presses.
@@ -16,7 +16,7 @@ export default function useCloseAndEscape(
   isOpen: boolean,
   returnFocusOnClose: boolean = true,
 ) {
-  const triggerRef = useRef<HTMLElement | null>(null);
+  // const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,18 +34,6 @@ export default function useCloseAndEscape(
         onClose();
       }
     };
-
-    if (isOpen) {
-      // Save the currently focused element
-      triggerRef.current = document.activeElement as HTMLElement;
-
-      window.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("keydown", handleEscape);
-
-      if (ref.current && typeof ref.current.focus === "function") {
-        ref.current.focus();
-      }
-    }
 
     return () => {
       window.removeEventListener("mousedown", handleClickOutside);
