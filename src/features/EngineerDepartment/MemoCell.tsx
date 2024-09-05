@@ -34,10 +34,7 @@ export default function MemoCell({ data }: MemoCellProps) {
       </button>
       {
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <form
-            className="flex w-full flex-col border border-red-400 p-4 outline"
-            onSubmit={onSubmit}
-          >
+          <form className="flex w-[35vw] flex-col -mb-6" onSubmit={onSubmit}>
             <textarea
               name=""
               placeholder="請輸入備註"
