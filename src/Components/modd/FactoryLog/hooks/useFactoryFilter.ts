@@ -18,12 +18,13 @@ export default function useFilterState(
   preData: PreData,
   defaultDateStart?: string,
 ) {
+  // TODO: refactor how to handle default value. 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [factory, setFactory] = useState<Factory | null>(null);
-  const [point, setPoint] = useState<"ar" | "pamt_h" | null>(null);
+  const [factory, setFactory] = useState<Factory | null>("GD");
+  const [point, setPoint] = useState<"ar" | "pamt_h" | null>("ar");
   const [dateType, setDateType] = useState<"half-year" | "quarter" | null>(
-    null,
+    "half-year",
   );
   const [dateStart, setDateStart] = useState<string>(
     defaultDateStart ||
