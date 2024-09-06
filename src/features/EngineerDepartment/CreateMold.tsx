@@ -30,6 +30,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
   const [sys, setSys] = useState<Sys>("");
   const [sn_num, setSnNum] = useState<string>("");
   const [isSnNumReady, setIsSnNumReady] = useState<boolean>(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
   // I thihk it make sense to use a dedicated state for tracking the validity of the mold_num input. It's value is used in many places like conditional rendering, css styles and so on. It does not make sense to run regex on every place where it's used.
   // I want to attach the validation logic to onChange on the Input component. So users can get feedback about the validity of the input right away.
   // But I want to make sure that a request is only made when the input is valld and the select or input element looses focus.
@@ -111,6 +112,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
               className="w-3/4"
               disabled={isSnNumReady}
               // unable to reset.
+              required={true}
               // if I want to make this Select
               value={seriesOptions.find((option) => option.text === sys)}
               onSelect={(option) => {
@@ -161,6 +163,8 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
             <CreateMoldSubComponentWithPreData
               isSnNumReady={isSnNumReady}
               handleReset={handleReset}
+              isFormSubmitted={isFormSubmitted}
+              setIsFormSubmitted={setIsFormSubmitted}
             />
           )}
           {/* <Select name="maker" options={makerOptions} /> */}
