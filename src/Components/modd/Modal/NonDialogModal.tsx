@@ -45,9 +45,9 @@ export default function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useCloseAndEscape(modalRef, onClose, isOpen);
-
+  // TODO: Fix the animation. I might need to avoid using scaling for the animation because it messes up the width of listbox options. I am not sure if I can fix this. It's possible to fix this problem by delaying redering of the children. But that's not a good solution as it might cause performance issues.It also make the visual effect worse because I probably need to delay redering the children AFTER the animation is done.
   const currentVariant = animationVariants[enter];
-  currentVariant
+  currentVariant;
   return (
     <AnimatePresence>
       {isOpen && (
@@ -58,6 +58,7 @@ export default function Modal({
           tabIndex={-1}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          layout
           transition={{ ease: "easeOut", duration: 0.4 }}
           onClick={() => {
             if (modalRef.current) {
@@ -68,7 +69,8 @@ export default function Modal({
           <motion.div
             // initial={currentVariant.initial}
             // animate={currentVariant.animate}
-            initial={{ scale: 0.2 }}
+            layout
+            initial={{ scale: 1 }}
             animate={{ scale: 1 }}
             // exit={currentVariant.exit}
             // transition={currentVariant.transition}
