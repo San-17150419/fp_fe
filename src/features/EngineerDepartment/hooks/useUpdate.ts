@@ -30,7 +30,9 @@ export default function useUpdate({
       return copy as MoldInfoUpdateParams;
     })(),
   );
-
+  const isStateInPredefinedOptions = statusOptions.some(
+    (option) => option.value === data.state,
+  );
   const handleUpdateMoldInfo = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // const target = e.target as typeof e.target & {
@@ -99,7 +101,12 @@ export default function useUpdate({
   const selectConfig: SelectConfig = [
     { text: "位置", options: siteOptions, name: "site" },
     { text: "財產歸屬", options: propertyOptions, name: "property" },
-    { text: "狀態", options: statusOptions, name: "state" },
+    {
+      text: "狀態",
+      options: statusOptions,
+      name: "state",
+      disabled: !isStateInPredefinedOptions,
+    },
     { text: "製造商代號", options: makerOptions, name: "maker" },
   ];
   const inputConfig: InputConfig = [
@@ -126,6 +133,7 @@ type SelectConfig = {
   name: Name;
   text: string;
   options: Array<Option>;
+  disabled?: boolean;
 }[];
 
 type InputConfig = {

@@ -56,13 +56,14 @@ export default function Update({
               onChange={(data) => handleChange(name, data)}
             />
           ))}
-          {selectConfig.map(({ text, options, name }) => (
+          {selectConfig.map(({ text, options, name, disabled }) => (
             <SelectField
               key={text}
               name={name}
               text={text}
               options={options}
               data={data}
+              disabled={disabled}
               onSelect={(option) => handleChange(name, option.value as string)}
             />
           ))}
@@ -110,6 +111,7 @@ type SelectFieldProps = {
   data: FilterData["data"][number];
   onSelect?: (option: Option) => void;
   text: string;
+  disabled?: boolean;
 };
 
 function SelectField({
@@ -118,6 +120,7 @@ function SelectField({
   options,
   data,
   onSelect,
+  disabled,
 }: SelectFieldProps) {
   return (
     <Field text={text}>
@@ -125,8 +128,11 @@ function SelectField({
         name={name}
         className="font-normal"
         options={options}
+        disabled={disabled}
         defaultValue={
-          options.find((option) => option.value === data[name]) ?? undefined
+          disabled
+            ? { id: data.state, text: data.state, value: data.state }
+            : options.find((option) => option.value === data[name]) ?? undefined
         }
         onSelect={onSelect}
       />
