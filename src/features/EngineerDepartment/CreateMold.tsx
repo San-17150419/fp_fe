@@ -5,7 +5,11 @@ import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import withPreData from "./WithPreData";
 import Input from "../../Components/modd/Input/InputBase";
 import CreateMoldSubComponent from "./CreateMoldSubComponent";
-import { type Sys } from "./types";
+import {
+  type Sys,
+  type GetNewSNPForSysResponse,
+  type GetNewSNPForSys,
+} from "./types";
 import Select, { type Option } from "../../Components/modd/Select/Select";
 import axios from "axios";
 const CreateMoldSubComponentWithPreData = withPreData(CreateMoldSubComponent);
@@ -27,8 +31,9 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
   const [showModal, setShowModal] = useState(false);
   // const { handleCreateNewMold } = useCreateMold();
   const [moldNum, setMoldNum] = useState<string>("");
-  const [sys, setSys] = useState<Sys>("");
+  const [sys, setSys] = useState<Sys | "">("");
   const [sn_num, setSnNum] = useState<string>("");
+  const [sn_num_sub, setSnNumSub] = useState<string>("");
   const [isSnNumReady, setIsSnNumReady] = useState<boolean>(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
   // I thihk it make sense to use a dedicated state for tracking the validity of the mold_num input. It's value is used in many places like conditional rendering, css styles and so on. It does not make sense to run regex on every place where it's used.
@@ -53,6 +58,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData.entries());
+    // TODO: Remember to convert the input values for 模穴數 ,塞穴數 and 品牌 to number.
     console.log(data);
   };
 
@@ -62,6 +68,8 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
       setIsSnNumReady(false);
       setMoldNum("");
       setSys("");
+      setIsMoldNumValid(false);
+      setSnNumSub("");
     }
   }, [showModal]);
 
@@ -69,22 +77,60 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
     if (!sys || !moldNum) return;
     if (isSnNumReady) return;
     const api = "http://192.168.123.240:9000/api/engms/createSN/";
-    const params = {
-      sys: sys,
+    const params: GetNewSNPForSys<Exclude<typeof sys, "模仁">> = {
+      // 先不處理模仁系列
+      sys: sys as Exclude<Sys, "模仁">,
       mold_num: moldNum,
       sn_target: "",
     };
     try {
-      const response = await axios.post(api, { ...params });
-      setSnNum(response.data.sn_num);
-      setIsSnNumReady(true);
+      if (sys === "雙色系列") {
+        const response = await axios.post<GetNewSNPForSysResponse<"雙色系列">>(
+          api,
+          {
+            ...params,
+          },
+        );
+        setSnNumSub(response.data.sn_num_sub);
+        setSnNum(response.data.sn_num);
+        setIsSnNumReady(true);
+        console.log(response);
+      } else {
+        const response = await axios.post<
+          GetNewSNPForSysResponse<Exclude<typeof sys, "模仁">>
+        >(api, {
+          ...params,
+        });
+        setSnNum(response.data.sn_num);
+        setIsSnNumReady(true);
+        console.log(response);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCreateMold = async () => {
+    const api = "http://192.168.123.240:9000/api/engms/createMold/";
+    const params1 = {};
+    const params2 = { ...params1, sn_num: sn_num_sub };
+    Promise.all([axios.post(api, params1), axios.post(api, params2)]);
+    const params = {
+      sys,
+      mold_num: moldNum,
+      sn_num,
+      sn_num_sub,
+    };
+    try {
+      const response = await axios.post(api, {
+        ...params,
+      });
       console.log(response);
     } catch (err) {
       console.log(err);
     }
   };
 
-  useEffect(() => {});
   return (
     <div className="mb-4 inline-block">
       <div
@@ -107,18 +153,21 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
           >
             {/* <label htmlFor="sys"> */}
             <span className="w-1/4">系列</span>
-            <Select
-              options={seriesOptions.filter((option) => option.text !== "模仁")}
-              className="w-3/4"
-              disabled={isSnNumReady}
-              // unable to reset.
-              required={true}
-              // if I want to make this Select
-              value={seriesOptions.find((option) => option.text === sys)}
-              onSelect={(option) => {
-                setSys(option.text as string);
-              }}
-            />
+            <span className="w-3/4">
+              <Select
+                options={seriesOptions.filter(
+                  (option) => option.text !== "模仁",
+                )}
+                disabled={isSnNumReady}
+                // unable to reset.
+                required={true}
+                // if I want to make this Select
+                value={seriesOptions.find((option) => option.text === sys)}
+                onSelect={(option) => {
+                  setSys(option.text as Sys);
+                }}
+              />
+            </span>
           </label>
 
           <label
