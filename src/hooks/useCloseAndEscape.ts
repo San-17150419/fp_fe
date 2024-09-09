@@ -17,7 +17,6 @@ export default function useCloseAndEscape(
   returnFocusOnClose: boolean = true,
 ) {
   // const triggerRef = useRef<HTMLElement | null>(null);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -34,6 +33,10 @@ export default function useCloseAndEscape(
         onClose();
       }
     };
+
+
+    window.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleEscape);
 
     return () => {
       window.removeEventListener("mousedown", handleClickOutside);
