@@ -24,7 +24,7 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
       };
     });
   const sysName = eventData.post.sys;
-  const { xMin, xMax, yAverage, yMedian, generateSeries } =
+  const { xMin, xMax, yMedian, generateSeries } =
     generateBubbleChartConfig(filteredData);
 
   Highcharts.setOptions({
@@ -129,19 +129,6 @@ export default function BubbleChart({ eventData }: BubbleChartProps) {
               fontStyle: "italic",
             },
             text: t("中間值"),
-          },
-          zIndex: 8,
-        },
-        {
-          color: "black",
-          width: 2,
-          value: yAverage,
-          label: {
-            rotation: 0,
-            style: {
-              fontStyle: "italic",
-            },
-            text: t("平均值"),
           },
           zIndex: 8,
         },

@@ -301,7 +301,6 @@ export function generateBubbleChartConfig(
   const { dataByZValue: separateData, maxZValue } =
     separateByZValue(bubbleData);
   const yArray = moldData.map((event) => event["mamt"]);
-  const yAverage = findAverage(yArray);
   const yMedian = findMedian(yArray);
   const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
   const xMin = Math.min(...moldData.map((event) => event["ar"])) * 100;
@@ -350,7 +349,6 @@ export function generateBubbleChartConfig(
   return {
     xMin,
     xMax,
-    yAverage,
     yMedian,
     generateSeries,
   };
