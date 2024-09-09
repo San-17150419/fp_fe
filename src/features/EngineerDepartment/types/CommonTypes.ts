@@ -53,7 +53,8 @@ export type NameBoard = FilterData["data"][number]["prod_name_board"];
 
 export type NameNocolor = FilterData["data"][number]["prod_name_nocolor"];
 
-export type Sys = FilterData["post"]["sys"];
+export type Sys =
+  PreData["preData"]["series"][keyof PreData["preData"]["series"]];
 
 export type PropertyNum = FilterData["data"][number]["property_num"];
 

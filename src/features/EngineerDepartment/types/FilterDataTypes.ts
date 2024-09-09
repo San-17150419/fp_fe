@@ -1,8 +1,8 @@
-import { MakerCode, Site, MoldStatus } from "./CommonTypes";
+import { MakerCode, Site, MoldStatus, Sys } from "./CommonTypes";
 
 export type FilterData = {
   post: {
-    sys: string;
+    sys: Sys;
     sn_num: string;
     prod_name_board: string;
     mold_num: string;
@@ -13,7 +13,7 @@ export type FilterData = {
     sn_num: string;
     site: Site;
     state: MoldStatus;
-    sys: string;
+    sys: Sys;
     property: string;
     brand: number;
     prod_name_board: string;
@@ -33,7 +33,7 @@ export type FilterData = {
 
 export type FilterDataParams = {
   site: Site | "";
-  sys: string | "";
+  sys: Sys | "";
   sn_num: string | "";
   property: string | "";
   prod_name_board: string | "";

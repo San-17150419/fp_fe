@@ -15,12 +15,12 @@ import {
   type DutydateMonth,
   type Spare,
   type Brand,
-  type MoldStatus
+  type MoldStatus,
 } from "./CommonTypes";
 
 export type MoldInfoUpdateParams = {
   id_ms: IdMs; // Not sure if it is string or number. From filterData, it should be a number. This is also the only required field.
-  sn_num: SnNum | null;
+  sn_num: SnNum;
   site: Site | null;
   state: MoldStatus | null;
   sys: Sys | null;
@@ -36,6 +36,7 @@ export type MoldInfoUpdateParams = {
   maker: MakerCode | null; //
   dutydate_month: DutydateMonth | null;
   spare: Spare | null;
+  [key: string]: any;
 };
 
 //This should cover both case 2 and case 3. The only difference is in case 3, no row is affected. So affected_rows should be 0. I will separate them if needed.

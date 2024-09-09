@@ -4,3 +4,4 @@ export * from "./FilterDataTypes";
 export * from "./PostDataTypes";
 export * from "./MoldInfoInsertTypes";
 export * from "./MoldInfoUpdateTypes";
+export * from "./CreateSNTypes"
