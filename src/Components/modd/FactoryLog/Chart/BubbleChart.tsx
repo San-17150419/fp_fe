@@ -9,23 +9,52 @@ import { generateBubbleChartConfig } from "../utils/bubbleChartUtils";
 
 type BubbleChartProps = {
   eventData: FactoryEventReponse;
+  xKey?: string;
+  key: "data_mold" | "data";
+  yKey?: string;
+  zKey?: string | null;
 };
 HC_more(Highcharts);
 BrokenAxis(Highcharts);
-export default function BubbleChart({ eventData }: BubbleChartProps) {
+export default function BubbleChart({
+  eventData,
+  key,
+  xKey,
+  yKey,
+  zKey,
+}: BubbleChartProps) {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  const filteredData = eventData.data_mold
-    .filter((event) => !!event["ar"])
-    .map((event) => {
-      return {
-        ...event,
-        mamt: Math.trunc(event.mamt),
-      };
-    });
+  const filteredData = (() => {
+    if (key === "data") {
+      return eventData[key]
+        .filter((event) => !!event["ar"])
+        .map((event) => {
+          return {
+            ...event,
+            pamt: key === "data" && Math.trunc(event.pamt),
+          };
+        });
+    }
+    if (key === "data_mold") {
+      return eventData[key]
+        .filter((event) => !!event["ar"])
+        .map((event) => {
+          return {
+            ...event,
+            mamt: key === "data_mold" && Math.trunc(event.mamt),
+          };
+        });
+    }
+  })();
   const sysName = eventData.post.sys;
-  const { xMin, xMax, yMedian, generateSeries } =
-    generateBubbleChartConfig(filteredData);
+  const { xMin, xMax, yMedian, generateSeries } = generateBubbleChartConfig(
+    filteredData,
+    xKey,
+    yKey,
+    zKey,
+  );
+  console.dir(generateSeries());
 
   Highcharts.setOptions({
     lang: {

@@ -28,6 +28,12 @@ export default function ProductChart({
   const [isOpen, setIsOpen] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
 
+  const listOfDeparmentThatSupportBubbleChart: Record<Factory, string[]> = {
+    GD: ["INJ", "T1", "T2"],
+    HP: ["INJ", "T1", "T2", "T3"],
+    DL: ["INJ", "ASM"],
+  };
+
   const fetchEventData = async () => {
     try {
       const response = await axios.post(
@@ -70,8 +76,26 @@ export default function ProductChart({
             postData={postData}
             title={sysName}
           />
-          {department === "INJ" && eventData && (
-            <BubbleChart eventData={eventData} />
+          {listOfDeparmentThatSupportBubbleChart[factory].includes(
+            department,
+          ) &&
+          eventData &&
+          department === "INJ" ? (
+            <BubbleChart
+              eventData={eventData}
+              xKey="ar"
+              yKey="mamt"
+              zKey="count_repaired"
+            />
+          ) : (
+            eventData && (
+              <BubbleChart
+                eventData={eventData}
+                xKey="ar"
+                yKey="mamt"
+                zKey={null}
+              />
+            )
           )}
         </div>
       </Modal>

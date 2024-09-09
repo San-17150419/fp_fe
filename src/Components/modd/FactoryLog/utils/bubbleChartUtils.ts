@@ -1,4 +1,7 @@
-import { type FactoryEventReponseMoldData } from "../types";
+import {
+  FactoryEventResponseData,
+  type FactoryEventReponseMoldData,
+} from "../types";
 import Highcharts, { type SeriesBubbleOptions } from "highcharts";
 /**
  * Formats a number into a hexadecimal string with a leading zero if necessary.
@@ -40,7 +43,9 @@ function generateColors(
   const endBlue = parseInt(endColor.substring(5, 7), 16);
 
   if (numberOfColors <= 0) {
-    throw new Error("numberOfColors must be greater than 0");
+    // throw new Error("numberOfColors must be greater than 0");
+    colors.push(startColor);
+    return colors;
   }
 
   if (numberOfColors === 1) {
@@ -90,7 +95,7 @@ type FormatsBubbleDataParams = {
   data_mold: FactoryEventReponseMoldData[];
   xKey: keyof FactoryEventReponseMoldData;
   yKey: keyof FactoryEventReponseMoldData;
-  zKey: keyof FactoryEventReponseMoldData;
+  zKey: keyof FactoryEventReponseMoldData | null;
   //TODO:Not sure what this function is for. Currently, this should be a function that formats the name of the bubble. nameKey is optional. Because it might not need to use properties of the data. For example, generate generic names such as "Data 1", "Data 2", etc. But wether or not this function will use `FactoryEventReponseMoldData`, it will still be passed in as an argument because I don't want to deal with situations where `nameKey` is provided, but `FactoryEventReponseMoldData` is not.
   nameKey?: keyof FactoryEventReponseMoldData;
   generateName?: (
@@ -124,7 +129,9 @@ function formatMoldDataForBubbleChart(
     // xValue, yValue, and zValue might be undefined here. So right now, if they are, set them to 0
     const xValue = event[xKey as keyof FactoryEventReponseMoldData] ?? 0;
     const yValue = event[yKey as keyof FactoryEventReponseMoldData] ?? 0;
-    const zValue = event[zKey as keyof FactoryEventReponseMoldData] ?? 0;
+    const zValue =
+      zKey === null ? 1 : event[zKey as keyof FactoryEventReponseMoldData];
+    console.log(zValue);
     // if xValue, yValue, or zValue is not a number, throw an error
     if (
       typeof xValue !== "number" ||
@@ -167,7 +174,10 @@ function separateByZValue(bubbleData: BubbleData[]): {
   dataByZValue: { [key: number]: BubbleData[] };
 } {
   const dataByZValue: { [key: number]: BubbleData[] } = {};
+  console.log(bubbleData);
+  console.log(bubbleData.map((d) => d.z));
   const maxZValue = Math.max(...bubbleData.map((d) => d.z));
+  console.log(maxZValue);
   for (let zValue = 0; zValue <= maxZValue; zValue++) {
     const bubbleDataWithSameZ = bubbleData.filter((d) => d.z === zValue);
     if (bubbleDataWithSameZ.length !== 0) {
@@ -188,6 +198,7 @@ function separateByZValue(bubbleData: BubbleData[]): {
       (a, b) => a.y - b.y,
     );
   });
+  console.log(dataByZValue);
 
   return { maxZValue, dataByZValue };
 }
@@ -286,25 +297,34 @@ export {
   isLabelOnLabel,
 };
 
+type ZKey = keyof FactoryEventReponseMoldData | null;
+type YKey = keyof FactoryEventReponseMoldData | keyof FactoryEventResponseData;
+
 export function generateBubbleChartConfig(
-  moldData: FactoryEventReponseMoldData[],
+  data: FactoryEventReponseMoldData[] | FactoryEventResponseData[],
+  xKey: string = "ar",
+  yKey: YKey = "mamt",
+  zKey?: string | null,
+  // xKey: keyof FactoryEventReponseMoldData = "ar",
+  // yKey: keyof FactoryEventReponseMoldData = "mamt",
+  // zKey: keyof FactoryEventReponseMoldData = "count_repaired",
 ) {
   // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
   const bubbleData = formatMoldDataForBubbleChart({
-    data_mold: moldData,
-    xKey: "ar",
-    yKey: "mamt",
-    zKey: "count_repaired",
+    data_mold: data,
+    xKey: xKey as keyof FactoryEventReponseMoldData,
+    yKey: yKey as keyof FactoryEventReponseMoldData,
+    zKey: zKey as ZKey,
     nameKey: "sn_num",
   });
 
   const { dataByZValue: separateData, maxZValue } =
     separateByZValue(bubbleData);
-  const yArray = moldData.map((event) => event["mamt"]);
+  const yArray = data.map((event) => event[yKey]);
   const yMedian = findMedian(yArray);
   const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
-  const xMin = Math.min(...moldData.map((event) => event["ar"])) * 100;
-  const xMax = Math.max(...moldData.map((event) => event["ar"])) * 100;
+  const xMin = Math.min(...data.map((event) => event["ar"])) * 100;
+  const xMax = Math.max(...data.map((event) => event["ar"])) * 100;
 
   const generateSeries = () => {
     const series: SeriesBubbleOptions[] = [];
