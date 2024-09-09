@@ -2,7 +2,7 @@ import usePreFilter from "./hooks/usePreFilter";
 // https://github.com/react-icons/react-icons/issues/154 TODO: Reduce icon size
 // TODO:How to lazy load component
 // TODO: I don't think Loading component block the whole page. Might be a problem.
-import { Site } from "./types";
+import { type Site, type Sys, type FilterData } from "./types";
 // https://github.com/radix-ui/primitives/issues/1634
 import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import PostFilterSkeleton from "./PostFilterSkeleton";
@@ -15,7 +15,6 @@ export default function Filter({
   seriesOptions,
   siteOptions,
   propertyOptions,
-  states,
 }: PreFilterData) {
   const {
     isLoading,
@@ -24,8 +23,7 @@ export default function Filter({
     setSite,
     data,
     postFilterOptions,
-    dataLoaded,
-  } = usePreFilter(states.preData.series);
+  } = usePreFilter();
 
   return (
     <div className="flex flex-wrap justify-around gap-4">
@@ -34,7 +32,9 @@ export default function Filter({
           <Select
             options={seriesOptions}
             name="series"
-            onSelect={(option) => setSys(option.value as string)}
+            onSelect={(option) =>
+              setSys(option.text === "全部系列" ? "" : (option.text as Sys))
+            }
           />
         </div>
 
@@ -54,13 +54,13 @@ export default function Filter({
             onSelect={(option) => setSite(option.value as Site)}
           />
         </div>
-        {!dataLoaded ? <Loading /> : null}
-        {!dataLoaded ? (
+        {/* {!isLoading ? <Loading /> : null} */}
+        {isLoading ? (
           <PostFilterSkeleton />
         ) : (
           <PostFilter
             data={data}
-            isLoading={isLoading}
+            isLoading={false}
             postFilterOptions={postFilterOptions}
           />
         )}
