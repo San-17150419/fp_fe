@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { FormEvent } from "react";
-import { type MoldInfoUpdateParams, type FilterData } from "../types";
+import {
+  type MoldInfoUpdateParams,
+  type FilterData,
+  type MoldInfoUpdateResponse,
+} from "../types";
 import axios from "axios";
 import { Option } from "../../../Components/modd/Select/Select";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import inferSecondSnNum from "../utils/inferSecondSnNum";
 
-const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-update/";
 
 type Params = {
   data: FilterData["data"][number];
@@ -33,67 +38,59 @@ export default function useUpdate({
   const isStateInPredefinedOptions = statusOptions.some(
     (option) => option.value === data.state,
   );
+
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: UpdateMoldData,
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["preFilterData"],
+        (oldData: FilterData["data"] | undefined) => {
+          // Handle the case where oldData might be undefined
+          if (!oldData) return oldData;
+          const snNumOfUpdateTarget: string[] = [
+            data.post.sn_num,
+            ...(data.post.sys === "雙色系列"
+              ? [inferSecondSnNum(data.post.sn_num)].filter(
+                  (snNum) => snNum !== null,
+                )
+              : []),
+          ];
+
+          // Return a new array where the specific mold is updated (This is necessary to update the value in query cache)
+          return oldData.map((mold) => {
+            // Check if this is the mold we want to update
+            if (snNumOfUpdateTarget.includes(mold.sn_num)) {
+              // if (mold.sn_num === data.post.sn_num) {
+              const postData = data.post;
+              // Remove properties with null values to avoid updating them
+              const sanitizedData = Object.keys(postData).reduce(
+                (acc, key) => {
+                  if (postData[key] !== null) {
+                    acc[key as keyof FilterData["data"][number]] =
+                      postData[key];
+                  }
+                  return acc;
+                },
+                {} as Partial<FilterData["data"][number]>,
+              );
+              // TODO: Might add another check to prevent fields like sys, sn_num, mold_num, hole_num, and id_ms from being updated becasue they are not supposed to be changed here.
+              // Merge the updated properties with the old mold data
+              return { ...mold, ...sanitizedData };
+            }
+
+            return mold;
+          });
+        },
+      );
+    },
+  });
+
   const handleUpdateMoldInfo = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const target = e.target as typeof e.target & {
-    //   prod_name_board: { value: string };
-    //   prod_name_nocolor: { value: string };
-    //   sys: { value: string };
-    //   sn_num: { value: string };
-    //   mold_num: { value: string };
-    //   hole_num: { value: string };
-    //   "site[value]": { value: string };
-    //   "property[value]": { value: string };
-    //   "state[value]": { value: string };
-    //   "maker[value]": { value: string };
-    //   dutydate_month: { value: string };
-    // };
-    // TODO: Do I need to inlcude all fields with latest values and updated values? Or only fields with updated values? Fields that remain unchanged should be omitted or with null values?
-    // const params: MoldInfoUpdateParams = {
-    //   // id_ms is required
-    //   id_ms: data.id_ms,
-    //   prod_name_board: target.prod_name_board.value, //名版 *
-    //   prod_name_nocolor: target.prod_name_nocolor.value, //定義品名 aka 機種 *
-    //   sys: target.sys.value, //模具系列 *
-    //   sn_num: target.sn_num.value, //唯一碼 *
-    //   mold_num: target.mold_num.value, //模號 *
-    //   hole_num: Number(target.hole_num.value), //模穴數 *
-    //   site: target["site[value]"].value as Site, //位置 *
-    //   property: target["property[value]"].value, //財產歸屬 *
-    //   state: target["state[value]"].value as MoldInfoUpdateParams["state"], //模具狀態 如開發中 *
-    //   maker: target["maker[value]"].value, //製造商（代號）*
-    //   dutydate_month: target.dutydate_month.value, //開模日期 input date *
-    //   brand: 1, //品牌 number 1 2 原始版中沒有
-    //   spare: "", //備註 原始版中沒有
-    //   pnb_state: "incomplete", //名版狀態 incomplete done 原始版中沒有
-    //   property_num: "", //財產編號 原始版中沒有
-    //   block_num: 0, //塞穴數 原始版中沒有
-    // };
-    // console.log(
-    //   (() => {
-    //     let isEqual = true;
-    //     for (const key in params) {
-    //       if (
-    //         params[key as keyof MoldInfoUpdateParams] !==
-    //         formData[key as keyof MoldInfoUpdateParams]
-    //       ) {
-    //         isEqual = false;
-    //         break;
-    //       }
-    //     }
-    //     return isEqual;
-    //   })(),
-    // );
-    try {
-      const response = await axios.post(api, formData);
-      window.location.reload();
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-
-    // setIsModalOpen(false);
+    mutate(formData);
   };
+  
   function handleChange(name: keyof MoldInfoUpdateParams, data: string) {
     setFormData((prev) => ({ ...prev, [name]: data }));
   }
@@ -143,3 +140,49 @@ type InputConfig = {
 }[];
 
 type Name = keyof MoldInfoUpdateParams;
+
+async function UpdateMoldData(
+  moldData: MoldInfoUpdateParams,
+): Promise<MoldInfoUpdateResponse> {
+  const api =
+    import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-update/";
+  const sys = moldData.sys;
+  switch (sys) {
+    case "雙色系列": {
+      const sn_num1 = moldData.sn_num;
+      if (!sn_num1) {
+        throw new Error("雙色系列 sn_num is invalid");
+      }
+      const sn_num2 = inferSecondSnNum(sn_num1);
+      if (!sn_num2) {
+        throw new Error("雙色系列 second sn_num is invalid");
+      }
+      const promise1 = axios.post(api, {
+        ...moldData,
+        sn_num: sn_num1,
+      });
+      const promise2 = axios.post(api, {
+        ...moldData,
+        sn_num: sn_num2,
+      });
+      const response = await Promise.all([promise1, promise2]);
+
+      const moldData1 = response[0].data;
+      const moldData2 = response[1].data;
+
+      for (const key in moldData1) {
+        if (key !== "sn_num") {
+          if (moldData1[key] !== moldData2[key]) {
+            throw new Error("雙色系列 data of two mold is not equal");
+          }
+        }
+      }
+
+      return response[0].data;
+    }
+    default: {
+      const response = await axios.post<MoldInfoUpdateResponse>(api, moldData);
+      return response.data;
+    }
+  }
+}

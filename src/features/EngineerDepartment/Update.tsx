@@ -32,6 +32,7 @@ export default function Update({
     statusOptions,
   });
 
+
   return (
     <>
       <button
@@ -49,7 +50,7 @@ export default function Update({
           {inputConfig.map(({ name, text, readOnly }) => (
             <InputField
               key={text}
-              name={name}
+              name={name as keyof FilterData["data"][number] }
               text={text}
               data={data}
               readOnly={readOnly}
@@ -59,7 +60,7 @@ export default function Update({
           {selectConfig.map(({ text, options, name, disabled }) => (
             <SelectField
               key={text}
-              name={name}
+              name={name as keyof FilterData["data"][number]}
               text={text}
               options={options}
               data={data}
