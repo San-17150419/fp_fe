@@ -4,16 +4,55 @@ import {
   type MoldInfoInsertParams,
   type MoldInfoInsertSuccessResponse,
   type MoldInfoInsertErrorResponse,
+  type Sys,
+  type GetNewSNPForSysResponse,
+  type GetNewSNPForSys,
 } from "../types";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // TODO: Incoporate  192.168.123.240:9000/api/engms/createSN/ to get sn_num before creating new mold
 export default function useCreateMold() {
   const [isLoading, setIsLoading] = useState(false);
+  const [mold_num, setMoldNum] = useState<string>("");
+  const [sys, setSys] = useState<Sys | "">("");
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [sn_target, setSnTarget] = useState<string>("");
   const [message, setMessage] = useState("");
+  const [userIsStillEditing, setUserIsStillEditing] = useState(false);
   const [newMoldParams, setNewMoldParams] =
     useState<MoldInfoInsertParams | null>(null);
+
+  const {
+    data: snNumData,
+    isLoading: isFetchingSnNum,
+    isPending: isFetchingSnNumPending,
+    error: snNumError,
+  } = useQuery<string[]>({
+    queryKey: ["newMoldSnNum"],
+    queryFn: () => {
+      if (!sys || !mold_num) {
+        throw new Error(
+          " This should not be triggered when sys or mold_num is empty",
+        );
+      }
+      // if (!sys || !mold_num) return;
+      if (sys === "模仁") {
+        const params: GetNewSNPForSys<typeof sys> = {
+          sys: sys,
+          mold_num: "",
+          sn_target,
+        };
+        return getNewSnNum<typeof sys>(params);
+      } else {
+        return getNewSnNum<typeof sys>({ sys, mold_num, sn_target: "" });
+      }
+    },
+    enabled: !!sys && !!mold_num && !userIsStillEditing,
+  });
+
+  const queryClient = useQueryClient();
   const testParams = {
     sn_num: "123",
     sys: "123",
@@ -71,7 +110,6 @@ export default function useCreateMold() {
           console.log(response.data.post);
         }
       }
-      
     } catch (error) {
       setIsError(true);
       if (axios.isAxiosError(error)) {
@@ -94,6 +132,14 @@ export default function useCreateMold() {
       }
     }
   };
+
+  const clearForm = () => {
+    // 
+    queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
+    setSnTarget("");
+    setMoldNum("");
+    setSys("");
+  };
   return {
     isLoading,
     isError,
@@ -102,7 +148,27 @@ export default function useCreateMold() {
     newMoldParams,
     setNewMoldParams,
     handleCreateNewMold,
+    mold_num,
+    setMoldNum,
+    sys,
+    setSys,
+    sn_target,
+    setSnTarget,
+    snNumData,
+    isFetchingSnNumPending,
+    clearForm,
+    setUserIsStillEditing
   };
 }
 
-// required value includes: sn_num, sys, mold_num
+const getNewSnNum = async <T>(
+  params: GetNewSNPForSys<T>,
+): Promise<Array<string>> => {
+  const api = "http://192.168.123.240:9000/api/engms/createSN/";
+  const response = await axios.post<GetNewSNPForSysResponse<T>>(api, params);
+  if ("sn_num_sub" in response.data) {
+    return [response.data.sn_num, response.data.sn_num_sub];
+  } else {
+    return [response.data.sn_num];
+  }
+};
