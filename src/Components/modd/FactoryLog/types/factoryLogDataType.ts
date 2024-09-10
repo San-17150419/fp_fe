@@ -108,10 +108,10 @@ export type RawData = Partial<{ [key in Point]: number }> & { ar: number } & {
   pamt_p: number;
 } & { sys: string } & { pl: string };
 
-export type FactoryEventReponse = {
+export type FactoryEventResponse = {
   post: FactoryEventResponsePostData;
   data: FactoryEventResponseData[];
-  data_mold: FactoryEventReponseMoldData[];
+  data_mold: FactoryEventResponseMoldData[];
 };
 
 export type FactoryEventResponsePostData = {
@@ -133,7 +133,7 @@ export type FactoryEventResponseData = {
   ar: number;
 };
 
-export type FactoryEventReponseMoldData = {
+export type FactoryEventResponseMoldData = {
   ar: number;
   count_repaired: number;
   cpamt: number;
