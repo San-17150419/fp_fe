@@ -19,7 +19,16 @@ export default function useCloseAndEscape(
   // const triggerRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      const headlessUiPortal = document.getElementById(
+        "headlessui-portal-root",
+      );
+
+      if (
+        ref.current &&
+        !ref.current.contains(event.target as Node) &&
+        // a check to ensure that the click was not triggered from the headless ui portal
+        !(headlessUiPortal && headlessUiPortal.contains(event.target as Node))
+      ) {
         // This is for preventing element other than the trigger element from being focused when closing
         // Without this, the focus would be lost when clicking outside of the element
         event.preventDefault();
@@ -33,7 +42,6 @@ export default function useCloseAndEscape(
         onClose();
       }
     };
-
 
     window.addEventListener("mousedown", handleClickOutside);
     window.addEventListener("keydown", handleEscape);
