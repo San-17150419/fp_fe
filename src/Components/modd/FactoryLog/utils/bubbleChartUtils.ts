@@ -1,87 +1,12 @@
+import { generateColors } from "../../../../util/generateColors";
+
+//bubbleChartUtils.ts
 import {
   FactoryEventResponseData,
   type FactoryEventResponseMoldData,
 } from "../types";
 import Highcharts, { type SeriesBubbleOptions } from "highcharts";
-/**
- * Formats a number into a hexadecimal string with a leading zero if necessary.
- *
- * @param {number} number - The number to be formatted.
- * @return {string} The formatted hexadecimal string.
- */
-const formatHex = (number: number): string => {
-  const hexadecimal = number.toString(16);
-  return hexadecimal.padStart(2, "0");
-};
-
-/**
- * Generates an array of colors interpolated between two input colors.
- *
- * @param {string} startColor - The starting color in hex format.
- * @param {string} endColor - The ending color in hex format.
- * @param {number} numberOfColors - The number of colors to generate.
- * @returns {string[]} An array of colors in hex format.
- * @throws {Error} If the input colors are not in hex format.
- */
-function generateColors(
-  startColor: string,
-  endColor: string,
-  numberOfColors: number,
-): string[] {
-  if (startColor[0] !== "#" || endColor[0] !== "#") {
-    throw new Error("Colors must be in hex format");
-  }
-
-  const colors: string[] = [];
-
-  const startRed = parseInt(startColor.substring(1, 3), 16);
-  const startGreen = parseInt(startColor.substring(3, 5), 16);
-  const startBlue = parseInt(startColor.substring(5, 7), 16);
-
-  const endRed = parseInt(endColor.substring(1, 3), 16);
-  const endGreen = parseInt(endColor.substring(3, 5), 16);
-  const endBlue = parseInt(endColor.substring(5, 7), 16);
-
-  if (numberOfColors <= 0) {
-    // throw new Error("numberOfColors must be greater than 0");
-    colors.push(startColor);
-    return colors;
-  }
-
-  if (numberOfColors === 1) {
-    colors.push(startColor);
-    return colors;
-  }
-
-  if (numberOfColors === 2) {
-    colors.push(startColor);
-    colors.push(endColor);
-    return colors;
-  }
-
-  for (let i = 0; i < numberOfColors; i++) {
-    const ratio = i / (numberOfColors - 1);
-    if (isNaN(ratio)) {
-      throw new Error("Unexpected error, ratio is NaN");
-    }
-    const interpolatedRed = Math.round(startRed * (1 - ratio) + endRed * ratio);
-    const interpolatedGreen = Math.round(
-      startGreen * (1 - ratio) + endGreen * ratio,
-    );
-    const interpolatedBlue = Math.round(
-      startBlue * (1 - ratio) + endBlue * ratio,
-    );
-
-    const interpolatedColor =
-      "#" +
-      formatHex(interpolatedRed) +
-      formatHex(interpolatedGreen) +
-      formatHex(interpolatedBlue);
-
-    colors.push(interpolatedColor);
-  }
-  return colors;
-}
+// TODO: A total rework is needed. This version is too interconnected with types.
 
 type BubbleData = {
   x: number;
@@ -201,89 +126,6 @@ function separateByZValue(bubbleData: BubbleData[]): {
   console.log(dataByZValue);
 
   return { maxZValue, dataByZValue };
-}
-
-function staggerDataLabels(series: Highcharts.Series) {
-  if (series.points.length < 2) {
-    return;
-  }
-  for (let i = 0; i < series.points.length - 1; i++) {
-    const pointA = series.points[i];
-    const pointB = series.points[i + 1];
-
-    // if one of the points is undefined, skip the loop
-    if (!pointA || !pointB) {
-      return;
-    }
-
-    // Need to be careful after this. datalabels are type any. So there won't be any warning from typescript
-    const dataLabelA = (pointA as any).dataLabel;
-    const dataLabelB = (pointB as any).dataLabel;
-    const diff = dataLabelB.y - dataLabelA.y;
-    const h = dataLabelA.height + 2;
-
-    if (!dataLabelA || !dataLabelB) {
-      return;
-    }
-
-    if (isLabelOnLabel(pointA, pointB)) {
-      if (diff < 0)
-        dataLabelA.translate(
-          dataLabelA.translateX,
-          dataLabelA.translateY - (h + diff),
-        );
-      else
-        dataLabelB.translate(
-          dataLabelB.translateX,
-          dataLabelB.translateY - (h - diff),
-        );
-    }
-  }
-}
-
-type PartialDataLabel = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-function isLabelOnLabel(
-  pointA: Highcharts.Point,
-  pointB: Highcharts.Point,
-): boolean {
-  const dataLabelA: PartialDataLabel = (pointA as any).dataLabel;
-  const dataLabelB: PartialDataLabel = (pointB as any).dataLabel;
-  const al = dataLabelA.x - dataLabelA.width / 2;
-  const ar = dataLabelA.x + dataLabelA.width / 2;
-  const bl = dataLabelB.x - dataLabelB.width / 2;
-  const br = dataLabelB.x + dataLabelB.width / 2;
-
-  const at = dataLabelA.y;
-  const ab = dataLabelA.y + dataLabelA.height;
-  const bt = dataLabelB.y;
-  const bb = dataLabelB.y + dataLabelB.height;
-
-  if (bl > ar || br < al) {
-    return false;
-  } //overlap not possible
-  if (bt > ab || bb < at) {
-    return false;
-  } //overlap not possible
-  if (bl > al && bl < ar) {
-    return true;
-  }
-  if (br > al && br < ar) {
-    return true;
-  }
-
-  if (bt > at && bt < ab) {
-    return true;
-  }
-  if (bb > at && bb < ab) {
-    return true;
-  }
-
-  return false;
 }
 
 export {
