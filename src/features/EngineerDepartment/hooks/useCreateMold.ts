@@ -7,11 +7,17 @@ import {
   type Sys,
   type GetNewSNPForSysResponse,
   type GetNewSNPForSys,
+  FilterData,
 } from "../types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+// TODO: Note! In `CreateMold` component, option for 模仁 in sys is not shown. This case required addtional api call. It is possible that I will be forced to write a separate function to get sn_num for 模仁 if I can't fit it into getNewSnNum function.
+
 // TODO: Incoporate  192.168.123.240:9000/api/engms/createSN/ to get sn_num before creating new mold
+
+// TODO: I still have almost 2000 event listeners in the app.
+// TODO: BUG! When switching between factory log and engineer department, the number of event listener and DOM Nodes skyrockets. It does drop down
 export default function useCreateMold() {
   const [isLoading, setIsLoading] = useState(false);
   const [mold_num, setMoldNum] = useState<string>("");
@@ -24,6 +30,7 @@ export default function useCreateMold() {
   const [newMoldParams, setNewMoldParams] =
     useState<MoldInfoInsertParams | null>(null);
 
+  const queryClient = useQueryClient();
   const {
     data: snNumData,
     isLoading: isFetchingSnNum,
@@ -52,7 +59,29 @@ export default function useCreateMold() {
     enabled: !!sys && !!mold_num && !userIsStillEditing,
   });
 
-  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: createNewMold,
+    onSuccess: (data) => {
+      // Not sure if I need to invalidate queries here
+      // queryClient.invalidateQueries({ queryKey: ["newMoldSnNum"] });
+      queryClient.setQueryData(
+        ["preFilterData"],
+        (oldData: FilterData["data"] | undefined) => {
+          const newMoldData: FilterData["data"][number] = {
+            ...data.post,
+            dutydate_last: "",
+            // id_ms is auto generated in the database. It is not present in the post data. Get it from lastInsertedId
+            id_ms: data.info_insert.lastInsertedId,
+            // TODO: Convert brand to number before inserting
+            brand: Number(data.post.brand),
+          };
+
+          return [...(oldData || []), newMoldData];
+        },
+      );
+    },
+  });
+
   const testParams = {
     sn_num: "123",
     sys: "123",
@@ -134,7 +163,7 @@ export default function useCreateMold() {
   };
 
   const clearForm = () => {
-    // 
+    //
     queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
     setSnTarget("");
     setMoldNum("");
@@ -157,7 +186,7 @@ export default function useCreateMold() {
     snNumData,
     isFetchingSnNumPending,
     clearForm,
-    setUserIsStillEditing
+    setUserIsStillEditing,
   };
 }
 
@@ -172,3 +201,17 @@ const getNewSnNum = async <T>(
     return [response.data.sn_num];
   }
 };
+
+// TODO: Add error handling. See MoldInfoInsertErrorResponse. I am not sure how it interacts with react query.
+// 像是missing key, duplicate key 或是多次寫入
+async function createNewMold(
+  moldData: MoldInfoInsertParams,
+): Promise<MoldInfoInsertSuccessResponse> {
+  const api =
+    import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-insert/";
+
+  const response = await axios.post<MoldInfoInsertSuccessResponse>(api, {
+    ...moldData,
+  });
+  return response.data;
+}
