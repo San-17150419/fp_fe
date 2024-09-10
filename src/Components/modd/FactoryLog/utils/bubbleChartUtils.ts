@@ -1,6 +1,6 @@
 import {
   FactoryEventResponseData,
-  type FactoryEventReponseMoldData,
+  type FactoryEventResponseMoldData,
 } from "../types";
 import Highcharts, { type SeriesBubbleOptions } from "highcharts";
 /**
@@ -92,28 +92,28 @@ type BubbleData = {
 };
 
 type FormatsBubbleDataParams = {
-  data_mold: FactoryEventReponseMoldData[];
-  xKey: keyof FactoryEventReponseMoldData;
-  yKey: keyof FactoryEventReponseMoldData;
-  zKey: keyof FactoryEventReponseMoldData | null;
+  data_mold: FactoryEventResponseMoldData[];
+  xKey: keyof FactoryEventResponseMoldData;
+  yKey: keyof FactoryEventResponseMoldData;
+  zKey: keyof FactoryEventResponseMoldData | null;
   //TODO:Not sure what this function is for. Currently, this should be a function that formats the name of the bubble. nameKey is optional. Because it might not need to use properties of the data. For example, generate generic names such as "Data 1", "Data 2", etc. But wether or not this function will use `FactoryEventReponseMoldData`, it will still be passed in as an argument because I don't want to deal with situations where `nameKey` is provided, but `FactoryEventReponseMoldData` is not.
-  nameKey?: keyof FactoryEventReponseMoldData;
+  nameKey?: keyof FactoryEventResponseMoldData;
   generateName?: (
-    event: FactoryEventReponseMoldData,
+    event: FactoryEventResponseMoldData,
     index: number,
-    keyName?: keyof FactoryEventReponseMoldData,
+    keyName?: keyof FactoryEventResponseMoldData,
   ) => string;
 };
 
 /**
  * Generates bubble data from a list of FactoryEventReponseMoldData.
  * @param {FormatsBubbleDataParams} params - The parameters for the function.
- * @param {FactoryEventReponseMoldData} params.data_mold - The list of events to generate bubble data from.
- * @param {keyof FactoryEventReponseMoldData} params.xKey - The key of the x value in the event object.
- * @param {keyof FactoryEventReponseMoldData} params.yKey - The key of the y value in the event object.
- * @param {keyof FactoryEventReponseMoldData} params.zKey - The key of the z value in the event object.
- * @param {keyof FactoryEventReponseMoldData} params.[nameKey] - The key of the name value in the event object. Optional.
- * @param {(event: FactoryEventReponseMoldData, index: number, keyName?: keyof FactoryEventReponseMoldData) => string} [pramas.generateName] - A function that generates the name of the bubble.
+ * @param {FactoryEventResponseMoldData} params.data_mold - The list of events to generate bubble data from.
+ * @param {keyof FactoryEventResponseMoldData} params.xKey - The key of the x value in the event object.
+ * @param {keyof FactoryEventResponseMoldData} params.yKey - The key of the y value in the event object.
+ * @param {keyof FactoryEventResponseMoldData} params.zKey - The key of the z value in the event object.
+ * @param {keyof FactoryEventResponseMoldData} params.[nameKey] - The key of the name value in the event object. Optional.
+ * @param {(event: FactoryEventResponseMoldData, index: number, keyName?: keyof FactoryEventResponseMoldData) => string} [pramas.generateName] - A function that generates the name of the bubble.
  * @returns {BubbleData[]} The generated bubble data.
  * @throws {Error} If the data_mold is not an array.
  * @throws {Error} If the xKey, yKey, or zKey is not a valid key in the event object.
@@ -127,10 +127,10 @@ function formatMoldDataForBubbleChart(
 
   data_mold.forEach((event, index) => {
     // xValue, yValue, and zValue might be undefined here. So right now, if they are, set them to 0
-    const xValue = event[xKey as keyof FactoryEventReponseMoldData] ?? 0;
-    const yValue = event[yKey as keyof FactoryEventReponseMoldData] ?? 0;
+    const xValue = event[xKey as keyof FactoryEventResponseMoldData] ?? 0;
+    const yValue = event[yKey as keyof FactoryEventResponseMoldData] ?? 0;
     const zValue =
-      zKey === null ? 1 : event[zKey as keyof FactoryEventReponseMoldData];
+      zKey === null ? 1 : event[zKey as keyof FactoryEventResponseMoldData];
     console.log(zValue);
     // if xValue, yValue, or zValue is not a number, throw an error
     if (
@@ -142,7 +142,7 @@ function formatMoldDataForBubbleChart(
     }
     const name = generateName
       ? generateName(event, index, nameKey)
-      : event[nameKey as keyof FactoryEventReponseMoldData];
+      : event[nameKey as keyof FactoryEventResponseMoldData];
 
     bubbleData.push({
       x: xValue * 100,
@@ -292,16 +292,13 @@ export {
   findAverage,
   separateByZValue,
   generateColors,
-  formatHex,
-  staggerDataLabels,
-  isLabelOnLabel,
 };
 
-type ZKey = keyof FactoryEventReponseMoldData | null;
-type YKey = keyof FactoryEventReponseMoldData | keyof FactoryEventResponseData;
+type ZKey = keyof FactoryEventResponseMoldData | null;
+type YKey = keyof FactoryEventResponseMoldData | keyof FactoryEventResponseData;
 
 export function generateBubbleChartConfig(
-  data: FactoryEventReponseMoldData[] | FactoryEventResponseData[],
+  data: FactoryEventResponseMoldData[] | FactoryEventResponseData[],
   xKey: string = "ar",
   yKey: YKey = "mamt",
   zKey?: string | null,
@@ -312,8 +309,8 @@ export function generateBubbleChartConfig(
   // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
   const bubbleData = formatMoldDataForBubbleChart({
     data_mold: data,
-    xKey: xKey as keyof FactoryEventReponseMoldData,
-    yKey: yKey as keyof FactoryEventReponseMoldData,
+    xKey: xKey as keyof FactoryEventResponseMoldData,
+    yKey: yKey as keyof FactoryEventResponseMoldData,
     zKey: zKey as ZKey,
     nameKey: "sn_num",
   });

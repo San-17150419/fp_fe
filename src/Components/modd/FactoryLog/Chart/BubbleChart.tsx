@@ -1,14 +1,14 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import HC_more from "highcharts/highcharts-more";
-import { FactoryEventReponse } from "../types/factoryLogDataType";
+import { FactoryEventResponse } from "../types/factoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 import { useTranslation } from "react-i18next";
 import { generateBubbleChartConfig } from "../utils/bubbleChartUtils";
 
 type BubbleChartProps = {
-  eventData: FactoryEventReponse;
+  eventData: FactoryEventResponse;
   xKey?: string;
   key: "data_mold" | "data";
   yKey?: string;

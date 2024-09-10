@@ -9,14 +9,14 @@ import HighchartsExporting from "highcharts/modules/exporting";
 import HighchartsFullScreen from "highcharts/modules/full-screen";
 import { useTranslation } from "react-i18next";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
-import { type FactoryEventReponse } from "../types/factoryLogDataType";
+import { type FactoryEventResponse } from "../types/factoryLogDataType";
 
 type ColumnChartProps = {
   department: string;
-  rawData: FactoryEventReponse;
+  rawData: FactoryEventResponse;
 };
 
-function formatData(d: FactoryEventReponse) {
+function formatData(d: FactoryEventResponse) {
   const data = d.data.map((item) => {
     if (item.ar)
       return [item.prod_name, Number((item.ar * 100).toFixed(2))] as [

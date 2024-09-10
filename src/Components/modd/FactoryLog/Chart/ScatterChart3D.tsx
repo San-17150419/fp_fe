@@ -4,7 +4,7 @@ import Highcharts from "highcharts";
 import Highcharts3d from "highcharts/highcharts-3d";
 import HC_more from "highcharts/highcharts-more";
 import BrokenAxis from "highcharts/modules/broken-axis";
-import { FactoryEventReponse } from "../types/factoryLogDataType";
+import { FactoryEventResponse } from "../types/factoryLogDataType";
 
 Highcharts3d(Highcharts);
 HC_more(Highcharts);
@@ -31,7 +31,7 @@ BrokenAxis(Highcharts);
 // https://github.com/highcharts/highcharts-react/issues/163
 
 type ScatterChart3DProps = {
-  eventData: FactoryEventReponse;
+  eventData: FactoryEventResponse;
 };
 
 type Options3d = Highcharts.Options & Highcharts.Chart3dOptions;

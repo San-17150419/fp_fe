@@ -2,7 +2,10 @@ import { useState } from "react";
 import Modal from "../../Modal/NonDialogModal";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { Factory, type FactoryEventReponse } from "../types/factoryLogDataType";
+import {
+  Factory,
+  type FactoryEventResponse,
+} from "../types/factoryLogDataType";
 import BubbleChart from "./BubbleChart";
 import { useTheme } from "../../../../stores/ThemeContext";
 import clsx from "clsx";
@@ -23,7 +26,7 @@ export default function ProductChart({
   title: sysName,
   department,
 }: ProductChartProps) {
-  const [eventData, setEventData] = useState<FactoryEventReponse | null>(null);
+  const [eventData, setEventData] = useState<FactoryEventResponse | null>(null);
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { isSemiBold, isTextBase } = useTheme();
@@ -38,7 +41,7 @@ export default function ProductChart({
     try {
       const response = await axios.post(
         "http://192.168.123.240:9000/api/fj/event-data/",
-        {
+        {                                        
           factory: factory,
           department,
           sys: sysName,

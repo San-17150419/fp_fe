@@ -1,8 +1,8 @@
 import React from "react";
 import ProgressBar from "./ProgressBar";
-import { type FactoryEventReponse } from "../types/factoryLogDataType";
+import { type FactoryEventResponse } from "../types/factoryLogDataType";
 type ProgressChartProps = {
-  eventData: FactoryEventReponse;
+  eventData: FactoryEventResponse;
   children?: React.ReactNode;
 };
 export default function ProgressChart({
