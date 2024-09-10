@@ -42,13 +42,13 @@ export default function useCloseAndEscape(
         onClose();
       }
     };
-
-    window.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("keydown", handleEscape);
-    };
+    if (isOpen) {
+      window.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener("keydown", handleEscape);
+      return () => {
+        window.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("keydown", handleEscape);
+      };
+    }
   }, [ref, onClose, isOpen, returnFocusOnClose]);
 }
