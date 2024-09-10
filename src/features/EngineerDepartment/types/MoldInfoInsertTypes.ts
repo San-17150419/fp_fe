@@ -30,14 +30,14 @@ export type MoldInfoInsertParams = {
   hole_num: HoleNum;
   block_num: BlockNum;
   property_num: PropertyNum;
-  maker: Maker;
+  maker: Maker["list_id"];
   dutydate_month: DutydateMonth;
   spare: Spare;
 };
 
 export type MoldInfoInsertResponse =
   | MoldInfoInsertSuccessResponse
-  | MoldInfoInsertErrorResponse
+  | MoldInfoInsertErrorResponse;
 
 type InfoCheck = {
   status: boolean;
