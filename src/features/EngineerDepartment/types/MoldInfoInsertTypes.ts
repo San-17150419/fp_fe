@@ -14,15 +14,17 @@ import {
   type SnNum,
   type Site,
   type MoldStatus,
+  type Brand,
 } from "./CommonTypes";
 
 export type MoldInfoInsertParams = {
+  // id_ms is auto generated in the database. It is not present in the post data. Get it from lastInsertedId
   sn_num: SnNum;
   site: Site;
   state: MoldStatus;
   sys: Sys;
   property: Property;
-  brand: string;
+  brand: Brand;
   prod_name_board: NameBoard;
   pnb_state: PnbState;
   prod_name_nocolor: NameNocolor;

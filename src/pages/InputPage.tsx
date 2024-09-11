@@ -1,4 +1,4 @@
-import Input from "../Components/modd/Input/Input";
+import Input from "../Components/modd/Input/InputWithVerification";
 export default function InputPage() {
   return (
     <>
