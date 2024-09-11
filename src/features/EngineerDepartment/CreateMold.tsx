@@ -4,7 +4,13 @@ import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import withPreData from "./WithPreData";
 import Input from "../../Components/modd/Input/InputBase";
 import CreateMoldSubComponent from "./CreateMoldSubComponent";
-import { type Sys } from "./types";
+import {
+  type Sys,
+  type MoldInfoInsertParams,
+  Site,
+  MoldStatus,
+  PnbState,
+} from "./types";
 import Select, { type Option } from "../../Components/modd/Select/Select";
 import useCreateMold from "./hooks/useCreateMold";
 const CreateMoldSubComponentWithPreData = withPreData(CreateMoldSubComponent);
@@ -25,7 +31,6 @@ const regexforMoldNumInput = /^[A-Za-z]$|^A1$/;
 
 export default function CreateMold({ seriesOptions }: PreFilterData) {
   const [showModal, setShowModal] = useState(false);
-  const [sn_num_sub, setSnNumSub] = useState<string>("");
   const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
   const {
     setMoldNum,
@@ -36,16 +41,59 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
     isFetchingSnNumPending,
     clearForm,
     setUserIsStillEditing,
+    mutate,
   } = useCreateMold();
 
   const [isMoldNumValid, setIsMoldNumValid] = useState<boolean>(false);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    function isString(data: FormDataEntryValue | null): data is string {
+      {
+        return data !== null && typeof data === "string";
+      }
+    }
     event.preventDefault();
+    if (!snNumData) return;
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData.entries());
+    const blockNum = Number(data.block_num);
+    const holeNnum = Number(data.hole_num);
+    // TODO: This check is temporary. It should be checked earlier.
+    if (holeNnum <= 0) {
+      alert("模穴數不得小於或等於0");
+      return;
+    }
+    if (blockNum < 0) {
+      alert("塞穴數不得小於0");
+      return;
+    }
+    if (blockNum > holeNnum) {
+      alert("塞穴數不得大於模穴數");
+      return;
+    }
+    const params: MoldInfoInsertParams = {
+      sn_num: snNumData[0],
+      site: data.site as string as Site,
+      state: data.state as string as MoldStatus,
+      sys: sys as Sys,
+      property: data.property as string, // 財產歸屬
+      brand: Number(data.brand),
+      prod_name_board: data.prod_name_board as string,
+      pnb_state: data.pnb_state as string as PnbState,
+      prod_name_nocolor: data.prod_name_nocolor as string,
+      mold_num: mold_num,
+      hole_num: holeNnum,
+      block_num: blockNum,
+      property_num: data.property_num as string, // 財產編號
+      maker: data.maker as string,
+      spare: isString(data.spare) ? data.spare : "",
+      dutydate_month: isString(data.dutydate_month) ? data.dutydate_month : "",
+    };
+
     // TODO: Remember to convert the input values for 模穴數 ,塞穴數 and 品牌 to number.
     console.log(data);
+    console.log(params);
+    mutate(params);
   };
 
   useEffect(() => {
@@ -54,7 +102,6 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
       setMoldNum("");
       setSys("");
       setIsMoldNumValid(false);
-      setSnNumSub("");
     }
   }, [showModal]);
 
@@ -72,6 +119,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
           action=""
           onSubmit={onSubmit}
           id="Create Mold"
+          autoComplete="off"
           className="m-auto grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
         >
           <label

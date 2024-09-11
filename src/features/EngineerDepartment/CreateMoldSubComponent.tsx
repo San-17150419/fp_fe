@@ -30,7 +30,6 @@ export default function CreateMoldSubComponent({
     { name: "block_num", text: "塞穴數", readonly: false, pattern: "[0-9]" },
     { name: "property_num", text: "財產編號", readonly: false },
   ];
-  console.log(siteOptions);
   const selectheaders: Array<{
     readonly: boolean;
     options: Array<Option>;
@@ -40,6 +39,17 @@ export default function CreateMoldSubComponent({
     pattern?: RegExp;
   }> = [
     {
+      name: "pnb_state",
+      text: "名版狀態",
+      readonly: false,
+      options: [
+        { id: "1", text: "無", value: 0 },
+        { id: "incomplete", text: "未完成", value: "incomplete" },
+        { id: "done", text: "完成", value: "done" },
+      ],
+      required: true,
+    },
+    {
       name: "brand",
       text: "品牌",
       readonly: false,
@@ -48,6 +58,7 @@ export default function CreateMoldSubComponent({
         { id: "2", text: "第一品牌", value: 1 },
         { id: "3", text: "第二品牌", value: 2 },
       ],
+      required: true,
     },
     {
       name: "property",
@@ -113,17 +124,18 @@ export default function CreateMoldSubComponent({
           {inputConfig.map(({ name, text, readonly, pattern }) => (
             <motion.div key={name} className="">
               <label
-                className="flex h-full items-center justify-between gap-4 p-2"
+                className="flex h-full items-center justify-between gap-4 p-2 caret-transparent"
                 htmlFor={name}
               >
                 <span className="w-1/4">{text} </span>
                 <Input
                   type="text"
+                  name={name}
                   id={name}
                   required
                   className={clsx(
-                    "w-3/4",
-                    readonly
+                    "w-3/4 caret-black",
+                    !readonly
                       ? "bg-white"
                       : "border border-gray-100/50 bg-gray-100",
                   )}
@@ -151,15 +163,15 @@ export default function CreateMoldSubComponent({
             </motion.div>
           ))}
           <motion.div className="flex h-full items-center justify-between gap-4 p-2">
-            <label className="w-1/4" htmlFor="date">
+            <label className="w-1/4" htmlFor="dutydate_month">
               開模日期
             </label>
             <div className="w-3/4">
               <input
                 className="w-full rounded-md border px-2 py-1 shadow-sm shadow-gray-500"
                 type="date"
-                name="date"
-                id="date"
+                name="dutydate_month"
+                id="dutydate_month"
               />
             </div>
           </motion.div>
@@ -175,13 +187,7 @@ export default function CreateMoldSubComponent({
               ></textarea>
             </div>
           </motion.div>
-          <select name="123" id="" title="test" required>
-            <option value=""></option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
+
           <button
             className={clsx(
               "ml-auto w-1/2 rounded bg-blue-500 px-4 py-2 font-bold text-white",

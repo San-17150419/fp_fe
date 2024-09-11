@@ -9,7 +9,7 @@ import {
   type GetNewSNPForSys,
   FilterData,
 } from "../types";
-
+import inferSecondSnNum from "../utils/inferSecondSnNum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // TODO: Note! In `CreateMold` component, option for 模仁 in sys is not shown. This case required addtional api call. It is possible that I will be forced to write a separate function to get sn_num for 模仁 if I can't fit it into getNewSnNum function.
@@ -61,22 +61,29 @@ export default function useCreateMold() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createNewMold,
-    onSuccess: (data) => {
+    onSuccess: ([responseData1, responseData2]) => {
       // Not sure if I need to invalidate queries here
       // queryClient.invalidateQueries({ queryKey: ["newMoldSnNum"] });
       queryClient.setQueryData(
         ["preFilterData"],
         (oldData: FilterData["data"] | undefined) => {
-          const newMoldData: FilterData["data"][number] = {
-            ...data.post,
-            dutydate_last: "",
-            // id_ms is auto generated in the database. It is not present in the post data. Get it from lastInsertedId
-            id_ms: data.info_insert.lastInsertedId,
-            // TODO: Convert brand to number before inserting
-            brand: Number(data.post.brand),
-          };
+          const newMolds = [
+            {
+              ...responseData1.post,
+              dutydate_last: "",
+              id_ms: responseData1.info_insert.lastInsertedId,
+            },
+          ];
+          if (responseData2) {
+            newMolds.push({
+              ...responseData2.post,
+              dutydate_last: "",
+              id_ms: responseData2.info_insert.lastInsertedId,
+            });
+          }
+          if (!oldData) return newMolds;
 
-          return [...(oldData || []), newMoldData];
+          return [...(oldData || []), ...newMolds];
         },
       );
     },
@@ -108,6 +115,7 @@ export default function useCreateMold() {
     console.log("request send");
     try {
       if (newMoldParams?.sys === "雙色系列") {
+        console.log("雙色系列");
         const promise1 = axios.post<MoldInfoInsertSuccessResponse>(
           api,
           newMoldParams,
@@ -187,6 +195,7 @@ export default function useCreateMold() {
     isFetchingSnNumPending,
     clearForm,
     setUserIsStillEditing,
+    mutate,
   };
 }
 
@@ -206,12 +215,28 @@ const getNewSnNum = async <T>(
 // 像是missing key, duplicate key 或是多次寫入
 async function createNewMold(
   moldData: MoldInfoInsertParams,
-): Promise<MoldInfoInsertSuccessResponse> {
+): Promise<MoldInfoInsertSuccessResponse[]> {
   const api =
     import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-insert/";
-
-  const response = await axios.post<MoldInfoInsertSuccessResponse>(api, {
-    ...moldData,
-  });
-  return response.data;
+  if (moldData.sys === "雙色系列") {
+    console.log("雙色系列");
+    const moldDataForSecondMold = {
+      ...moldData,
+      sn_num: inferSecondSnNum(moldData.sn_num),
+    };
+    const promise1 = axios.post<MoldInfoInsertSuccessResponse>(api, moldData);
+    const promise2 = axios.post<MoldInfoInsertSuccessResponse>(
+      api,
+      moldDataForSecondMold,
+    );
+    const response = await axios.all([promise1, promise2]);
+    return [response[0].data, response[1].data];
+  } else {
+    console.log("非雙色系列");
+    const response = await axios.post<MoldInfoInsertSuccessResponse>(
+      api,
+      moldData,
+    );
+    return [response.data];
+  }
 }
