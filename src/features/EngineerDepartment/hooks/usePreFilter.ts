@@ -24,12 +24,11 @@ export default function usePreFilter() {
   };
   // Use React Query's useQuery to fetch data and cache it
   const { data, isLoading } = useQuery({
-    queryKey: ["preFilterData"],
-    // queryKey: ["preFilterData", params],
+    queryKey: ["preFilterData", params],
     queryFn: async () => {
       const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "filter-data/";
       const response = await axios.post<FilterData>(api, params);
-      return response.data.data;
+      return response.data;
     },
   });
 
@@ -37,7 +36,7 @@ export default function usePreFilter() {
     const temp: {
       [key: string]: { text: string; value: string; id: string };
     } = {};
-    data?.forEach((d) => {
+    data?.data.forEach((d) => {
       if (!temp[d.sn_num]) {
         temp[d.sn_num] = {
           text: d.prod_name_board,
@@ -53,7 +52,7 @@ export default function usePreFilter() {
     const temp: {
       [key: string]: { text: string; value: string; id: string };
     } = {};
-    data?.forEach((d) => {
+    data?.data.forEach((d) => {
       if (!temp[d.sn_num]) {
         temp[d.sn_num] = {
           text: d.mold_num,
@@ -69,7 +68,7 @@ export default function usePreFilter() {
     const temp: {
       [key: string]: { text: string; value: string; id: string };
     } = {};
-    data?.forEach((d) => {
+    data?.data.forEach((d) => {
       if (!temp[d.sn_num]) {
         temp[d.sn_num] = {
           text: d.sn_num,
@@ -82,7 +81,7 @@ export default function usePreFilter() {
   }, [data]);
 
   const memoizedProcessedData = useMemo(() => {
-    return createDictionary(data || []);
+    return createDictionary(data?.data || []);
   }, [data]);
 
   return {

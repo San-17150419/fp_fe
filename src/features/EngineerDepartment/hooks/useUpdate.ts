@@ -11,14 +11,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
 
 type Params = {
-  data: FilterData["data"][number];
+  currentMoldData: FilterData["data"][number];
   makerOptions: Array<Option>;
   propertyOptions: Array<Option>;
   siteOptions: Array<Option>;
   statusOptions: Array<Option>;
 };
 export default function useUpdate({
-  data,
+  currentMoldData,
   makerOptions,
   propertyOptions,
   siteOptions,
@@ -29,59 +29,109 @@ export default function useUpdate({
   const preFilterData = queryClient.getQueryData<FilterData["data"]>([
     "preFilterData",
   ]);
+  // TODO: Separate UI logic from API logic
 
   const [formData, setFormData] = useState<MoldInfoUpdateParams>(
     (() => {
       // delete dutydate_last in data because it is not present in MoldInfoUpdateParams. Needs to temporarily extend MoldInfoUpdateParams to include dutydate_last and make this property optional. Otherwise, typescript will not allow it to be deleted
       const copy: MoldInfoUpdateParams & { dutydate_last?: string } =
-        Object.assign({}, data);
+        Object.assign({}, currentMoldData);
       delete copy["dutydate_last"];
       return copy as MoldInfoUpdateParams;
     })(),
   );
   const isStateInPredefinedOptions = statusOptions.some(
-    (option) => option.value === data.state,
+    (option) => option.value === currentMoldData.state,
   );
 
   const { mutate, isPending } = useMutation({
     mutationFn: UpdateMoldData,
-    onSuccess: ([moldData1, moldData2]) => {
-      queryClient.setQueryData(
-        ["preFilterData"],
-        (oldData: FilterData["data"] | undefined) => {
+    onSuccess: ([response1, response2]) => {
+      queryClient.setQueriesData(
+        { queryKey: ["preFilterData"] },
+        (oldData: FilterData | undefined) => {
           if (!oldData) return oldData;
 
-          const updatedMolds = [moldData1];
-          if (moldData2) {
-            updatedMolds.push(moldData2);
+          const { data: oldDataFromFilterData, post } = oldData;
+          const dataOfUpdatedMolds = [response1.post];
+
+          if (response2) {
+            dataOfUpdatedMolds.push(response2.post);
           }
 
-          return oldData.map((mold) => {
-            // Check if the current mold matches either of the updated molds
-            const updatedMold = updatedMolds.find(
-              (updated) => updated.post.sn_num === mold.sn_num,
-            );
+          // Check if the updated mold was already in the cache
+          const moldInCacheBeforeUpdate = !!oldDataFromFilterData.find(
+            (mold) => mold.sn_num === dataOfUpdatedMolds[0].sn_num,
+          );
 
-            if (updatedMold) {
-              const postData = updatedMold.post;
+          // Check if the mold should still be in the cache after the update
+          const moldInCacheAfterUpdate =
+            dataOfUpdatedMolds[0].site === post.site &&
+            dataOfUpdatedMolds[0].property === post.property;
 
-              // Sanitize and merge the updated data with the existing mold data
-              const sanitizedData = Object.keys(postData).reduce(
-                (acc, key) => {
-                  if (postData[key] !== null) {
-                    acc[key as keyof FilterData["data"][number]] =
-                      postData[key];
-                  }
-                  return acc;
-                },
-                {} as Partial<FilterData["data"][number]>,
+          // Handle all possible cases:
+          if (moldInCacheBeforeUpdate && moldInCacheAfterUpdate) {
+            // **Update existing mold data**:
+            const updatedFilterData = oldDataFromFilterData.map((mold) => {
+              const updatedMold = dataOfUpdatedMolds.find(
+                (updated) => updated.sn_num === mold.sn_num,
               );
 
-              return { ...mold, ...sanitizedData };
-            }
+              if (updatedMold) {
+                const sanitizedData = Object.keys(updatedMold).reduce(
+                  (acc, key) => {
+                    if (updatedMold[key as keyof typeof updatedMold] !== null) {
+                      acc[key as keyof FilterData["data"][number]] =
+                        updatedMold[key as keyof typeof updatedMold];
+                    }
+                    return acc;
+                  },
+                  {} as Partial<FilterData["data"][number]>,
+                );
+                return { ...mold, ...sanitizedData };
+              }
+              return mold;
+            });
 
-            return mold; // Return the mold unchanged if it wasn't updated
-          });
+            return { post, data: updatedFilterData };
+          } else if (moldInCacheBeforeUpdate && !moldInCacheAfterUpdate) {
+            // **Remove mold from the cache**:
+            const updatedFilterData = oldDataFromFilterData.filter(
+              (mold) => mold.sn_num !== dataOfUpdatedMolds[0].sn_num,
+            );
+            return { post, data: updatedFilterData };
+          } else if (!moldInCacheBeforeUpdate && moldInCacheAfterUpdate) {
+            // **Add new mold to the cache**:
+            const sanitizedNewMoldData = Object.keys(
+              dataOfUpdatedMolds[0],
+            ).reduce(
+              (acc, key) => {
+                if (
+                  dataOfUpdatedMolds[0][
+                    key as keyof (typeof dataOfUpdatedMolds)[0]
+                  ] !== null
+                ) {
+                  acc[key as keyof FilterData["data"][number]] =
+                    dataOfUpdatedMolds[0][
+                      key as keyof (typeof dataOfUpdatedMolds)[0]
+                    ];
+                }
+                return acc;
+              },
+              {} as Partial<FilterData["data"][number]>,
+            );
+
+            return {
+              post,
+              data: [
+                ...oldDataFromFilterData,
+                sanitizedNewMoldData as FilterData["data"][number],
+              ],
+            };
+          } else {
+            // **Do nothing if the mold wasn't in the cache and shouldn't be there**:
+            return oldData;
+          }
         },
       );
     },

@@ -105,7 +105,7 @@ export default function TableRow({ data, visibleColumns }: TableRowProps) {
       ),
       id_ms: (
         <TableCell key={`id_ms-${data.id_ms}`}>
-          <UpdateWithPreData data={data} />
+          <UpdateWithPreData currentMoldData={data} />
         </TableCell>
       ),
     };

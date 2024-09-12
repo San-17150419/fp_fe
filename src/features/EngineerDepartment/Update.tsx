@@ -7,11 +7,11 @@ import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import { ReactNode } from "react";
 import useUpdate from "./hooks/useUpdate";
 type UpdateProps = {
-  data: FilterData["data"][number];
+  currentMoldData: FilterData["data"][number];
 } & PreFilterData;
 
 export default function Update({
-  data,
+  currentMoldData,
   makerOptions,
   propertyOptions,
   siteOptions,
@@ -25,7 +25,7 @@ export default function Update({
     isModalOpen,
     setIsModalOpen,
   } = useUpdate({
-    data,
+    currentMoldData,
     makerOptions,
     propertyOptions,
     siteOptions,
@@ -52,7 +52,7 @@ export default function Update({
               key={text}
               name={name as keyof FilterData["data"][number] }
               text={text}
-              data={data}
+              data={currentMoldData}
               readOnly={readOnly}
               onChange={(data) => handleChange(name, data)}
             />
@@ -63,7 +63,7 @@ export default function Update({
               name={name as keyof FilterData["data"][number]}
               text={text}
               options={options}
-              data={data}
+              data={currentMoldData}
               disabled={disabled}
               onSelect={(option) => handleChange(name, option.value as string)}
             />
@@ -72,7 +72,7 @@ export default function Update({
           <InputField
             text="開模日期"
             name="dutydate_month"
-            data={data}
+            data={currentMoldData}
             readOnly={false}
             type="date"
             onChange={(data) => handleChange("dutydate_month", data)}

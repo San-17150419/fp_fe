@@ -64,8 +64,8 @@ export default function useCreateMold() {
     onSuccess: ([responseData1, responseData2]) => {
       // Not sure if I need to invalidate queries here
       // queryClient.invalidateQueries({ queryKey: ["newMoldSnNum"] });
-      queryClient.setQueryData(
-        ["preFilterData"],
+      queryClient.setQueriesData(
+        { queryKey: ["preFilterData"] },
         (oldData: FilterData["data"] | undefined) => {
           const newMolds = [
             {
