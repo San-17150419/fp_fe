@@ -1,5 +1,5 @@
 import { generateColors } from "../../../../util/generateColors";
-
+import { findMedian, findAverage } from "./numberUtils";
 //bubbleChartUtils.ts
 import {
   FactoryEventResponseData,
@@ -16,47 +16,31 @@ type BubbleData = {
   color?: string;
 };
 
-type FormatsBubbleDataParams = {
-  data_mold: FactoryEventResponseMoldData[];
-  xKey: keyof FactoryEventResponseMoldData;
-  yKey: keyof FactoryEventResponseMoldData;
-  zKey: keyof FactoryEventResponseMoldData | null;
+type FormatsBubbleDataParams<T> = {
+  data_mold: T[];
+  xKey: keyof T;
+  yKey: keyof T;
+  zKey?: keyof T;
   //TODO:Not sure what this function is for. Currently, this should be a function that formats the name of the bubble. nameKey is optional. Because it might not need to use properties of the data. For example, generate generic names such as "Data 1", "Data 2", etc. But wether or not this function will use `FactoryEventReponseMoldData`, it will still be passed in as an argument because I don't want to deal with situations where `nameKey` is provided, but `FactoryEventReponseMoldData` is not.
-  nameKey?: keyof FactoryEventResponseMoldData;
-  generateName?: (
-    event: FactoryEventResponseMoldData,
-    index: number,
-    keyName?: keyof FactoryEventResponseMoldData,
-  ) => string;
+  nameKey?: keyof T;
+  generateName?: (event: T, index: number, keyName?: keyof T) => string;
 };
 
-/**
- * Generates bubble data from a list of FactoryEventReponseMoldData.
- * @param {FormatsBubbleDataParams} params - The parameters for the function.
- * @param {FactoryEventResponseMoldData} params.data_mold - The list of events to generate bubble data from.
- * @param {keyof FactoryEventResponseMoldData} params.xKey - The key of the x value in the event object.
- * @param {keyof FactoryEventResponseMoldData} params.yKey - The key of the y value in the event object.
- * @param {keyof FactoryEventResponseMoldData} params.zKey - The key of the z value in the event object.
- * @param {keyof FactoryEventResponseMoldData} params.[nameKey] - The key of the name value in the event object. Optional.
- * @param {(event: FactoryEventResponseMoldData, index: number, keyName?: keyof FactoryEventResponseMoldData) => string} [pramas.generateName] - A function that generates the name of the bubble.
- * @returns {BubbleData[]} The generated bubble data.
- * @throws {Error} If the data_mold is not an array.
- * @throws {Error} If the xKey, yKey, or zKey is not a valid key in the event object.
- * @throws {Error} If the nameKey is not a valid key in the event object.
- */
-function formatMoldDataForBubbleChart(
-  params: FormatsBubbleDataParams,
+function formatMoldDataForBubbleChart<FactoryEventReponseMoldData>(
+  params: FormatsBubbleDataParams<FactoryEventReponseMoldData>,
 ): BubbleData[] {
   const bubbleData: BubbleData[] = [];
   const { data_mold, xKey, yKey, zKey, nameKey, generateName } = params;
 
   data_mold.forEach((event, index) => {
     // xValue, yValue, and zValue might be undefined here. So right now, if they are, set them to 0
-    const xValue = event[xKey as keyof FactoryEventResponseMoldData] ?? 0;
-    const yValue = event[yKey as keyof FactoryEventResponseMoldData] ?? 0;
-    const zValue =
-      zKey === null ? 1 : event[zKey as keyof FactoryEventResponseMoldData];
-    console.log(zValue);
+    const xValue = event[xKey] ?? 0;
+    const yValue = event[yKey] ?? 0;
+    if (!zKey) {
+      throw new Error("zKey is not defined");
+    }
+    const zValue = event[zKey] ?? 0;
+
     // if xValue, yValue, or zValue is not a number, throw an error
     if (
       typeof xValue !== "number" ||
@@ -65,46 +49,38 @@ function formatMoldDataForBubbleChart(
     ) {
       throw new Error("xValue, yValue, or zValue is not a number");
     }
+    if (!nameKey) {
+      throw new Error("nameKey is not defined");
+    }
     const name = generateName
       ? generateName(event, index, nameKey)
-      : event[nameKey as keyof FactoryEventResponseMoldData];
+      : event[nameKey];
 
     bubbleData.push({
       x: xValue * 100,
       y: yValue,
       z: zValue,
-      name: name.toString(),
+      name: (name as string).toString(),
     });
   });
   return bubbleData;
 }
 
-function findMedian(arr: number[]) {
-  const sortedArr = arr.sort((a, b) => a - b);
-  const middle = Math.floor(sortedArr.length / 2);
-  if (sortedArr.length % 2 === 0) {
-    return (sortedArr[middle - 1] + sortedArr[middle]) / 2;
-  } else {
-    return sortedArr[middle];
-  }
+interface GroupAndSortBubbleDataByZ {
+  (data: BubbleData[]): {
+    zArray: number[];
+    dataByZValue: { [key: number]: BubbleData[] };
+  };
 }
 
-function findAverage(arr: number[]) {
-  const sum = arr.reduce((a, b) => a + b, 0);
-  return sum / arr.length;
-}
-
-function separateByZValue(bubbleData: BubbleData[]): {
-  maxZValue: number;
-  dataByZValue: { [key: number]: BubbleData[] };
-} {
+const groupAndSortBubbleDataByZ: GroupAndSortBubbleDataByZ = function (
+  bubbleData,
+) {
   const dataByZValue: { [key: number]: BubbleData[] } = {};
-  console.log(bubbleData);
-  console.log(bubbleData.map((d) => d.z));
   const maxZValue = Math.max(...bubbleData.map((d) => d.z));
-  console.log(maxZValue);
   for (let zValue = 0; zValue <= maxZValue; zValue++) {
     const bubbleDataWithSameZ = bubbleData.filter((d) => d.z === zValue);
+    // TODO: I think this dummy data is not needed.
     if (bubbleDataWithSameZ.length !== 0) {
       // this dummy data is to make the ratio of the bubble size consistent.
       bubbleDataWithSameZ.push({
@@ -123,47 +99,47 @@ function separateByZValue(bubbleData: BubbleData[]): {
       (a, b) => a.y - b.y,
     );
   });
-  console.log(dataByZValue);
 
-  return { maxZValue, dataByZValue };
-}
-
-export {
-  formatMoldDataForBubbleChart,
-  findMedian,
-  findAverage,
-  separateByZValue,
-  generateColors,
+  return { dataByZValue, zArray: Object.keys(dataByZValue).map(Number) };
 };
 
-type ZKey = keyof FactoryEventResponseMoldData | null;
-type YKey = keyof FactoryEventResponseMoldData | keyof FactoryEventResponseData;
-
+// TODO: This shouldn't depend on the type of the `FactoryEventResponseMoldData`.
 export function generateBubbleChartConfig(
-  data: FactoryEventResponseMoldData[] | FactoryEventResponseData[],
-  xKey: string = "ar",
-  yKey: YKey = "mamt",
-  zKey?: string | null,
-  // xKey: keyof FactoryEventReponseMoldData = "ar",
-  // yKey: keyof FactoryEventReponseMoldData = "mamt",
-  // zKey: keyof FactoryEventReponseMoldData = "count_repaired",
+  moldData: FactoryEventResponseMoldData[],
+  xKey: keyof FactoryEventResponseMoldData = "ar",
+  yKey: keyof FactoryEventResponseMoldData = "mamt",
+  zKey: keyof FactoryEventResponseMoldData = "count_repaired",
 ) {
   // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
   const bubbleData = formatMoldDataForBubbleChart({
-    data_mold: data,
+    data_mold: moldData,
     xKey: xKey as keyof FactoryEventResponseMoldData,
     yKey: yKey as keyof FactoryEventResponseMoldData,
-    zKey: zKey as ZKey,
+    zKey: zKey as keyof FactoryEventResponseMoldData,
     nameKey: "sn_num",
   });
 
-  const { dataByZValue: separateData, maxZValue } =
-    separateByZValue(bubbleData);
-  const yArray = data.map((event) => event[yKey]);
+  const { dataByZValue: separateData, zArray } =
+    groupAndSortBubbleDataByZ(bubbleData);
+  const yArray = moldData.map((event) => event[yKey]);
+  function isNumberArray(arr: unknown[]): arr is number[] {
+    return arr.every((item) => typeof item === "number");
+  }
+  // This is a temporary fix.
+  if (!isNumberArray(yArray)) {
+    throw new Error("yArray is not a number array");
+  }
+  // zArray is already sorted
+  // TODO: Check if z array is sorted
+  const maxZValue = zArray[zArray.length - 1];
   const yMedian = findMedian(yArray);
-  const colorsArray = generateColors("#fca5a5", "#991b1b", maxZValue + 1);
-  const xMin = Math.min(...data.map((event) => event["ar"])) * 100;
-  const xMax = Math.max(...data.map((event) => event["ar"])) * 100;
+  const colorsArray = generateColors(
+    "#fca5a5",
+    "#991b1b",
+    zArray[zArray.length - 1] + 1,
+  );
+  const xMin = Math.min(...moldData.map((event) => event["ar"])) * 100;
+  const xMax = Math.max(...moldData.map((event) => event["ar"])) * 100;
 
   const generateSeries = () => {
     const series: SeriesBubbleOptions[] = [];
@@ -211,4 +187,113 @@ export function generateBubbleChartConfig(
     yMedian,
     generateSeries,
   };
+}
+export function generateBubbleChartConfigFromData(
+  moldData: FactoryEventResponseData[],
+  xKey: keyof FactoryEventResponseData = "ar",
+  yKey: keyof FactoryEventResponseData = "pamt",
+) {
+  // Single source of truth. Because `eventData.data_mold` is used in multiple places. Always use this to manipulate the chart data. For example, filter out the data that is not null.
+  const bubbleData = formatDataForBubbleChart<FactoryEventResponseData>({
+    data_mold: moldData,
+    xKey: xKey,
+    yKey: yKey,
+    nameKey: "prod_name",
+  });
+
+  const { dataByZValue: separateData, zArray } =
+    groupAndSortBubbleDataByZ(bubbleData);
+  const yArray = moldData.map((event) => event[yKey]);
+  function isNumberArray(arr: unknown[]): arr is number[] {
+    return arr.every((item) => typeof item === "number");
+  }
+  // This is a temporary fix.
+  if (!isNumberArray(yArray)) {
+    throw new Error("yArray is not a number array");
+  }
+  // zArray is already sorted
+  // TODO: Check if z array is sorted
+  const maxZValue = zArray[zArray.length - 1];
+  const yMedian = findMedian(yArray);
+  const colorsArray = generateColors(
+    "#fca5a5",
+    "#991b1b",
+    zArray[zArray.length - 1] + 1,
+  );
+  const xMin = Math.min(...moldData.map((event) => event["ar"])) * 100;
+  const xMax = Math.max(...moldData.map((event) => event["ar"])) * 100;
+
+  const generateSeries = () => {
+    const series: SeriesBubbleOptions[] = [];
+    const defaultConfig: SeriesBubbleOptions = {
+      type: "bubble",
+      maxSize: maxZValue * 10 + 10,
+      minSize: 10,
+      sizeBy: "width",
+      dataGrouping: { enabled: false },
+      jitter: { x: 0.5 },
+      accessibility: {
+        enabled: false,
+      },
+    };
+    series.push({
+      ...defaultConfig,
+      color: colorsArray[0],
+      data: separateData[1],
+    });
+    return series;
+  };
+
+  return {
+    xMin,
+    xMax,
+    yMedian,
+    generateSeries,
+  };
+}
+
+export {
+  formatMoldDataForBubbleChart,
+  findMedian,
+  findAverage,
+  groupAndSortBubbleDataByZ as separateByZValue,
+  generateColors,
+};
+
+export function formatDataForBubbleChart<FactoryEventResponseData>(
+  params: FormatsBubbleDataParams<FactoryEventResponseData>,
+): BubbleData[] {
+  const bubbleData: BubbleData[] = [];
+  const { data_mold, xKey, yKey, nameKey, generateName } = params;
+
+  data_mold.forEach((event, index) => {
+    // xValue, yValue, and zValue might be undefined here. So right now, if they are, set them to 0
+    const xValue = event[xKey] ?? 0;
+    const yValue = event[yKey] ?? 0;
+    const zValue = 1;
+
+    // if xValue, yValue, or zValue is not a number, throw an error
+    if (
+      typeof xValue !== "number" ||
+      typeof yValue !== "number" ||
+      typeof zValue !== "number"
+    ) {
+      throw new Error("xValue, yValue, or zValue is not a number");
+    }
+
+    if (!nameKey) {
+      throw new Error("nameKey is not defined");
+    }
+    const name = generateName
+      ? generateName(event, index, nameKey)
+      : event[nameKey];
+
+    bubbleData.push({
+      x: xValue * 100,
+      y: yValue,
+      z: zValue,
+      name: (name as string).toString(),
+    });
+  });
+  return bubbleData;
 }

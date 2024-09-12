@@ -41,7 +41,7 @@ export default function ProductChart({
     try {
       const response = await axios.post(
         "http://192.168.123.240:9000/api/fj/event-data/",
-        {                                        
+        {
           factory: factory,
           department,
           sys: sysName,
@@ -79,26 +79,13 @@ export default function ProductChart({
             postData={postData}
             title={sysName}
           />
-          {listOfDeparmentThatSupportBubbleChart[factory].includes(
-            department,
-          ) &&
-          eventData &&
-          department === "INJ" ? (
-            <BubbleChart
-              eventData={eventData}
-              xKey="ar"
-              yKey="mamt"
-              zKey="count_repaired"
-            />
+          {eventData && department === "INJ" ? (
+            <BubbleChart eventData={eventData} keyForData="data_mold" />
           ) : (
-            eventData && (
-              <BubbleChart
-                eventData={eventData}
-                xKey="ar"
-                yKey="mamt"
-                zKey={null}
-              />
-            )
+            listOfDeparmentThatSupportBubbleChart[factory].includes(
+              department,
+            ) &&
+            eventData && <BubbleChart eventData={eventData} keyForData="data" />
           )}
         </div>
       </Modal>

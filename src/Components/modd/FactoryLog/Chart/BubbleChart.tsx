@@ -5,56 +5,57 @@ import { FactoryEventResponse } from "../types/factoryLogDataType";
 import BrokenAxis from "highcharts/modules/broken-axis";
 import useWindowDimensions from "../../../../hooks/useWindowDimensions";
 import { useTranslation } from "react-i18next";
-import { generateBubbleChartConfig } from "../utils/bubbleChartUtils";
-
+import {
+  generateBubbleChartConfig,
+  generateBubbleChartConfigFromData,
+} from "../utils/bubbleChartUtils";
 type BubbleChartProps = {
   eventData: FactoryEventResponse;
-  xKey?: string;
-  key: "data_mold" | "data";
-  yKey?: string;
-  zKey?: string | null;
+  keyForData: "data" | "data_mold";
 };
 HC_more(Highcharts);
 BrokenAxis(Highcharts);
 export default function BubbleChart({
   eventData,
-  key,
-  xKey,
-  yKey,
-  zKey,
+  keyForData: key,
 }: BubbleChartProps) {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  const filteredData = (() => {
-    if (key === "data") {
-      return eventData[key]
-        .filter((event) => !!event["ar"])
-        .map((event) => {
-          return {
-            ...event,
-            pamt: key === "data" && Math.trunc(event.pamt),
-          };
-        });
-    }
-    if (key === "data_mold") {
-      return eventData[key]
-        .filter((event) => !!event["ar"])
-        .map((event) => {
-          return {
-            ...event,
-            mamt: key === "data_mold" && Math.trunc(event.mamt),
-          };
-        });
-    }
-  })();
+
+  const filteredData =
+    key === "data_mold"
+      ? eventData.data_mold
+          .filter((event) => !!event["ar"])
+          .map((event) => {
+            return {
+              ...event,
+              mamt: Math.trunc(event.mamt),
+            };
+          })
+      : eventData.data
+          .filter((event) => !!event["ar"])
+          .map((event) => {
+            return {
+              ...event,
+              pamt: Math.trunc(event.pamt),
+            };
+          });
+  console.log(filteredData);
+
   const sysName = eventData.post.sys;
-  const { xMin, xMax, yMedian, generateSeries } = generateBubbleChartConfig(
-    filteredData,
-    xKey,
-    yKey,
-    zKey,
-  );
-  console.dir(generateSeries());
+  const { xMin, xMax, yMedian, generateSeries } =
+    key === "data_mold"
+      ? generateBubbleChartConfig(
+          filteredData as FactoryEventResponse["data_mold"],
+          "ar",
+          "mamt",
+          "count_repaired",
+        )
+      : generateBubbleChartConfigFromData(
+          filteredData as FactoryEventResponse["data"],
+          "ar",
+          "pamt",
+        );
 
   Highcharts.setOptions({
     lang: {
@@ -81,6 +82,7 @@ export default function BubbleChart({
       },
     },
     subtitle: {
+      // TODO:
       text: `${eventData.post.date_start} ~ ${eventData.post.date_end}`,
       style: {
         color: "#666666",
@@ -94,10 +96,13 @@ export default function BubbleChart({
       enabled: false,
     },
     legend: {
-      enabled: true,
+      enabled: key === "data_mold" ? true : false,
     },
     title: {
-      text: `${t(sysName)} ${t("達成率")}/${t("總模次")}/${t("維修次數")} `,
+      text:
+        key === "data_mold"
+          ? `${t(sysName)} ${t("達成率")}/${t("總模次")}/${t("維修次數")} `
+          : `${t(sysName)}  ${t("達成率")}/${t("總產能")}`,
     },
     xAxis: {
       title: {
@@ -136,8 +141,7 @@ export default function BubbleChart({
           fontWeight: "bold",
           color: "#000000",
         },
-        text: t("總模次"),
-
+        text: key === "data_mold" ? t("總模次") : t("總產能"),
         margin: 40,
         rotation: 0,
       },
@@ -173,8 +177,11 @@ export default function BubbleChart({
       // https://github.com/highcharts/highcharts/issues/20778
       // the type definition of formatter doesn't include the z index
       formatter: function () {
+        // TODO:
         // thousandsSep somehow does not work here. I am not sure why. Maybe because I am using html? Or formatter?
-        return `<div style="text-align:left; padding: 0.25rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● ${t("唯一碼")}: ${this.point.name}</p> <br> <p>● ${t("達成率")}: ${this.point.x.toFixed(2)} % </p><br> <p>● ${t("總模次")}: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● ${t("維修次數")}: ${this.point.options.z} 次</p></div>`;
+        return key === "data_mold"
+          ? `<div style="text-align:left; padding: 0.25rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● ${t("唯一碼")}: ${this.point.name}</p> <br> <p>● ${t("達成率")}: ${this.point.x.toFixed(2)} % </p><br> <p>● ${t("總模次")}: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </p><br> <p>● ${t("維修次數")}: ${this.point.options.z} 次</p></div>`
+          : `<div style="text-align:left; padding: 0.25rem; background-color: #FFFFFF";  display: flex; flex-direction: column; > <p>● ${t("產品名稱")}: ${this.point.name}</p> <br> <p>● ${t("達成率")}: ${this.point.x.toFixed(2)} % </p><br> <p>● ${t("總產能")}: ${Number(this.point.y?.toFixed(0)).toLocaleString()} </div>`;
       },
     },
     plotOptions: {
@@ -192,9 +199,5 @@ export default function BubbleChart({
     series: generateSeries(),
   };
 
-  return (
-    // <div className="flex w-[95%] justify-center border border-gray-200">
-    <HighchartsReact highcharts={Highcharts} options={options} />
-    // </div>
-  );
+  return <HighchartsReact highcharts={Highcharts} options={options} />;
 }
