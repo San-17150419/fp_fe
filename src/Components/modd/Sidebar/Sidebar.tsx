@@ -76,7 +76,7 @@ export default function Sidebar() {
         <div
           // 48px is from p-2 in navbar and the size of the button.
           className={cn(
-            "absolute left-12 top-0 z-50 h-full min-w-max max-w-80 bg-white px-4 py-6 transition-all duration-300",
+            "absolute left-12 top-0 z-50 flex h-full min-w-max max-w-80 flex-col gap-1 bg-white px-4 py-6 transition-all duration-300",
             !isOpen && "hidden w-0",
           )}
         >
