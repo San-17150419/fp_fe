@@ -1,27 +1,19 @@
 import { useState, type FormEvent } from "react";
 import Modal from "../../Components/modd/Modal/NonDialogModal";
 import { type FilterData } from "./types";
-import axios from "axios";
+import useUpdate from "./hooks/useUpdate";
 
 type MemoCellProps = {
-  data: FilterData["data"][number];
+  currentMoldData: FilterData["data"][number];
 };
-const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-update/";
-export default function MemoCell({ data }: MemoCellProps) {
+export default function MemoCell({ currentMoldData }: MemoCellProps) {
+  const { mutate } = useUpdate({ currentMoldData });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState<string>(data.spare);
+  const [message, setMessage] = useState<string>(currentMoldData.spare);
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(api, {
-        ...data,
-        spare: message,
-      });
-      setIsModalOpen(false);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
+    const moldData = { ...currentMoldData, spare: message };
+    mutate(moldData);
   };
   return (
     <>
@@ -34,7 +26,7 @@ export default function MemoCell({ data }: MemoCellProps) {
       </button>
       {
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <form className="flex w-[35vw] flex-col -mb-6" onSubmit={onSubmit}>
+          <form className="-mb-6 flex w-[35vw] flex-col" onSubmit={onSubmit}>
             <textarea
               name=""
               placeholder="請輸入備註"
