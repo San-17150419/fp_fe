@@ -8,7 +8,8 @@ export default function BaseButton({
     <button
       {...props}
       className={cn(
-        "rounded bg-stone-300 px-2 py-1 text-xs shadow-sm shadow-gray-400 tabletP:text-sm lg:text-base",
+        "rounded p-1 text-xs text-white tabletP:text-sm lg:text-base",
+        props.className,
       )}
     >
       {props.children}
