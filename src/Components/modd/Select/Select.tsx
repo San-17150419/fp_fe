@@ -63,8 +63,8 @@ export default function Select({
       {required && (
         <select
           className="absolute left-0 h-full w-full opacity-0"
-          name="123"
-          id="123"
+          name={name}
+          id={`${name}-create-new-mold`}
           title={reuquiredText}
           required
           tabIndex={-1}
