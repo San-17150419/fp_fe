@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormEvent } from "react";
 import {
   type MoldInfoUpdateParams,
@@ -18,8 +18,6 @@ export default function useUpdate({ currentMoldData }: Params) {
   const preFilterData = queryClient.getQueryData<FilterData["data"]>([
     "preFilterData",
   ]);
-  // TODO: Separate UI logic from API logic
-
   const [formData, setFormData] = useState<MoldInfoUpdateParams>(
     (() => {
       // delete dutydate_last in data because it is not present in MoldInfoUpdateParams. Needs to temporarily extend MoldInfoUpdateParams to include dutydate_last and make this property optional. Otherwise, typescript will not allow it to be deleted
@@ -29,9 +27,12 @@ export default function useUpdate({ currentMoldData }: Params) {
       return copy as MoldInfoUpdateParams;
     })(),
   );
-  const isStateInPredefinedOptions = statusOptions.some(
-    (option) => option.value === currentMoldData.state,
-  );
+  useEffect(() => {
+    const copy: MoldInfoUpdateParams & { dutydate_last?: string } =
+      Object.assign({}, currentMoldData);
+    delete copy["dutydate_last"];
+    setFormData(copy as MoldInfoUpdateParams);
+  }, [currentMoldData]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: UpdateMoldData,
