@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { type Site, type PostData, type PostDataParams } from "./types";
-import axios, { isAxiosError } from "axios";
+import { type Site, type PostData } from "./types";
+import axios from "axios";
 import Modal from "../../Components/modd/Modal/NonDialogModal";
 import { useTranslation } from "react-i18next";
+import Loading from "../../Components/Loading";
+import { useQuery } from "@tanstack/react-query";
 // Don't know what to name this
 type EventProps = {
   sn_num: string;
@@ -10,51 +12,60 @@ type EventProps = {
   dutydate_last: string;
 };
 
-// TODO: Rename this component to something more descriptive.
-// TODO: Data is fetched upon demand. So data is not always ready when modal is fully rendered. The issue is I am not sure why certain table takes longer to render. Even if other table has significantly more data. 1. Add visual cue to inform users data is being fetched. 2. Check the time for table to be ready is caused by the time it takes to fetch data or something else. 
 
-export default function Event({ sn_num, site, dutydate_last }: EventProps) {
+// TODO: Data is fetched upon demand. So data is not always ready when modal is fully rendered. The issue is I am not sure why certain table takes longer to render. Even if other table has significantly more data. 1. Add visual cue to inform users data is being fetched. 2. Check the time for table to be ready is caused by the time it takes to fetch data or something else.
+// This is for 最後上機
+// TODO: If Loading component is shown, it should be shown at least for 1 second(or less). Because sometimes, the data is ready almost immediately. The UX is very inconsistent.
+export default function LogData({ sn_num, site, dutydate_last }: EventProps) {
   const [open, setOpen] = useState(false);
-  const [postData, setPostData] = useState<PostData | null>(null);
   const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "event-data/";
+  const {
+    data: logData,
+    isLoading,
+    isSuccess,
+  } = useQuery({
+    queryKey: [sn_num, site, dutydate_last],
+    queryFn: async () => {
+      const response = await axios.post<PostData>(api, {
+        sn_num: sn_num,
+        site: site,
+        dutydate_last: dutydate_last,
+      });
+      return response.data;
+    },
+    enabled: open,
+  });
   const { t } = useTranslation();
-  const params: PostDataParams = {
-    sn_num: sn_num,
-    site: site,
-    dutydate_last: dutydate_last,
-  };
-  const fetchPostData = async () => {
-    try {
-      const response = await axios.post<PostData>(api, params);
-      setPostData(response.data);
-    } catch (error) {
-      console.error(error);
-      isAxiosError(error) && console.error(error.response?.data);
-    }
-  };
 
   const handleOpen = () => {
-    fetchPostData();
     setOpen(true);
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <>
-      <div onClick={() => handleOpen()} className="cursor-pointer p-2">
+      <div
+        onClick={() => handleOpen()}
+        className="cursor-pointer p-2 text-blue-400"
+      >
         {dutydate_last}
       </div>
       {open && (
-        // TODO: animation is a bit janky. Especially when site is D08. 
+        // TODO: animation is a bit janky. Especially when site is D08.
         <Modal isOpen={open} onClose={() => setOpen(false)}>
           {/* <p>{JSON.stringify(postData, null, 2)}</p> */}
-          {postData && (
+          {isSuccess && (
             <div className="mx-auto min-w-[50vw] px-1 py-4">
               <div className="relative mx-auto max-h-[70vh] max-w-full overflow-auto px-2">
                 {/* <div className="mx-auto max-w-[90%] max-h-[80vh] bg-red-200 overflow-auto"> */}
                 <table className="h-full w-full table-auto border-separate border-spacing-0">
                   <thead className="sticky top-0 z-10 backdrop-opacity-0">
                     <tr>
-                      {postData.data[0] &&
-                        Object.keys(postData.data[0]).map((key) => (
+                      {logData.data[0] &&
+                        Object.keys(logData.data[0]).map((key) => (
                           <th
                             key={key}
                             className="border border-gray-300 bg-zinc-200 p-3 text-blue-600"
@@ -65,8 +76,8 @@ export default function Event({ sn_num, site, dutydate_last }: EventProps) {
                     </tr>
                   </thead>
                   <tbody className="text-center text-black">
-                    {postData &&
-                      postData.data.map((item, index) => (
+                    {isSuccess &&
+                      logData.data.map((item, index) => (
                         <tr key={`${item.sn_num}-${index}`}>
                           {Object.keys(item).map((key) => (
                             <td
