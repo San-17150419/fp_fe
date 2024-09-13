@@ -2,12 +2,12 @@ import { MakerCode, Site, MoldStatus, Sys } from "./CommonTypes";
 
 export type FilterData = {
   post: {
-    sys: Sys;
+    sys: Sys | "";
     sn_num: string;
     prod_name_board: string;
     mold_num: string;
-    property: string;
-    site: Site;
+    property: string | "";
+    site: Site | "";
   };
   data: {
     sn_num: string;
