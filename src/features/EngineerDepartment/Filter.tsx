@@ -2,11 +2,10 @@ import usePreFilter from "./hooks/usePreFilter";
 // https://github.com/react-icons/react-icons/issues/154 TODO: Reduce icon size
 // TODO:How to lazy load component
 // TODO: I don't think Loading component block the whole page. Might be a problem.
-import { type Site, type Sys, type FilterData } from "./types";
+import { type Site, type Sys } from "./types";
 // https://github.com/radix-ui/primitives/issues/1634
 import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import PostFilterSkeleton from "./PostFilterSkeleton";
-import Loading from "../../Components/Loading";
 import { lazy } from "react";
 const PostFilter = lazy(() => import("./PostFilter"));
 const Select = lazy(() => import("../../Components/modd/Select/Select"));
@@ -16,15 +15,8 @@ export default function Filter({
   siteOptions,
   propertyOptions,
 }: PreFilterData) {
-  const {
-    isLoading,
-    setSys,
-    setProperty,
-    setSite,
-    data,
-    postFilterOptions,
-  } = usePreFilter();
-
+  const { isLoading, setSys, setProperty, setSite, data, postFilterOptions } =
+    usePreFilter();
   return (
     <div className="flex flex-wrap justify-around gap-4">
       <>
