@@ -6,24 +6,13 @@ import {
   type MoldInfoUpdateResponse,
 } from "../types";
 import axios from "axios";
-import { Option } from "../../../Components/modd/Select/Select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
 
 type Params = {
   currentMoldData: FilterData["data"][number];
-  makerOptions: Array<Option>;
-  propertyOptions: Array<Option>;
-  siteOptions: Array<Option>;
-  statusOptions: Array<Option>;
 };
-export default function useUpdate({
-  currentMoldData,
-  makerOptions,
-  propertyOptions,
-  siteOptions,
-  statusOptions,
-}: Params) {
+export default function useUpdate({ currentMoldData }: Params) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const preFilterData = queryClient.getQueryData<FilterData["data"]>([
@@ -205,48 +194,14 @@ export default function useUpdate({
     setFormData((prev) => ({ ...prev, [name]: data }));
   }
 
-  const selectConfig: SelectConfig = [
-    { text: "位置", options: siteOptions, name: "site" },
-    { text: "財產歸屬", options: propertyOptions, name: "property" },
-    {
-      text: "狀態",
-      options: statusOptions,
-      name: "state",
-      disabled: !isStateInPredefinedOptions,
-    },
-    { text: "製造商代號", options: makerOptions, name: "maker" },
-  ];
-  const inputConfig: InputConfig = [
-    { text: "名版", name: "prod_name_board", readOnly: false },
-    { text: "機種", name: "prod_name_nocolor", readOnly: false },
-    { text: "系列", name: "sys", readOnly: true },
-    { text: "唯一碼", name: "sn_num", readOnly: true },
-    { text: "模號", name: "mold_num", readOnly: true },
-    { text: "模穴數", name: "hole_num", readOnly: true },
-  ];
-
   return {
     handleUpdateMoldInfo,
-    handleChange,
     isModalOpen,
     setIsModalOpen,
-    selectConfig,
-    inputConfig,
     setFormData,
+    handleChange,
+    mutate,
+    isPending,
+    error,
   };
 }
-
-type SelectConfig = {
-  name: Name;
-  text: string;
-  options: Array<Option>;
-  disabled?: boolean;
-}[];
-
-type InputConfig = {
-  name: Name;
-  text: string;
-  readOnly?: boolean;
-}[];
-
-type Name = keyof MoldInfoUpdateParams;

@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import { ReactNode } from "react";
 import useUpdate from "./hooks/useUpdate";
+import { getFilterConfig } from "./utils/getFilterConfig";
 type UpdateProps = {
   currentMoldData: FilterData["data"][number];
 } & PreFilterData;
@@ -17,20 +18,15 @@ export default function Update({
   siteOptions,
   statusOptions,
 }: UpdateProps) {
-  const {
-    handleUpdateMoldInfo,
-    inputConfig,
-    selectConfig,
-    handleChange,
-    isModalOpen,
-    setIsModalOpen,
-  } = useUpdate({
+  const { handleUpdateMoldInfo, handleChange, isModalOpen, setIsModalOpen } =
+    useUpdate({ currentMoldData });
+  const { inputConfig, selectConfig } = getFilterConfig(
     currentMoldData,
     makerOptions,
     propertyOptions,
     siteOptions,
     statusOptions,
-  });
+  );
 
 
   return (
