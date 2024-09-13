@@ -56,8 +56,9 @@ export default function useUpdate({ currentMoldData }: Params) {
 
           // Check if the mold should still be in the cache after the update
           const moldInCacheAfterUpdate =
-            dataOfUpdatedMolds[0].site === post.site &&
-            dataOfUpdatedMolds[0].property === post.property;
+            (post.site === "" || dataOfUpdatedMolds[0].site === post.site) &&
+            (post.property === "" ||
+              dataOfUpdatedMolds[0].property === post.property);
 
           // Handle all possible cases:
           if (moldInCacheBeforeUpdate && moldInCacheAfterUpdate) {
