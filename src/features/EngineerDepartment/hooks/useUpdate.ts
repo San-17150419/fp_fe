@@ -15,8 +15,16 @@ type Params = {
 export default function useUpdate({ currentMoldData }: Params) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
-  const preFilterData = queryClient.getQueryData<FilterData["data"]>([
+  const preFilterData = queryClient.getQueryData<FilterData>([
     "preFilterData",
+    {
+      mold_num: "",
+      prod_name_board: "",
+      property: "",
+      site: "",
+      sn_num: "",
+      sys: "",
+    },
   ]);
   const [formData, setFormData] = useState<MoldInfoUpdateParams>(
     (() => {
@@ -34,14 +42,13 @@ export default function useUpdate({ currentMoldData }: Params) {
     setFormData(copy as MoldInfoUpdateParams);
   }, [currentMoldData]);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: UpdateMoldData,
     onSuccess: ([response1, response2]) => {
       queryClient.setQueriesData(
         { queryKey: ["preFilterData"] },
         (oldData: FilterData | undefined) => {
           if (!oldData) return oldData;
-
           const { data: oldDataFromFilterData, post } = oldData;
           const dataOfUpdatedMolds = [response1.post];
 
@@ -143,38 +150,32 @@ export default function useUpdate({ currentMoldData }: Params) {
         if (!sn_num2) {
           throw new Error("雙色系列 second sn_num is invalid");
         }
-
-        const idMsForMold2 = preFilterData?.find(
+        const idMsForMold2 = preFilterData?.data.find(
           (mold) => mold.sn_num === sn_num2,
         );
-
         if (!idMsForMold2) {
           throw new Error("雙色系列 idMsForMold2 is invalid");
         }
-        const promise1 = axios.post(api, {
+        const promise1 = axios.post<MoldInfoUpdateResponse>(api, {
           ...moldData,
           sn_num: sn_num1,
         });
-        const promise2 = axios.post(api, {
+        const promise2 = axios.post<MoldInfoUpdateResponse>(api, {
           ...moldData,
           sn_num: sn_num2,
-          idMs: idMsForMold2,
+          id_ms: idMsForMold2,
         });
         const response = await Promise.all([promise1, promise2]);
 
-        const moldData1 = response[0].data;
-        console.log(moldData1);
-        const moldData2 = response[1].data;
-        console.log(moldData2);
-
+        const moldData1 = response[0].data.post;
+        const moldData2 = response[1].data.post;
         for (const key in moldData1) {
-          if (key !== "sn_num") {
+          if (key !== "sn_num" && key !== "id_ms") {
             if (moldData1[key] !== moldData2[key]) {
-              throw new Error("雙色系列 data of two mold is not equal");
+              throw new Error(`${key} 雙色系列 data of two mold is not equal`);
             }
           }
         }
-
         return response.map((res) => res.data) as MoldInfoUpdateResponse[];
       }
       default: {
