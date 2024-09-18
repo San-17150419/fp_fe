@@ -4,7 +4,7 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 type Option<T> = {
   id: string | number;
@@ -44,12 +44,9 @@ export default function ComboBox<T>({
         optionsWithNoDuplicateText.filter((item) => {
           return item.text.toLowerCase().trim().includes(query.toLowerCase());
         });
-  // TODO: performance issue. When there is a lot of options, the combobox will be slow.
-  // TODO: Inconsistent behavior. Combobox is not always open immediately when you switch between multiple comboboxes.. I am not certain why. Need further testing. (The length of the options doesn't seem to be the problem. It's possible that the problem is outside of the combobox. Overall, the whole filter component is slow. )
-  // TODO: ESC key does not clear the displayed value.
-
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
+      // TODO: escape key does not clear the displayed value, but it does clear the combobox.
       if (event.key === "Escape") {
         setQuery("");
         setSelected(defaultValue.value as Option<T>);
