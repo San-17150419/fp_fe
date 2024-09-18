@@ -146,4 +146,7 @@ type SelectProps = {
   required?: boolean;
   value?: Option;
   reuquiredText?: string;
+  onBlur?: () => void;
+  onFocus?: () => void;
+  onChange?: (option: Option) => void;
 };
