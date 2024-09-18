@@ -1,4 +1,6 @@
-export const createDictionary = (data: typeof sample) => {
+import { MoldStatus, PnbState, type FilterData, type Site } from "../types";
+
+export const createDictionary = (data: FilterData["data"]) => {
   const dictionary: {
     allData: {
       [key: string]: FilterData["data"][number];
@@ -56,8 +58,6 @@ export const createDictionary = (data: typeof sample) => {
       dictionary.boardNameToId[d.prod_name_board].push(d.sn_num);
     }
   });
-
-  console.log(dictionary);
 
   return dictionary;
 };

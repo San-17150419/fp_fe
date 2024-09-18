@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { type Site, type FilterData, type Sys } from "../types";
-import { createDictionary } from "../temp";
+import { createDictionary } from "../utils/createDictionary";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 // manage state in pre filter (sys, property, site)
