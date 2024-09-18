@@ -10,6 +10,12 @@
   background: linear-gradient(to bottom, #434343, #000000);
 }
 
+/* https://github.com/tailwindlabs/headlessui/issues/762 */
+/* There is a bug in headlessui where if the dropdown menu is too long, it will add padding-right to account for the scrollbar */
+html {
+  padding-right: 0px !important;
+}
+
 #root {
   height: 100vh;
 }
