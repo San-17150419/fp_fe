@@ -7,13 +7,11 @@ type MemoCellProps = {
   currentMoldData: FilterData["data"][number];
 };
 export default function MemoCell({ currentMoldData }: MemoCellProps) {
-  const { mutate } = useUpdate({ currentMoldData });
+  const { mutate, formData, setFormData } = useUpdate({ currentMoldData });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState<string>(currentMoldData.spare);
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const moldData = { ...currentMoldData, spare: message };
-    mutate(moldData);
+    mutate(formData);
   };
   return (
     <>
@@ -33,9 +31,12 @@ export default function MemoCell({ currentMoldData }: MemoCellProps) {
               id=""
               cols={30}
               rows={10}
-              defaultValue={message}
+              defaultValue={formData.spare ?? ""}
               className="w-full border border-black p-2"
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) =>
+                setFormData({ ...formData, spare: e.target.value })
+              }
+              // onChange={(e) => setMessage(e.target.value)}
             />
             <button
               className="my-4 ml-auto block rounded-md bg-blue-400 p-2"
