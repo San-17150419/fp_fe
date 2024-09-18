@@ -1,6 +1,7 @@
 // Infer second sn_num from first sn_num
 // 模仁的sn_num has special format (e.g., "11-030-02-R01")
 export default function inferSecondSnNum(snNum: string): string | null {
+  // TODO: This test only works for non 模仁
   if (snNum.length !== 9 || !/^\d{2}-\d{3}-\d{2}$/.test(snNum)) {
     // Ensure sn_num format is valid (e.g., "11-030-01")
     return null;
