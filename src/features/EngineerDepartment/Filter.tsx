@@ -46,7 +46,6 @@ export default function Filter({
             onSelect={(option) => setSite(option.value as Site)}
           />
         </div>
-        {/* {!isLoading ? <Loading /> : null} */}
         {isLoading ? (
           <PostFilterSkeleton />
         ) : (
