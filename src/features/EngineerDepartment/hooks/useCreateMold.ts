@@ -1,14 +1,15 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import {
   type MoldInfoInsertParams,
   type MoldInfoInsertSuccessResponse,
-  type MoldInfoInsertErrorResponse,
   type Sys,
   type GetNewSNPForSysResponse,
   type GetNewSNPForSys,
   FilterData,
 } from "../types";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -18,14 +19,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // TODO: I still have almost 2000 event listeners in the app.
 // TODO: BUG! When switching between factory log and engineer department, the number of event listener and DOM Nodes skyrockets. It does drop down
+// TODO: I am considering separating this hook into two hooks. One for fetching `sn_num` and another for `createMold`
 export default function useCreateMold() {
-  const [isLoading, setIsLoading] = useState(false);
   const [mold_num, setMoldNum] = useState<string>("");
   const [sys, setSys] = useState<Sys | "">("");
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [sn_target, setSnTarget] = useState<string>("");
-  const [message, setMessage] = useState("");
   const [userIsStillEditing, setUserIsStillEditing] = useState(false);
   const [newMoldParams, setNewMoldParams] =
     useState<MoldInfoInsertParams | null>(null);
@@ -33,9 +31,9 @@ export default function useCreateMold() {
   const queryClient = useQueryClient();
   const {
     data: snNumData,
-    isLoading: isFetchingSnNum,
+    // isLoading: isFetchingSnNum,
     isPending: isFetchingSnNumPending,
-    error: snNumError,
+    // error: snNumError,
   } = useQuery<string[]>({
     queryKey: ["newMoldSnNum"],
     queryFn: () => {
@@ -58,12 +56,19 @@ export default function useCreateMold() {
     },
     enabled: !!sys && !!mold_num && !userIsStillEditing,
   });
-
-  const { mutate, isPending } = useMutation({
+  // crud
+  const { mutate, isPending, error, isSuccess } = useMutation({
     mutationFn: createNewMold,
     onSuccess: ([responseData1, responseData2]) => {
-      // Not sure if I need to invalidate queries here
-      // queryClient.invalidateQueries({ queryKey: ["newMoldSnNum"] });
+      // In Update componet, I need to worry about for the cache I am updating, is it add, delete, update or do nothing? In there, it's always add.
+
+      const notify = () =>
+        toast.success("新增成功", {
+          position: "top-center",
+          autoClose: 5000,
+          closeButton: true,
+        });
+      notify();
       queryClient.setQueriesData(
         { queryKey: ["preFilterData"] },
         (oldData: FilterData["data"] | undefined) => {
@@ -89,87 +94,6 @@ export default function useCreateMold() {
     },
   });
 
-  const testParams = {
-    sn_num: "123",
-    sys: "123",
-    mold_num: "123",
-    prod_name_board: "123",
-    prod_name_nocolor: "123",
-    hole_num: 123,
-    block_num: 123,
-    property_num: "123",
-    brand: "123",
-    property: "123",
-    site: "GD",
-    pnb_state: "done",
-    maker: "123",
-    state: "已報廢",
-    dutydate_month: "123",
-    spare: "123",
-  };
-  const handleCreateNewMold = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    const api =
-      import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-insert/";
-    console.log("request send");
-    try {
-      if (newMoldParams?.sys === "雙色系列") {
-        console.log("雙色系列");
-        const promise1 = axios.post<MoldInfoInsertSuccessResponse>(
-          api,
-          newMoldParams,
-        );
-        const promise2 = axios.post<MoldInfoInsertSuccessResponse>(
-          api,
-          testParams,
-        );
-        const response = await axios.all([promise1, promise2]);
-        response.forEach((response) => {
-          setIsSuccess(response.data.info_check.status);
-          if ("info_insert" in response.data) {
-            console.log(response.data.info_insert);
-          }
-          if (response.data.post) {
-            console.log(response.data.post);
-          }
-        });
-      } else {
-        const response = await axios.post<MoldInfoInsertSuccessResponse>(
-          api,
-          newMoldParams,
-        );
-        setIsSuccess(response.data.info_check.status);
-        if ("info_insert" in response.data) {
-          console.log(response.data.info_insert);
-        }
-        if (response.data.post) {
-          console.log(response.data.post);
-        }
-      }
-    } catch (error) {
-      setIsError(true);
-      if (axios.isAxiosError(error)) {
-        const errorResponse = error.response
-          ?.data as MoldInfoInsertErrorResponse;
-
-        if (errorResponse) {
-          console.log(errorResponse.info_check);
-          if ("info_insert" in errorResponse) {
-            console.log(errorResponse.info_insert);
-          }
-          if (errorResponse.post) {
-            console.log(errorResponse.post);
-          }
-        } else {
-          console.error("Unexpected error:", error);
-        }
-      } else {
-        console.error("Unexpected error:", error);
-      }
-    }
-  };
-
   const clearForm = () => {
     //
     queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
@@ -178,24 +102,22 @@ export default function useCreateMold() {
     setSys("");
   };
   return {
-    isLoading,
-    isError,
     isSuccess,
-    message,
     newMoldParams,
     setNewMoldParams,
-    handleCreateNewMold,
-    mold_num,
-    setMoldNum,
-    sys,
-    setSys,
+    mold_num, //
+    setMoldNum, //
+    sys, //
+    setSys, //
     sn_target,
     setSnTarget,
-    snNumData,
-    isFetchingSnNumPending,
-    clearForm,
-    setUserIsStillEditing,
-    mutate,
+    snNumData, //
+    isFetchingSnNumPending, //
+    clearForm, //
+    setUserIsStillEditing, //
+    mutate, //
+    isPending,
+    error,
   };
 }
 
@@ -216,10 +138,10 @@ const getNewSnNum = async <T>(
 async function createNewMold(
   moldData: MoldInfoInsertParams,
 ): Promise<MoldInfoInsertSuccessResponse[]> {
+  // TODO: dutydate_month is required?
   const api =
     import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-insert/";
   if (moldData.sys === "雙色系列") {
-    console.log("雙色系列");
     const moldDataForSecondMold = {
       ...moldData,
       sn_num: inferSecondSnNum(moldData.sn_num),
@@ -229,10 +151,9 @@ async function createNewMold(
       api,
       moldDataForSecondMold,
     );
-    const response = await axios.all([promise1, promise2]);
+    const response = await Promise.all([promise1, promise2]);
     return [response[0].data, response[1].data];
   } else {
-    console.log("非雙色系列");
     const response = await axios.post<MoldInfoInsertSuccessResponse>(
       api,
       moldData,

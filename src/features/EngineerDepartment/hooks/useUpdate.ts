@@ -5,10 +5,11 @@ import {
   type FilterData,
   type MoldInfoUpdateResponse,
 } from "../types";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 type Params = {
   currentMoldData: FilterData["data"][number];
 };
@@ -41,10 +42,16 @@ export default function useUpdate({ currentMoldData }: Params) {
     delete copy["dutydate_last"];
     setFormData(copy as MoldInfoUpdateParams);
   }, [currentMoldData]);
-
   const { mutate, isPending, error } = useMutation({
     mutationFn: UpdateMoldData,
     onSuccess: ([response1, response2]) => {
+      const notify = () =>
+        toast.success("更新成功", {
+          position: "top-center",
+          autoClose: 5000,
+          closeButton: true,
+        });
+      notify();
       queryClient.setQueriesData(
         { queryKey: ["preFilterData"] },
         (oldData: FilterData | undefined) => {
@@ -133,6 +140,19 @@ export default function useUpdate({ currentMoldData }: Params) {
         },
       );
     },
+    onError: (error) => {
+      const notify = () =>
+        toast.error(error.message, {
+          position: "top-center",
+          autoClose: 5000,
+          closeButton: true,
+        });
+      notify();
+      console.error(error);
+      if (isAxiosError(error)) {
+        console.log(error.response?.data?.info_check.detail);
+      }
+    },
   });
   async function UpdateMoldData(
     moldData: MoldInfoUpdateParams,
@@ -150,9 +170,10 @@ export default function useUpdate({ currentMoldData }: Params) {
         if (!sn_num2) {
           throw new Error("雙色系列 second sn_num is invalid");
         }
+        // TODO: Think about how to prevent idMsForMold2 from being undefined (for example when it is not in the cache but it does exist on the server)
         const idMsForMold2 = preFilterData?.data.find(
           (mold) => mold.sn_num === sn_num2,
-        );
+        )?.id_ms;
         if (!idMsForMold2) {
           throw new Error("雙色系列 idMsForMold2 is invalid");
         }
@@ -201,6 +222,7 @@ export default function useUpdate({ currentMoldData }: Params) {
     handleUpdateMoldInfo,
     isModalOpen,
     setIsModalOpen,
+    formData,
     setFormData,
     handleChange,
     mutate,
