@@ -45,7 +45,6 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
   } = useCreateMold();
 
   const [isMoldNumValid, setIsMoldNumValid] = useState<boolean>(false);
-
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     function isString(data: FormDataEntryValue | null): data is string {
       {
@@ -91,8 +90,6 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
     };
 
     // TODO: Remember to convert the input values for 模穴數 ,塞穴數 and 品牌 to number.
-    console.log(data);
-    console.log(params);
     mutate(params);
   };
 
@@ -104,7 +101,6 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
       setIsMoldNumValid(false);
     }
   }, [showModal]);
-
   return (
     <div className="mb-4 inline-block">
       <div
@@ -120,7 +116,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
           onSubmit={onSubmit}
           id="Create Mold"
           autoComplete="off"
-          className="m-auto grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
+          className="grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
         >
           <label
             onBlur={() => setUserIsStillEditing(false)}
