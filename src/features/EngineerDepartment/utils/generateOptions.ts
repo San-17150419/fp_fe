@@ -1,12 +1,14 @@
-import { type PreData } from "../types";
+import {
+  type PreData,
+  type Maker,
+  Sys,
+  Site,
+  MoldStatus,
+  PropertyNum,
+} from "../types";
 // import { type SelectOption } from "../../../Components/modd/Select/selectType";
 import { v4 as uuidv4 } from "uuid";
-
-type Option = {
-  text: string;
-  value: string;
-  id: string;
-};
+import { type Option } from "../../../Components/modd/Select/Select";
 
 // Generates dropdown options for a select component used in the Engineer Department's filter.
 // Each category (maker, series, site, factory) gets a list of options derived from preData, with an additional placeholder option for each.
@@ -14,11 +16,11 @@ type Option = {
 export const createEngineerFilterOptions = (
   preData: PreData["preData"],
 ): {
-  makerOptions: Option[];
-  seriesOptions: Option[];
-  siteOptions: Option[];
-  propertyOptions: Option[];
-  statusOptions: Option[];
+  makerOptions: Option<Maker["list_id"]>[];
+  seriesOptions: Option<Sys>[];
+  siteOptions: Option<Site>[];
+  propertyOptions: Option<PropertyNum>[];
+  statusOptions: Option<MoldStatus>[];
 } => {
   const makerOptions = [
     {
@@ -38,12 +40,12 @@ export const createEngineerFilterOptions = (
       text: "全部系列",
       id: uuidv4(),
     },
-    ...Object.entries(preData.series).map(([key, value]) => ({
-      value: key,
+    ...Object.entries(preData.series).map(([_, value]) => ({
+      value: value,
       text: value,
       id: uuidv4(),
     })),
-  ];
+  ] as Option<Sys>[];
   const propertyOptions = [
     {
       value: "",
@@ -63,7 +65,7 @@ export const createEngineerFilterOptions = (
       text: site,
       id: uuidv4(),
     })),
-  ];
+  ] as Option<Site>[];
 
   const statusOptions = [
     { value: "", text: "無", id: uuidv4() },
@@ -72,7 +74,7 @@ export const createEngineerFilterOptions = (
       text: status,
       id: uuidv4(),
     })),
-  ];
+  ] as Option<MoldStatus>[];
 
   return {
     makerOptions,

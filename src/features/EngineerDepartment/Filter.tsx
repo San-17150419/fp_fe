@@ -8,7 +8,7 @@ import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import PostFilterSkeleton from "./PostFilterSkeleton";
 import { lazy } from "react";
 const PostFilter = lazy(() => import("./PostFilter"));
-const Select = lazy(() => import("../../Components/modd/Select/Select"));
+import Select from "../../Components/modd/Select/Select";
 
 export default function Filter({
   seriesOptions,
@@ -21,7 +21,7 @@ export default function Filter({
     <div className="flex flex-wrap justify-around gap-4">
       <>
         <div className="h-10 flex-grow basis-[100px]">
-          <Select
+          <Select<Sys>
             options={seriesOptions}
             name="series"
             onSelect={(option) =>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { type PreData } from "../types";
+import { Maker, MoldStatus, Property, Site, Sys, type PreData } from "../types";
 import { type Option } from "../../../Components/modd/Select/Select";
 const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "pre-data/";
 import { createEngineerFilterOptions } from "../utils/generateOptions";
@@ -31,10 +31,10 @@ export default function useENGDepartmentPreData() {
 }
 
 export type PreFilterData = {
-  makerOptions: Option[];
-  seriesOptions: Option[];
-  siteOptions: Option[];
-  propertyOptions: Option[];
-  statusOptions: Option[];
+  makerOptions: Option<Maker["list_id"]>[];
+  seriesOptions: Option<Sys>[];
+  siteOptions: Option<Site>[];
+  propertyOptions: Option<Property>[];
+  statusOptions: Option<MoldStatus>[];
   states: PreData;
 };

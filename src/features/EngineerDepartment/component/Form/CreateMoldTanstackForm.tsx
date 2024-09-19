@@ -1,5 +1,5 @@
 import { Dispatch, useState } from "react";
-import Select, { type Option } from "../../../../Components/modd/Select/Select";
+import Select from "../../../../Components/modd/Select/Select";
 import Input from "../../../../Components/modd/Input/InputBase";
 import { type PreFilterData } from "../../hooks/useENGDepartmentPreData";
 import { PnbState, Site, type MoldInfoInsertParams } from "../../types";
@@ -117,20 +117,18 @@ export default function CreateMoldTanstackForm({
                   >
                     <span className="w-1/4">系列</span>
                     <span className="w-3/4">
-                      <Select
+                      <Select<MoldInfoInsertParams["sys"]>
                         onChange={(e) => {
-                          field.handleChange(
-                            e.text as MoldInfoInsertParams["sys"],
-                          );
+                          field.handleChange(e.value);
                         }}
                         onSelect={(e) => {
-                          field.handleChange(
-                            e.text as MoldInfoInsertParams["sys"],
-                          );
-                          setSys(e.text as MoldInfoInsertParams["sys"]);
+                          field.handleChange(e.value);
+                          setSys(e.value);
                         }}
                         onBlur={() => field.handleBlur()}
                         options={seriesOptions}
+                        disabled={!!snNumData}
+                        value={field.state.value}
                       />
                     </span>
                   </label>
@@ -428,14 +426,10 @@ export default function CreateMoldTanstackForm({
                         htmlFor="pnb_state"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">名版狀態</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(e.value as PnbState)
-                            }
+                          <Select<"done" | "incomplete" | "">
+                            onSelect={(e) => field.handleChange(e.value)}
                             options={[
-                              { id: "1", text: "無", value: 0 },
+                              { id: "1", text: "無", value: "" },
                               {
                                 id: "incomplete",
                                 text: "未完成",
@@ -472,12 +466,8 @@ export default function CreateMoldTanstackForm({
                         htmlFor="brand"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">品牌</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(Number(e.value))
-                            }
+                          <Select<number>
+                            onSelect={(e) => field.handleChange(Number(e))}
                             options={[
                               { id: "1", text: "無", value: 0 },
                               { id: "2", text: "第一品牌", value: 1 },
@@ -512,12 +502,8 @@ export default function CreateMoldTanstackForm({
                         htmlFor="property"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">財產歸屬</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(e.value as string)
-                            }
+                          <Select<string>
+                            onSelect={(e) => field.handleChange(e.value)}
                             options={propertyOptions}
                           />
                         </span>
@@ -548,12 +534,8 @@ export default function CreateMoldTanstackForm({
                         htmlFor="property"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">位置</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(e.value as Site)
-                            }
+                          <Select<Site>
+                            onSelect={(e) => field.handleChange(e.value)}
                             options={siteOptions}
                           />
                         </span>
@@ -584,14 +566,8 @@ export default function CreateMoldTanstackForm({
                         htmlFor="state"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">狀態</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(
-                                e.value as MoldInfoInsertParams["state"],
-                              )
-                            }
+                          <Select<MoldInfoInsertParams["state"]>
+                            onSelect={(e) => field.handleChange(e.value)}
                             options={statusOptions}
                           />
                         </span>
@@ -622,14 +598,8 @@ export default function CreateMoldTanstackForm({
                         htmlFor="maker"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">廠商代號</span>
-                        <span className="relative w-3/4">
-                          <Select
-                            onSelect={(e) =>
-                              field.handleChange(
-                                e.value as MoldInfoInsertParams["maker"],
-                              )
-                            }
+                          <Select<MoldInfoInsertParams["maker"]>
+                            onSelect={(e) => field.handleChange(e.value)}
                             options={makerOptions}
                           />
                         </span>

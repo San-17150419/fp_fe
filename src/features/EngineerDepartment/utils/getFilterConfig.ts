@@ -1,11 +1,18 @@
 import { type Option } from "../../../Components/modd/Select/Select";
-import { type FilterData, type MoldInfoUpdateParams } from "../types";
+import {
+  Maker,
+  MoldStatus,
+  Property,
+  Site,
+  type FilterData,
+  type MoldInfoUpdateParams,
+} from "../types";
 export function getFilterConfig(
   currentMoldData: FilterData["data"][number],
-  makerOptions: Option[],
-  propertyOptions: Option[],
-  siteOptions: Option[],
-  statusOptions: Option[],
+  makerOptions: Option<Maker["list_id"]>[],
+  propertyOptions: Option<Property>[],
+  siteOptions: Option<Site>[],
+  statusOptions: Option<MoldStatus>[],
 ) {
   const isStateInPredefinedOptions = statusOptions.some(
     (option) => option.value === currentMoldData.state,
@@ -36,7 +43,7 @@ export function getFilterConfig(
 type SelectConfig = {
   name: Name;
   text: string;
-  options: Array<Option>;
+  options: Array<Option<MoldInfoUpdateParams[Name]>>;
   disabled?: boolean;
 }[];
 

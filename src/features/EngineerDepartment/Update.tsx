@@ -27,8 +27,7 @@ export default function Update({
     siteOptions,
     statusOptions,
   );
-
-
+  // console.log(error);
   return (
     <>
       <button
@@ -46,7 +45,7 @@ export default function Update({
           {inputConfig.map(({ name, text, readOnly }) => (
             <InputField
               key={text}
-              name={name as keyof FilterData["data"][number] }
+              name={name as keyof FilterData["data"][number]}
               text={text}
               data={currentMoldData}
               readOnly={readOnly}
@@ -54,7 +53,7 @@ export default function Update({
             />
           ))}
           {selectConfig.map(({ text, options, name, disabled }) => (
-            <SelectField
+            <SelectField<(typeof options)[number]["value"]>
               key={text}
               name={name as keyof FilterData["data"][number]}
               text={text}
@@ -102,33 +101,33 @@ function Field({ text, children }: FieldProps) {
   );
 }
 
-type SelectFieldProps = {
+type SelectFieldProps<T> = {
   name: keyof FilterData["data"][number];
-  options: Option[];
+  options: Option<T>[];
   data: FilterData["data"][number];
-  onSelect?: (option: Option) => void;
+  onSelect?: (option: Option<T>) => void;
   text: string;
   disabled?: boolean;
 };
 
-function SelectField({
+function SelectField<T>({
   name,
   text,
   options,
   data,
   onSelect,
   disabled,
-}: SelectFieldProps) {
+}: SelectFieldProps<T>) {
   return (
     <Field text={text}>
-      <Select
+      <Select<T>
         name={name}
         className="font-normal"
         options={options}
         disabled={disabled}
         defaultValue={
           disabled
-            ? { id: data.state, text: data.state, value: data.state }
+            ? { id: data.state, text: data.state, value: data.state as T }
             : options.find((option) => option.value === data[name]) ?? undefined
         }
         onSelect={onSelect}
