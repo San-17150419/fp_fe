@@ -27,7 +27,7 @@ export default function FactoryLog() {
     fetchPreData();
   }, []);
   return (
-    <div className=" ">
+    <div className="min-w-[815px]">
       {/* <div className="flex gap-2">
         <button
           type="button"
