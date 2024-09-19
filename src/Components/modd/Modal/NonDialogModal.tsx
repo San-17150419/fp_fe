@@ -75,22 +75,25 @@ export default function Modal({
             // exit={currentVariant.exit}
             // transition={currentVariant.transition}
             transition={{ ease: "easeOut", duration: 0.4 }}
-            className="relative max-h-[90%] max-w-[70%] overflow-auto rounded-md bg-white px-8 py-12"
-            // className="relative left-1/2 top-1/2 max-h-[90%] min-h-[50%] min-w-[50%] max-w-[70%] rounded-md bg-white py-6"
+            className="max-h-[90%] max-w-[70%] rounded-md bg-white p-2"
             ref={modalRef}
             role="dialog"
             aria-modal="true"
             onClick={(e) => e.stopPropagation()} // Prevent clicks inside the modal from closing it
           >
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close modal"
-              className="absolute right-1 top-1 z-10 h-10 w-10 rounded-full text-base hover:bg-gray-300"
-            >
-              X
-            </button>
-            {children}
+            <div className="">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close modal"
+                className="z-10 ml-auto block h-10 w-10 rounded-full text-base hover:bg-gray-300"
+              >
+                X
+              </button>
+            </div>
+            <div className="max-h-[90vh] max-w-full overflow-auto">
+              {children}
+            </div>
             {/* <div className="relative mx-3 mt-4  rounded-md outline">
               {children}
             </div> */}
