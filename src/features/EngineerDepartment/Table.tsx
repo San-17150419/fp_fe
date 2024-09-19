@@ -1,18 +1,20 @@
 import { useState, useMemo, memo, useCallback } from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import Loading from "../../Components/Loading";
 import { type FilterData } from "./types";
 import FilterForTable from "./FilterForTable";
 import TableRow from "./TableRow";
+import Loading from "../../Components/Loading";
+
+// TODO: Vitualized table. This component with 600 plus rows contributed over 15000 DOM Nodes.
+
 type TableProps = {
   data: FilterData["data"];
   // data: { [key: string]: number | string | undefined }[];
   //  header props act as a key to the data. Allow you to decide the order of the table and what to show. If the header props is an object, the key of the object will be used as key of the data and the value of the object will be used as the header
-  isLoading?: boolean;
+  isLoading: boolean;
   visibleList: string[];
 };
-// Memoized Table Component
 const memoizedTable = memo(function Table({
   data,
   isLoading,
@@ -103,7 +105,6 @@ const memoizedTable = memo(function Table({
                   key={`header-${key}`}
                 >
                   {t(key)}
-                  {/* <td>{t(key)}</td> */}
                 </th>
               ))}
             </tr>
@@ -119,13 +120,6 @@ const memoizedTable = memo(function Table({
                 <td colSpan={memoizedColumnsOrder.length}>{t("No Data")}</td>
               </tr>
             )}
-            {/* {data.map((row) => (
-              <TableRow
-                key={row.sn_num}
-                data={row}
-                visibleColumns={visibleColumns}
-              />
-            ))} */}
           </tbody>
         </table>
       </div>

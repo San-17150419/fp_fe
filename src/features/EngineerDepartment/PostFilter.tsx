@@ -50,7 +50,6 @@ export default function PostFilter({
 
   const handleSnNumChange = (selectedSnNum: string) => {
     setCurrentSnNum(selectedSnNum);
-    console.log(selectedSnNum);
   };
 
   const visibleList: Array<string> = (() => {
@@ -85,21 +84,16 @@ export default function PostFilter({
       <div className="h-10 flex-grow basis-[100px]">
         <ComboBox<string>
           options={visibleList.map((key) => snNumOptions[key])}
-          // options={memoizedSnNumOptions}
           onChange={(value) => handleSnNumChange(value.value)}
           name="模具唯一碼"
         />
       </div>
       <div className="order-last flex h-full min-w-full flex-shrink flex-col">
-        {data ? (
-          <Table
-            data={Object.values(data.allData)}
-            visibleList={visibleList}
-            isLoading={isLoading}
-          />
-        ) : (
-          <Loading />
-        )}
+        <Table
+          data={Object.values(data.allData)}
+          visibleList={visibleList}
+          isLoading={isLoading}
+        />
       </div>
     </>
   );

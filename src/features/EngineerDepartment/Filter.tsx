@@ -5,10 +5,10 @@ import usePreFilter from "./hooks/usePreFilter";
 import { type Site, type Sys } from "./types";
 // https://github.com/radix-ui/primitives/issues/1634
 import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
-import PostFilterSkeleton from "./PostFilterSkeleton";
 import { lazy } from "react";
 const PostFilter = lazy(() => import("./PostFilter"));
 import Select from "../../Components/modd/Select/Select";
+import Notification from "../../Components/modd/Modal/Notification";
 
 export default function Filter({
   seriesOptions,
@@ -46,16 +46,15 @@ export default function Filter({
             onSelect={(option) => setSite(option.value as Site)}
           />
         </div>
-        {isLoading ? (
-          <PostFilterSkeleton />
-        ) : (
-          <PostFilter
-            data={data}
-            isLoading={false}
-            postFilterOptions={postFilterOptions}
-          />
-        )}
+
+        <PostFilter
+          data={data}
+          postFilterOptions={postFilterOptions}
+          isLoading={isLoading}
+        />
       </>
+
+      <Notification />
     </div>
   );
 }
