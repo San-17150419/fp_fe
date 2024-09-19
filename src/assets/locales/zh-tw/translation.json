@@ -89,5 +89,19 @@
   "塞穴数": "塞穴数",
   "周期": "週期",
   "作业": "作業",
-  "开台": "開台"
+  "开台": "開台",
+  "prod_name_board": "名版",
+  "prod_name_nocolor": "定義品名",
+  "site": "位置",
+  "property": "財產歸屬",
+  "state": "狀態",
+  "maker": "製造商代號",
+  "dutydate_month": "開模日期",
+  "pnb_state": "名板狀態",
+  "brand": "品牌",
+  "dutydate_last": "最後上機",
+  "spare": "備註",
+  "id_ms": "資料表id",
+  "No Data": "查無資料",
+  "OEM": "代工(國登)"
 }
