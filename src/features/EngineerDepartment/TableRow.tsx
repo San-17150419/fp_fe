@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { type FilterData } from "./types";
 import Update from "./Update";
 import MemoCell from "./MemoCell";
-import Event from "./Event";
+import LogData from "./LogData";
 import cn from "../../util/cn";
 import withPreData from "./WithPreData";
 type TableRowProps = {
@@ -11,7 +11,6 @@ type TableRowProps = {
 };
 
 const UpdateWithPreData = withPreData(Update);
-
 export default function TableRow({ data, visibleColumns }: TableRowProps) {
   const order = [
     "sn_num",
@@ -88,7 +87,7 @@ export default function TableRow({ data, visibleColumns }: TableRowProps) {
           className="text-sm text-blue-400"
         >
           {!data.dutydate_last ? null : (
-            <Event
+            <LogData
               dutydate_last={data.dutydate_last}
               site={data.site}
               sn_num={data.sn_num}
@@ -100,7 +99,7 @@ export default function TableRow({ data, visibleColumns }: TableRowProps) {
       state: <TableCell key={`state-${data.id_ms}`}>{data.state}</TableCell>,
       spare: (
         <TableCell key={`spare-${data.id_ms}`}>
-          <MemoCell data={data} />
+          <MemoCell currentMoldData={data} />
         </TableCell>
       ),
       id_ms: (
