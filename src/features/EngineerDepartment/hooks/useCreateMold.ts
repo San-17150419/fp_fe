@@ -22,7 +22,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 // TODO: I am considering separating this hook into two hooks. One for fetching `sn_num` and another for `createMold`
 export default function useCreateMold() {
   const [mold_num, setMoldNum] = useState<string>("");
-  const [sys, setSys] = useState<Sys | "">("");
+  const [sys, setSys] = useState<Sys>();
   const [sn_target, setSnTarget] = useState<string>("");
   const [userIsStillEditing, setUserIsStillEditing] = useState(false);
   const [newMoldParams, setNewMoldParams] =
@@ -60,8 +60,6 @@ export default function useCreateMold() {
   const { mutate, isPending, error, isSuccess } = useMutation({
     mutationFn: createNewMold,
     onSuccess: ([responseData1, responseData2]) => {
-      // In Update componet, I need to worry about for the cache I am updating, is it add, delete, update or do nothing? In there, it's always add.
-
       const notify = () =>
         toast.success("新增成功", {
           position: "top-center",
@@ -99,7 +97,7 @@ export default function useCreateMold() {
     queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
     setSnTarget("");
     setMoldNum("");
-    setSys("");
+    setSys(undefined);
   };
   return {
     isSuccess,

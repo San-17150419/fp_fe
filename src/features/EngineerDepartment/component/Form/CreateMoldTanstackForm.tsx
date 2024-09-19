@@ -1,12 +1,12 @@
-import { Dispatch, useState } from "react";
+import { useState } from "react";
 import Select from "../../../../Components/modd/Select/Select";
 import Input from "../../../../Components/modd/Input/InputBase";
 import { type PreFilterData } from "../../hooks/useENGDepartmentPreData";
-import { PnbState, Site, type MoldInfoInsertParams } from "../../types";
+import { Site, type MoldInfoInsertParams } from "../../types";
 import Modal from "../../../../Components/modd/Modal/NonDialogModal";
 import { useForm, type FieldApi } from "@tanstack/react-form";
 import useCreateMold from "../../hooks/useCreateMold";
-import regexValidator from "../../../../util/regexValidator";
+import clsx from "clsx";
 export default function CreateMoldTanstackForm({
   seriesOptions,
   makerOptions,
@@ -22,47 +22,34 @@ export default function CreateMoldTanstackForm({
     snNumData,
     isFetchingSnNumPending,
     setUserIsStillEditing,
-    setNewMoldParams,
+    mutate,
   } = useCreateMold();
-  const regexforMoldNumInput = /^[A-Za-z]$|^A1$/;
+  const regexForMoldNumInput = /^[A-Za-z]$|^A1$/;
+  const regexForNumberOnlyInput = /^[0-9]*$/;
   const [showModal, setShowModal] = useState(false);
-  const fieldConfig: Array<{
-    name: keyof MoldInfoInsertParams;
-    label: string;
-    type: "input" | "select";
-    options?: any;
-    readOnly?: boolean;
-    validator?: (value: any) => string | undefined;
-  }> = [
-    { name: "sys", label: "系列", type: "select", options: seriesOptions },
-    {
-      name: "mold_num",
-      label: "模號",
-      type: "input",
-      validator: regexValidator(regexforMoldNumInput, "模號格式錯誤"),
-    },
-    { name: "sn_num", label: "系列唯一碼", type: "input", readOnly: true },
-  ];
   const form = useForm({
     defaultValues: {
       sys: sys,
       mold_num: mold_num,
-      sn_num: "" as MoldInfoInsertParams["sn_num"],
-      prod_name_board: "" as MoldInfoInsertParams["prod_name_board"],
-      prod_name_nocolor: "" as MoldInfoInsertParams["prod_name_nocolor"],
-      hole_num: 0 as MoldInfoInsertParams["hole_num"],
-      block_num: 0 as MoldInfoInsertParams["block_num"],
-      property_num: "" as MoldInfoInsertParams["property_num"],
-      pnb_state: "" as MoldInfoInsertParams["pnb_state"],
-      brand: 0 as MoldInfoInsertParams["brand"],
-      property: "" as MoldInfoInsertParams["property"],
-      site: "" as MoldInfoInsertParams["site"],
-      state: "" as MoldInfoInsertParams["state"],
-      maker: "" as MoldInfoInsertParams["maker"],
-      dutydate_month: "" as MoldInfoInsertParams["dutydate_month"],
-      spare: "" as MoldInfoInsertParams["spare"],
+      sn_num: snNumData ? snNumData[0] : "",
+      prod_name_board: "",
+      prod_name_nocolor: "",
+      hole_num: 0,
+      block_num: 0,
+      property_num: "",
+      pnb_state: "",
+      brand: 0,
+      property: "",
+      site: "",
+      state: "",
+      maker: "",
+      dutydate_month: "",
+      spare: "",
     },
-
+    onSubmit: (values) => {
+      // I am not sure if I need to using type guard here since the form already validates the value.
+      mutate(values.value as MoldInfoInsertParams);
+    },
   });
   return (
     <div className="mb-4 inline-block">
@@ -79,10 +66,9 @@ export default function CreateMoldTanstackForm({
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log(form.handleSubmit);
             form.handleSubmit();
           }}
-          className="m-auto grid w-fit grid-flow-row grid-cols-2 gap-8 text-nowrap border p-2"
+          className="grid grid-flow-row grid-cols-2 gap-8 text-nowrap p-2"
         >
           <div>
             <form.Field
@@ -111,11 +97,11 @@ export default function CreateMoldTanstackForm({
                 <>
                   <label
                     htmlFor="mold_num"
-                    className="flex h-full items-center justify-between gap-4 p-2"
+                    className="relative flex h-full items-center justify-between gap-4 p-2"
                     onBlur={() => setUserIsStillEditing(false)}
                     onFocus={() => setUserIsStillEditing(true)}
                   >
-                    <span className="w-1/4">系列</span>
+                    <span className="w-1/4">系列 *</span>
                     <span className="w-3/4">
                       <Select<MoldInfoInsertParams["sys"]>
                         onChange={(e) => {
@@ -143,14 +129,13 @@ export default function CreateMoldTanstackForm({
               name="mold_num"
               validators={{
                 onBlur: ({ value }) => {
-                  if (!regexforMoldNumInput.test(value as string)) {
+                  if (!regexForMoldNumInput.test(value as string)) {
                     return "模號格式錯誤";
                   }
                   return undefined;
                 },
                 onChange: ({ value }) => {
-                  console.log(value);
-                  if (!regexforMoldNumInput.test(value as string)) {
+                  if (!regexForMoldNumInput.test(value as string)) {
                     return "模號格式錯誤";
                   }
                   if ((value as any) === "") {
@@ -166,14 +151,15 @@ export default function CreateMoldTanstackForm({
                 <>
                   <label
                     htmlFor="mold_num"
-                    className="flex h-full items-center justify-between gap-4 p-2"
+                    className="relative flex h-full items-center justify-between gap-4 p-2"
                     onBlur={() => setUserIsStillEditing(false)}
                     onFocus={() => setUserIsStillEditing(true)}
                   >
-                    <span className="w-1/4">模號</span>
-                    <span className="relative w-3/4">
+                    <span className="w-1/4">模號 *</span>
+                    <span className="w-3/4">
                       <Input
                         type="text"
+                        disabled={!!snNumData}
                         maxLength={2}
                         value={field.state.value}
                         onChange={(e) => {
@@ -196,17 +182,16 @@ export default function CreateMoldTanstackForm({
                 <>
                   <label
                     htmlFor="sn_num"
-                    className="flex h-full items-center justify-between gap-4 p-2"
+                    className="relative flex h-full items-center justify-between gap-4 p-2"
                   >
-                    <span className="w-1/4">模號</span>
-                    <span className="relative w-3/4">
+                    <span className="w-1/4">唯一碼 *</span>
+                    <span className="w-3/4">
                       <Input
                         type="text"
                         value={snNumData && snNumData[0]}
                         readOnly
                         onChange={(e) => {
                           field.handleChange(e.target.value);
-                          setMoldNum(e.target.value);
                         }}
                       />
                     </span>
@@ -238,17 +223,18 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="prod_name_board"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">名板</span>
-                        <span className="relative w-3/4">
+                        <span className="w-1/4">名板 *</span>
+                        <span className="w-3/4">
                           <Input
                             type="text"
                             onChange={(e) => field.handleChange(e.target.value)}
+                            value={field.state.value}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -271,19 +257,20 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="prod_name_nocolor"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">定義品名</span>
-                        <span className="relative w-3/4">
+                        <span className="w-1/4">定義品名 *</span>
+                        <span className="w-3/4">
                           <Input
                             type="text"
                             onChange={(e) =>
                               field.handleChange(e.target.value as string)
                             }
+                            value={field.state.value}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -293,6 +280,13 @@ export default function CreateMoldTanstackForm({
                   name="hole_num"
                   validators={{
                     onChange: ({ value }) => {
+                      if (
+                        !regexForNumberOnlyInput.test(
+                          value as unknown as string,
+                        )
+                      ) {
+                        return "模穴數格式錯誤";
+                      }
                       if ((value as any) === "") {
                         return "模穴數為必填";
                       }
@@ -306,20 +300,21 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="hole_num"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">模穴數</span>
-                        <span className="relative w-3/4">
+                        <span className="w-1/4">模穴數 *</span>
+                        <span className="w-3/4">
                           <Input
                             type="text"
-                            pattern="[0-9]*"
+                            pattern="^[0-9]*$"
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))
                             }
+                            value={field.state.value}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -330,10 +325,17 @@ export default function CreateMoldTanstackForm({
                   validators={{
                     onChangeListenTo: ["hole_num"],
                     onChange: ({ value, fieldApi }) => {
+                      if (
+                        !regexForNumberOnlyInput.test(
+                          value as unknown as string,
+                        )
+                      ) {
+                        return "模穴數格式錯誤";
+                      }
                       if ((value as any) === "") {
                         return "塞穴數為必填";
                       }
-                      if (!value) {
+                      if (value !== 0 && !value) {
                         return "塞穴數為必填";
                       }
                       if (value < 0) {
@@ -342,6 +344,7 @@ export default function CreateMoldTanstackForm({
                       if (value > fieldApi.form.getFieldValue("hole_num")) {
                         return "塞穴數不可大於模穴數";
                       }
+
                       return undefined;
                     },
                   }}
@@ -349,20 +352,21 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="block_num"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">塞穴數</span>
-                        <span className="relative w-3/4">
+                        <span className="w-1/4">塞穴數 *</span>
+                        <span className="w-3/4">
                           <Input
                             type="text"
                             pattern="[0-9]*"
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))
                             }
+                            value={field.state.value}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -386,17 +390,17 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="property_num"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">財產編號</span>
+                        <span className="w-1/4">財產編號 *</span>
                         <span className="relative w-3/4">
                           <Input
                             type="text"
                             onChange={(e) => field.handleChange(e.target.value)}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -424,8 +428,10 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="pnb_state"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">名版狀態 *</span>
+                        <span className="w-3/4">
                           <Select<"done" | "incomplete" | "">
                             onSelect={(e) => field.handleChange(e.value)}
                             options={[
@@ -439,8 +445,8 @@ export default function CreateMoldTanstackForm({
                             ]}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -464,8 +470,10 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="brand"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">品牌 *</span>
+                        <span className="w-3/4">
                           <Select<number>
                             onSelect={(e) => field.handleChange(Number(e))}
                             options={[
@@ -475,8 +483,8 @@ export default function CreateMoldTanstackForm({
                             ]}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -500,15 +508,17 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="property"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">財產歸屬 *</span>
+                        <span className="w-3/4">
                           <Select<string>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={propertyOptions}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -532,15 +542,17 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="property"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">位置 *</span>
+                        <span className="w-3/4">
                           <Select<Site>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={siteOptions}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -564,15 +576,17 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="state"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">狀態 *</span>
+                        <span className="w-3/4">
                           <Select<MoldInfoInsertParams["state"]>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={statusOptions}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -596,15 +610,17 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="maker"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
+                        <span className="w-1/4">廠商代號 *</span>
+                        <span className="w-3/4">
                           <Select<MoldInfoInsertParams["maker"]>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={makerOptions}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
@@ -616,10 +632,10 @@ export default function CreateMoldTanstackForm({
                     <>
                       <label
                         htmlFor="dutydate_month"
-                        className="flex h-full items-center justify-between gap-4 p-2"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
                       >
                         <span className="w-1/4">開模日期</span>
-                        <span className="relative w-3/4">
+                        <span className="w-3/4">
                           <Input
                             id="dutydate_month"
                             type="date"
@@ -628,13 +644,13 @@ export default function CreateMoldTanstackForm({
                             onChange={(e) => field.handleChange(e.target.value)}
                           />
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
               </div>
-              <div>
+              <div className="col-span-2">
                 <form.Field
                   name="dutydate_month"
                   children={(field) => (
@@ -643,37 +659,47 @@ export default function CreateMoldTanstackForm({
                         htmlFor="spare"
                         className="flex h-full items-center justify-between gap-4 p-2"
                       >
-                        <span className="w-1/4">備註</span>
-                        <span className="relative w-3/4">
+                        {/* 1/4 = 25% 25% / 2 = 12.5%  */}
+                        <span className="w-[12.5%]">備註</span>
+                        <span className="w-full">
                           <textarea
                             name="spare"
                             id="spare"
-                            className="rounded-md border"
+                            className="w-full rounded-md border"
                           ></textarea>
                         </span>
+                        <FieldInfo field={field} />
                       </label>
-                      <FieldInfo field={field} />
                     </>
                   )}
                 />
               </div>
 
-              <div className="col-span-2 outline">
+              <div className="col-span-2">
                 <form.Subscribe
                   selector={(state) => ({
                     ...state,
                     canSubmit: state.canSubmit,
                     isSubmitting: state.isSubmitting,
                   })}
-                  children={({ canSubmit, isSubmitting }) => (
-                    <button
-                      type="submit"
-                      disabled={!canSubmit || isSubmitting}
-                      className="ml-auto rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                    >
-                      Submit
-                    </button>
-                  )}
+                  children={({ canSubmit, isSubmitting, isDirty }) => {
+                    const isBTNDisabled =
+                      !canSubmit || isSubmitting || !isDirty;
+                    return (
+                      <button
+                        type="submit"
+                        disabled={isBTNDisabled}
+                        className={clsx(
+                          "ml-auto block rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700",
+                          {
+                            "cursor-not-allowed opacity-50": isBTNDisabled,
+                          },
+                        )}
+                      >
+                        Submit
+                      </button>
+                    );
+                  }}
                 />
               </div>
             </>
@@ -688,61 +714,63 @@ function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
   return (
     <>
       {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <em>{field.state.meta.errors.join(", ")}</em>
+        <em className="absolute left-24 top-12 text-red-500">
+          {field.state.meta.errors.join(", ")}
+        </em>
       ) : null}
       {field.state.meta.isValidating ? "Validating..." : null}
     </>
   );
 }
 
-function requiredValidator(value: any) {
-  if (!value) {
-    return "必填";
-  }
-  return undefined;
-}
+// function requiredValidator(value: any) {
+//   if (!value) {
+//     return "必填";
+//   }
+//   return undefined;
+// }
 
-function renderSelectField(
-  field: FieldApi<any, any, any>,
-  label: string,
-  options: Option[],
-  setFunc: Function,
-) {
-  return (
-    <div>
-      <label htmlFor={field.name}>{label}</label>
-      <Select
-        value={field.state.value}
-        onChange={(e) => field.handleChange(e.text)}
-        onSelect={(e) => {
-          field.handleChange(e.text);
-          setFunc((prev: any) => {
-            return { ...prev, [field.name]: e.text };
-          });
-        }}
-        onBlur={field.handleBlur}
-        options={options}
-      />
-      <FieldInfo field={field} />
-    </div>
-  );
-}
-function renderInputField(
-  field: FieldApi<any, any, any>,
-  label: string,
-  readOnly = false,
-) {
-  return (
-    <div>
-      <label htmlFor={field.name}>{label}</label>
-      <Input
-        id={field.name}
-        value={field.state.value}
-        readOnly={readOnly}
-        onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
-      />
-      <FieldInfo field={field} />
-    </div>
-  );
-}
+// function renderSelectField(
+//   field: FieldApi<any, any, any>,
+//   label: string,
+//   options: Option[],
+//   setFunc: Function,
+// ) {
+//   return (
+//     <div>
+//       <label htmlFor={field.name}>{label}</label>
+//       <Select
+//         value={field.state.value}
+//         onChange={(e) => field.handleChange(e.text)}
+//         onSelect={(e) => {
+//           field.handleChange(e.text);
+//           setFunc((prev: any) => {
+//             return { ...prev, [field.name]: e.text };
+//           });
+//         }}
+//         onBlur={field.handleBlur}
+//         options={options}
+//       />
+//       <FieldInfo field={field} />
+//     </div>
+//   );
+// }
+// function renderInputField(
+//   field: FieldApi<any, any, any>,
+//   label: string,
+//   readOnly = false,
+// ) {
+//   return (
+//     <div>
+//       <label htmlFor={field.name}>{label}</label>
+//       <Input
+//         id={field.name}
+//         value={field.state.value}
+//         readOnly={readOnly}
+//         onBlur={field.handleBlur}
+//         onChange={(e) => field.handleChange(e.target.value)}
+//       />
+//       <FieldInfo field={field} />
+//     </div>
+//   );
+// }
