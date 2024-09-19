@@ -8,18 +8,21 @@ export type MakerName = Maker["name_big5"];
 
 export type Site = "GD" | "HP" | "DL" | "D08" | "停用";
 
-export type MoldStatus =
-  | "開發中"
-  | "製模中"
-  | "待生產"
-  | "待驗收"
-  | "生產中"
-  | "待維修"
-  | "維修中"
-  | "待轉回"
-  | "移轉中"
-  | "待報廢"
-  | "已報廢";
+const moldStatus = [
+  "開發中",
+  "製模中",
+  "待生產",
+  "待驗收",
+  "生產中",
+  "待維修",
+  "維修中",
+  "待轉回",
+  "移轉中",
+  "待報廢",
+  "已報廢",
+] as const;
+
+export type MoldStatus = typeof moldStatus[number];
 
 export type BlockNum = PostData["data"][number]["block_num"];
 
