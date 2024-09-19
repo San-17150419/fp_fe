@@ -12,7 +12,6 @@ type EventProps = {
   dutydate_last: string;
 };
 
-
 // TODO: Data is fetched upon demand. So data is not always ready when modal is fully rendered. The issue is I am not sure why certain table takes longer to render. Even if other table has significantly more data. 1. Add visual cue to inform users data is being fetched. 2. Check the time for table to be ready is caused by the time it takes to fetch data or something else.
 // This is for 最後上機
 // TODO: If Loading component is shown, it should be shown at least for 1 second(or less). Because sometimes, the data is ready almost immediately. The UX is very inconsistent.
@@ -33,7 +32,7 @@ export default function LogData({ sn_num, site, dutydate_last }: EventProps) {
       });
       return response.data;
     },
-    enabled: open,
+    enabled: false,
   });
   const { t } = useTranslation();
 
@@ -60,7 +59,6 @@ export default function LogData({ sn_num, site, dutydate_last }: EventProps) {
           {isSuccess && (
             <div className="mx-auto min-w-[50vw] px-1 py-4">
               <div className="relative mx-auto max-h-[70vh] max-w-full overflow-auto px-2">
-                {/* <div className="mx-auto max-w-[90%] max-h-[80vh] bg-red-200 overflow-auto"> */}
                 <table className="h-full w-full table-auto border-separate border-spacing-0">
                   <thead className="sticky top-0 z-10 backdrop-opacity-0">
                     <tr>
