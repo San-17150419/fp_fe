@@ -12,7 +12,7 @@ import clsx from "clsx";
 
 // TODO: Make is controlled component. I should be able to reset the value from outside
 
-export default function Select({
+export default function Select<T>({
   options,
   className,
   onSelect,
@@ -21,14 +21,16 @@ export default function Select({
   disabled = false,
   required = false,
   reuquiredText = "Required",
-}: SelectProps) {
+}: SelectProps<T>) {
   const { t } = useTranslation();
 
   // TODO: The red border added when invalid is triggered did not disappear after the Select component loses focus. I am not sure if I want this behavior or not. It does tell the user that the input is invalid. But it does not behave like a native select. Either I add a another useEffect to remove the style after the input loses focus or modified how the style is applied or even have another state to control this. One thing I need to consider is do I want my Select component to behave like a native select or not. It might be easier to implement the required message in the Select component. But if I insist to show the required message after the submit button is clicked, I might not be able to implement the required message in the Select component. I might need to create a form component to encapsulate the logic. (composition component pattern plus context api)
   // If user wish to add a placeholder, add it to options.
-  const [selectedOption, setSelectedOption] = useState<Option>(
-    defaultValue || options[0],
+  const defaultOption: Option<T> = options[0];
+  const [selectedOption, setSelectedOption] = useState<Option<T>>(
+    defaultValue || defaultOption,
   );
+
   const selectRef = useRef<HTMLSelectElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -51,7 +53,7 @@ export default function Select({
     };
   }, [required, selectedOption]);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: Option<T>) => {
     setIsInvalid(false); // reset
     if (onSelect) {
       onSelect(option);
@@ -70,12 +72,12 @@ export default function Select({
           tabIndex={-1}
           ref={selectRef}
         >
-          <option value={selectedOption.value}></option>
+          <option value={selectedOption.value as string}></option>
         </select>
       )}
       <Listbox
-        value={selectedOption}
-        onChange={handleSelect}
+        value={options.find((option) => option.value === selectedOption)}
+        onChange={(option) => handleSelect(option)}
         disabled={disabled}
         defaultValue={defaultValue}
         name={name}
@@ -99,7 +101,9 @@ export default function Select({
                 isInvalid && !open && "border border-red-500",
               )}
             >
-              <p className="max-w-4/5 truncate">{t(selectedOption.text)}</p>
+              <p className="max-w-4/5 truncate">
+                {t(selectedOption?.text || "")}
+              </p>
               <PiCaretDownBold
                 className={clsx(
                   "ml-auto duration-150",
@@ -131,22 +135,22 @@ export default function Select({
   );
 }
 
-export type Option = {
+export type Option<T> = {
   text: string;
-  value: string | number;
+  value: T;
   id: string | number;
 };
-type SelectProps = {
-  options: Option[];
+type SelectProps<T> = {
+  options: Option<T>[];
   name?: string;
   className?: string;
-  onSelect?: (option: Option) => void;
-  defaultValue?: Option;
+  onSelect?: (option: Option<T>) => void;
+  defaultValue?: Option<T>;
   disabled?: boolean;
   required?: boolean;
-  value?: Option;
+  value?: Option<T>["value"] | Option<T>["text"];
   reuquiredText?: string;
   onBlur?: () => void;
   onFocus?: () => void;
-  onChange?: (option: Option) => void;
+  onChange?: (option: Option<T>) => void;
 };
