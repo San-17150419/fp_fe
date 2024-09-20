@@ -13,13 +13,11 @@ import "react-toastify/dist/ReactToastify.css";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "createSN/";
+
 // TODO: Note! In `CreateMold` component, option for 模仁 in sys is not shown. This case required addtional api call. It is possible that I will be forced to write a separate function to get sn_num for 模仁 if I can't fit it into getNewSnNum function.
-
-// TODO: Incoporate  192.168.123.240:9000/api/engms/createSN/ to get sn_num before creating new mold
-
 // TODO: I still have almost 2000 event listeners in the app.
 // TODO: BUG! When switching between factory log and engineer department, the number of event listener and DOM Nodes skyrockets. It does drop down
-// TODO: I am considering separating this hook into two hooks. One for fetching `sn_num` and another for `createMold`
 export default function useCreateMold() {
   const [mold_num, setMoldNum] = useState<string>("");
   const [sys, setSys] = useState<Sys>();
@@ -93,7 +91,6 @@ export default function useCreateMold() {
   });
 
   const clearForm = () => {
-    //
     queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
     setSnTarget("");
     setMoldNum("");
@@ -122,7 +119,6 @@ export default function useCreateMold() {
 const getNewSnNum = async <T>(
   params: GetNewSNPForSys<T>,
 ): Promise<Array<string>> => {
-  const api = "http://192.168.123.240:9000/api/engms/createSN/";
   const response = await axios.post<GetNewSNPForSysResponse<T>>(api, params);
   if ("sn_num_sub" in response.data) {
     return [response.data.sn_num, response.data.sn_num_sub];
