@@ -15,7 +15,7 @@ export default function FactoryLog() {
   useEffect(() => {
     const fetchPreData = async () => {
       try {
-        const response = await axios.get<FactoryLogPreData>(`${api}/pre-data/`);
+        const response = await axios.get<FactoryLogPreData>(`${api}pre-data/`);
         const data = response.data;
         const { factory, point, date_type, dep } = data.preData;
         setPreData({ factory, point, date_type, dep });
