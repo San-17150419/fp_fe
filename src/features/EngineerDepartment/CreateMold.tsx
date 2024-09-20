@@ -24,7 +24,7 @@ export type InputConfig = {
 export type SelectConfig = {
   name: string;
   text: string;
-  options: Array<Option>;
+  options: Array<Option<unknown>>;
 };
 
 const regexforMoldNumInput = /^[A-Za-z]$|^A1$/;
@@ -97,7 +97,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
     if (!showModal) {
       clearForm();
       setMoldNum("");
-      setSys("");
+      setSys(undefined);
       setIsMoldNumValid(false);
     }
   }, [showModal]);
@@ -132,7 +132,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
                 disabled={!isFetchingSnNumPending}
                 // unable to reset.
                 required={true}
-                value={seriesOptions.find((option) => option.text === sys)}
+                value={seriesOptions.find((option) => option.text === sys)?.value}
                 onSelect={(option) => {
                   setSys(option.text as Sys);
                 }}
