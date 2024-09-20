@@ -10,6 +10,7 @@ export default function Sidebar() {
     ["工廠日誌", "/"],
     ["工程部", "/EngineerDepartment"],
     // ["表單", "/test"],
+    ["倉庫", "/Warehouse"],
     // ["按鈕", "/button"],
     // ["標籤", "/tab"],
     // ["圖表", "/highcharts"],
@@ -99,6 +100,7 @@ export default function Sidebar() {
             </NavLink>
           ))}
         </div>
+        {/* <LinkGroup /> */}
       </Transition>
     </div>
   );

@@ -140,6 +140,15 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/Warehouse",
+        lazy: async () => {
+          let { default: Warehouse } = await import("./pages/Warehouse");
+          return {
+            Component: Warehouse,
+          };
+        },
+      },
     ],
   },
 
