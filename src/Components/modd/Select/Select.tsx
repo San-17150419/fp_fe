@@ -16,6 +16,7 @@ export default function Select<T>({
   options,
   className,
   onSelect,
+  onChange,
   name,
   defaultValue,
   disabled = false,
@@ -32,7 +33,7 @@ export default function Select<T>({
   const [selectedOption, setSelectedOption] = useState<Option<T>>(
     defaultValue || defaultOption,
   );
-
+  console.log(value);
   const selectRef = useRef<HTMLSelectElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -40,7 +41,7 @@ export default function Select<T>({
 
   //  Sync selectedOption with external value (Enable consumer to set value such as reset )
   useEffect(() => {
-  // TODO: Test performance. 
+    // TODO: Test performance.
     if (value !== undefined) {
       const newSelectedOption = options.find(
         (option) => option.value === value,
@@ -49,6 +50,8 @@ export default function Select<T>({
         setSelectedOption(newSelectedOption);
       }
     }
+    // TODO: This is for when value is reset to undefined.
+    setSelectedOption(defaultValue || defaultOption);
   }, [value, options]);
   useEffect(() => {
     const transferFocusToButtonWhenInvalidEventFired = () => {
@@ -72,6 +75,9 @@ export default function Select<T>({
     setIsInvalid(false); // reset
     if (onSelect) {
       onSelect(option);
+    }
+    if (onChange) {
+      onChange(option);
     }
     setSelectedOption(option);
   };

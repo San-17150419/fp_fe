@@ -116,6 +116,7 @@ export default function CreateMoldTanstackForm({
                     <span className="w-3/4">
                       <Select<MoldInfoInsertParams["sys"]>
                         onChange={(e) => {
+                          console.log(e);
                           field.handleChange(e.value);
                         }}
                         onSelect={(e) => {
@@ -495,7 +496,17 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">品牌 *</span>
                         <span className="w-3/4">
                           <Select<number>
-                            onSelect={(e) => field.handleChange(Number(e))}
+                            onSelect={(e) => {
+                              console.log(e);
+
+                              field.handleChange(Number(e));
+                            }}
+                            value={field.state.value}
+                            onChange={(e) => {
+                              console.log(e);
+
+                              field.handleChange(Number(e));
+                            }}
                             options={[
                               { id: "1", text: "無", value: 0 },
                               { id: "2", text: "第一品牌", value: 1 },
@@ -567,8 +578,13 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">位置 *</span>
                         <span className="w-3/4">
                           <Select<Site>
-                            onSelect={(e) => field.handleChange(e.value)}
+                            onSelect={(e) => {
+                              console.log(e);
+                              console.log(e.value);
+                              field.handleChange(e.value);
+                            }}
                             options={siteOptions}
+                            value={field.state.value as Site}
                           />
                         </span>
                         <FieldInfo field={field} />
@@ -603,6 +619,9 @@ export default function CreateMoldTanstackForm({
                           <Select<MoldInfoInsertParams["state"]>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={statusOptions}
+                            value={
+                              field.state.value as MoldInfoInsertParams["state"]
+                            }
                           />
                         </span>
                         <FieldInfo field={field} />
@@ -637,6 +656,9 @@ export default function CreateMoldTanstackForm({
                           <Select<MoldInfoInsertParams["maker"]>
                             onSelect={(e) => field.handleChange(e.value)}
                             options={makerOptions}
+                            value={
+                              field.state.value as MoldInfoInsertParams["maker"]
+                            }
                           />
                         </span>
                         <FieldInfo field={field} />
@@ -695,7 +717,7 @@ export default function CreateMoldTanstackForm({
                 />
               </div>
 
-              <div className="col-span-2">
+              <div className="col-span-2 flex">
                 <form.Subscribe
                   selector={(state) => ({
                     ...state,
@@ -719,7 +741,11 @@ export default function CreateMoldTanstackForm({
                         >
                           Submit
                         </button>
-                        <button type="reset" onClick={handleReset}>
+                        <button
+                          type="reset"
+                          className="ml-auto block rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+                          onClick={handleReset}
+                        >
                           reset
                         </button>
                       </>
