@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "../../../../Components/modd/Select/Select";
 import Input from "../../../../Components/modd/Input/InputBase";
 import { type PreFilterData } from "../../hooks/useENGDepartmentPreData";
@@ -23,6 +23,7 @@ export default function CreateMoldTanstackForm({
     isFetchingSnNumPending,
     setUserIsStillEditing,
     mutate,
+    clearForm,
   } = useCreateMold();
   const regexForMoldNumInput = /^[A-Za-z]$|^A1$/;
   const regexForNumberOnlyInput = /^[0-9]*$/;
@@ -43,14 +44,24 @@ export default function CreateMoldTanstackForm({
       site: "",
       state: "",
       maker: "",
-      dutydate_month: "",
+      dutydate_month: "0000-00-00",
       spare: "",
     },
     onSubmit: (values) => {
       // I am not sure if I need to using type guard here since the form already validates the value.
-      mutate(values.value as MoldInfoInsertParams);
+      mutate(values.value as unknown as MoldInfoInsertParams);
     },
   });
+  const handleReset = () => {
+    // call clearForm() first. Otherwise, the default value form.reset() reset to is still the old value.
+    clearForm();
+    form.reset();
+  };
+  useEffect(() => {
+    if (!showModal) {
+      handleReset();
+    }
+  }, [showModal]);
   return (
     <div className="mb-4 inline-block">
       <div
@@ -188,7 +199,7 @@ export default function CreateMoldTanstackForm({
                     <span className="w-3/4">
                       <Input
                         type="text"
-                        value={snNumData && snNumData[0]}
+                        defaultValue={snNumData && snNumData[0]}
                         readOnly
                         onChange={(e) => {
                           field.handleChange(e.target.value);
@@ -307,9 +318,13 @@ export default function CreateMoldTanstackForm({
                           <Input
                             type="text"
                             pattern="^[0-9]*$"
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (!!value)
+                                if (!!Number(value)) {
+                                  field.handleChange(Number(value));
+                                }
+                            }}
                             value={field.state.value}
                           />
                         </span>
@@ -359,9 +374,14 @@ export default function CreateMoldTanstackForm({
                           <Input
                             type="text"
                             pattern="[0-9]*"
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (!!value)
+                                if (!!Number(value)) {
+                                  field.handleChange(Number(value));
+                                }
+                            }}
+                            placeholder={field.state.value === 0 ? "" : "0"}
                             value={field.state.value}
                           />
                         </span>
@@ -686,18 +706,23 @@ export default function CreateMoldTanstackForm({
                     const isBTNDisabled =
                       !canSubmit || isSubmitting || !isDirty;
                     return (
-                      <button
-                        type="submit"
-                        disabled={isBTNDisabled}
-                        className={clsx(
-                          "ml-auto block rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700",
-                          {
-                            "cursor-not-allowed opacity-50": isBTNDisabled,
-                          },
-                        )}
-                      >
-                        Submit
-                      </button>
+                      <>
+                        <button
+                          type="submit"
+                          disabled={isBTNDisabled}
+                          className={clsx(
+                            "ml-auto block rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700",
+                            {
+                              "cursor-not-allowed opacity-50": isBTNDisabled,
+                            },
+                          )}
+                        >
+                          Submit
+                        </button>
+                        <button type="reset" onClick={handleReset}>
+                          reset
+                        </button>
+                      </>
                     );
                   }}
                 />
