@@ -1,12 +1,14 @@
-import React from "react";
-import Select from "../Components/modd/Select/Select";
+import { useState } from "react";
+import Modal from "../Components/modd/Modal/NonDialogModal";
 import { LuUpload } from "react-icons/lu";
 export default function Warehouse() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="flex gap-x-24 mb-5">
+    <div className="mb-5 flex gap-x-24">
+      <button onClick={() => setIsOpen(true)}>Open</button>
       <form
         action=""
-        className="flex  w-[600px] h-fit flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
+        className="flex h-fit w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
         // className="grid h-full w-[600px] grid-cols-2 space-x-4 space-y-3 bg-white px-12 py-4 shadow-lg shadow-gray-500"
       >
         <h1 className="border-b-2 border-black py-2 text-center text-2xl font-semibold">
@@ -139,7 +141,9 @@ export default function Warehouse() {
             htmlFor=""
             className="col-span-2 flex flex-col gap-4 border-b-2"
           >
-            <span className="font-extrabold text-red-400 text-lg">退貨產品 *</span>
+            <span className="text-lg font-extrabold text-red-400">
+              退貨產品 *
+            </span>
             <input type="text" />
           </label>
           <label
@@ -157,9 +161,17 @@ export default function Warehouse() {
             <span>單位 </span>
             <select name="" id=""></select>
           </label>
-          <label htmlFor="" className="flex col-span-2 flex-col gap-2 row-span-2  ">
+          <label
+            htmlFor=""
+            className="col-span-2 row-span-2 flex flex-col gap-2"
+          >
             <span> 備註 * </span>
-            <textarea className="w-full border rounded-md" name="" id="" rows={3}></textarea>
+            <textarea
+              className="w-full rounded-md border"
+              name=""
+              id=""
+              rows={3}
+            ></textarea>
           </label>
         </div>
 
@@ -168,6 +180,85 @@ export default function Warehouse() {
           確認上傳
         </button>
       </form>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <table className="w-fit table-auto border-separate bg-white border-spacing-0 text-nowrap align-middle">
+          <thead>
+            <tr>
+              <Th rowSpan={2}>檢驗項目</Th>
+              <Th rowSpan={2}>抽樣數</Th>
+              <Th colSpan={3}>(AC/不良數)</Th>
+              <Th rowSpan={2}>檢驗記錄</Th>
+              <Th rowSpan={2}>結果</Th>
+            </tr>
+            <tr>
+              <Th>嚴重</Th>
+              <Th>主要</Th>
+              <Th>次要</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 12 }).map((_, index) => (
+              <tr>
+                <Td>A</Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td></Td>
+                <Td>
+                  <input type="text" name="1" id="1" title='1' className="w-1/5" />
+                  <input type="text" name="1" id="2" title='1' className="w-1/5" />
+                  <input type="text" name="1" id="3" title='1' className="w-1/5" />
+                  <input type="text" name="1" id="4" title='1' className="w-1/5" />
+                  <input type="text" name="1" id="5" title='1' className="w-1/5" />
+                </Td>
+                <Td></Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Modal>
     </div>
+  );
+}
+
+function Th({
+  children,
+  rowSpan,
+  colSpan,
+}: {
+  key?: string;
+  children?: React.ReactNode;
+  rowSpan?: number;
+  colSpan?: number;
+}) {
+  return (
+    <th
+      colSpan={colSpan || 1}
+      rowSpan={rowSpan || 1}
+      className="h-[75px] min-w-[85px] max-w-[300px] text-nowrap border border-gray-400 p-3 text-center"
+    >
+      {children}
+    </th>
+  );
+}
+
+function Td({
+  children,
+  rowSpan,
+  colSpan,
+}: {
+  key?: string;
+  children?: React.ReactNode;
+  rowSpan?: number;
+  colSpan?: number;
+}) {
+  return (
+    <td
+      colSpan={colSpan || 1}
+      rowSpan={rowSpan || 1}
+      className="h-[75px] min-w-[100px] max-w-[800px] text-nowrap border border-gray-400 p-2 text-center"
+    >
+      {children}
+    </td>
   );
 }
