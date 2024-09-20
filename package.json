@@ -48,8 +48,10 @@
     "source-map-explorer": "^2.5.3",
     "tailwind-merge": "^2.4.0",
     "uuid": "^10.0.0",
+    "vite-plugin-mkcert": "^1.17.6",
     "web-vitals": "^2.1.4",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
   },
   "scripts": {
     "dev": "vite",
