@@ -18,7 +18,6 @@ export default function useFilterState(
   preData: PreData,
   defaultDateStart?: string,
 ) {
-  // TODO: refactor how to handle default value. 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [factory, setFactory] = useState<Factory | null>("GD");
@@ -93,7 +92,7 @@ export default function useFilterState(
     };
 
     fetchFactoryLogRawData(
-      "http://192.168.123.240:9000/api/fj/raw-data/",
+      `${api}/raw-data/`,
       params,
     ).then(() => setIsLoading(false));
   };
