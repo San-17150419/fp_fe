@@ -32,7 +32,7 @@ export default function CreateMoldSubComponent({
   ];
   const selectheaders: Array<{
     readonly: boolean;
-    options: Array<Option>;
+    options: Array<Option<unknown>>;
     name: string;
     text: string;
     required?: boolean;
