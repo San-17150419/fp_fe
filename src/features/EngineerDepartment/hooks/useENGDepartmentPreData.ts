@@ -21,13 +21,6 @@ export default function useENGDepartmentPreData() {
   if (error) return { isPending: false, error, data: null };
 
   return { isPending: false, error: null, data };
-
-  //   return {
-  //     isPending,
-  //     isLoading,
-  //     error,
-  //     data: data,
-  //   };
 }
 
 export type PreFilterData = {
