@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ComboBox from "./ComboBox";
 import { type FilterData } from "./types";
-import Loading from "../../Components/Loading";
 import Table from "./Table";
 
 // TODO
