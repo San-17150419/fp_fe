@@ -35,24 +35,31 @@ export default function useCreateMold() {
   } = useQuery<string[]>({
     queryKey: ["newMoldSnNum"],
     queryFn: () => {
-      if (!sys || !mold_num) {
+      if (!sys) throw new Error("sys is empty");
+      if (sys === "模仁" && !sn_target) {
+        throw new Error("sn_target is empty");
+      }
+      if (sys !== "模仁" && !mold_num) {
         throw new Error(
-          " This should not be triggered when sys or mold_num is empty",
+          "mold_num is empty when sys is not 模仁",
         );
       }
       // if (!sys || !mold_num) return;
       if (sys === "模仁") {
         const params: GetNewSNPForSys<typeof sys> = {
           sys: sys,
-          mold_num: "",
           sn_target,
         };
         return getNewSnNum<typeof sys>(params);
       } else {
-        return getNewSnNum<typeof sys>({ sys, mold_num, sn_target: "" });
+        return getNewSnNum<typeof sys>({ sys, mold_num });
       }
     },
-    enabled: !!sys && !!mold_num && !userIsStillEditing,
+
+    enabled:
+      !!sys &&
+      !userIsStillEditing &&
+      (sys === "模仁" ? !!sn_target : !!mold_num),
   });
   // crud
   const { mutate, isPending, error, isSuccess } = useMutation({

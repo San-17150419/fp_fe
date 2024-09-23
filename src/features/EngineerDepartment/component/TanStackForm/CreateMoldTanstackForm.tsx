@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import Select from "../../../../Components/modd/Select/Select";
+import FieldInfo from "./FieldInfo";
 import Input from "../../../../Components/modd/Input/InputBase";
 import { type PreFilterData } from "../../hooks/useENGDepartmentPreData";
 import { Site, type MoldInfoInsertParams } from "../../types";
 import Modal from "../../../../Components/modd/Modal/NonDialogModal";
-import { useForm, type FieldApi } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import useCreateMold from "../../hooks/useCreateMold";
 import clsx from "clsx";
+import FormInputFiled from "./FormInputField";
 export default function CreateMoldTanstackForm({
   seriesOptions,
   makerOptions,
@@ -24,6 +26,7 @@ export default function CreateMoldTanstackForm({
     setUserIsStillEditing,
     mutate,
     clearForm,
+    setSnTarget,
   } = useCreateMold();
   const regexForMoldNumInput = /^[A-Za-z]$|^A1$/;
   const regexForNumberOnlyInput = /^[0-9]*$/;
@@ -32,11 +35,12 @@ export default function CreateMoldTanstackForm({
     defaultValues: {
       sys: sys,
       mold_num: mold_num,
-      sn_num: snNumData ? snNumData[0] : "",
+      sn_target: "",
+      sn_num: "",
       prod_name_board: "",
       prod_name_nocolor: "",
-      hole_num: 0,
-      block_num: 0,
+      hole_num: "",
+      block_num: "",
       property_num: "",
       pnb_state: "",
       brand: 0,
@@ -48,8 +52,20 @@ export default function CreateMoldTanstackForm({
       spare: "",
     },
     onSubmit: (values) => {
+      if (snNumData === undefined) return;
+      const newValues: MoldInfoInsertParams = {
+        ...values.value,
+        hole_num: Number(values.value["hole_num"]),
+        block_num: Number(values.value.block_num),
+        sys: values.value.sys as MoldInfoInsertParams["sys"],
+        site: values.value.site as MoldInfoInsertParams["site"],
+        state: values.value.state as MoldInfoInsertParams["state"],
+        pnb_state: values.value.pnb_state as MoldInfoInsertParams["pnb_state"],
+        //
+        sn_num: snNumData[0],
+      };
       // I am not sure if I need to using type guard here since the form already validates the value.
-      mutate(values.value as unknown as MoldInfoInsertParams);
+      mutate(newValues);
     },
   });
   const handleReset = () => {
@@ -79,7 +95,7 @@ export default function CreateMoldTanstackForm({
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="grid grid-flow-row grid-cols-2 gap-8 text-nowrap p-2"
+          className="grid grid-flow-row grid-cols-2 gap-4 text-nowrap p-2"
         >
           <div>
             <form.Field
@@ -136,17 +152,72 @@ export default function CreateMoldTanstackForm({
               )}
             />
           </div>
-          <div>
+          <div className={!sys || sys !== "模仁" ? "hidden" : ""}>
+            <form.Field
+              name="sn_target"
+              validators={{
+                onChangeListenTo: ["sys"],
+                onBlur: ({ value, fieldApi }) => {
+                  if (fieldApi.form.getFieldValue("sys") !== "模仁")
+                    return undefined;
+                  if (!value) {
+                    return "目標唯一碼為必填";
+                  }
+                  return undefined;
+                },
+                onChange: ({ value, fieldApi }) => {
+                  if (fieldApi.form.getFieldValue("sys") !== "模仁")
+                    return undefined;
+                  if (!value) {
+                    return "目標唯一碼為必填";
+                  }
+                  return undefined;
+                },
+              }}
+              children={(field) => (
+                <>
+                  <label
+                    htmlFor="sn_target"
+                    className="relative flex h-full items-center justify-between gap-4 p-2"
+                    onBlur={() => setUserIsStillEditing(false)}
+                    onFocus={() => setUserIsStillEditing(true)}
+                  >
+                    <span className="w-1/4">目標唯一碼 *</span>
+                    <span className="w-3/4">
+                      <Input
+                        type="text"
+                        disabled={!!snNumData}
+                        maxLength={2}
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                          setSnTarget(e.target.value);
+                        }}
+                      />
+                    </span>
+                  </label>
+
+                  <FieldInfo field={field} />
+                </>
+              )}
+            />
+          </div>
+          <div className={!sys || sys === "模仁" ? "hidden" : ""}>
             <form.Field
               name="mold_num"
               validators={{
-                onBlur: ({ value }) => {
+                onChangeListenTo: ["sys"],
+                onBlur: ({ value, fieldApi }) => {
+                  if (fieldApi.form.getFieldValue("sys") === "模仁")
+                    return undefined;
                   if (!regexForMoldNumInput.test(value as string)) {
                     return "模號格式錯誤";
                   }
                   return undefined;
                 },
-                onChange: ({ value }) => {
+                onChange: ({ value, fieldApi }) => {
+                  if (fieldApi.form.getFieldValue("sys") === "模仁")
+                    return undefined;
                   if (!regexForMoldNumInput.test(value as string)) {
                     return "模號格式錯誤";
                   }
@@ -187,36 +258,38 @@ export default function CreateMoldTanstackForm({
               )}
             />
           </div>
-          <div>
-            <form.Field
-              name="sn_num"
-              children={(field) => (
-                <>
-                  <label
-                    htmlFor="sn_num"
-                    className="relative flex h-full items-center justify-between gap-4 p-2"
-                  >
-                    <span className="w-1/4">唯一碼 *</span>
-                    <span className="w-3/4">
-                      <Input
-                        type="text"
-                        defaultValue={snNumData && snNumData[0]}
-                        readOnly
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                        }}
-                      />
-                    </span>
-                  </label>
-
-                  <FieldInfo field={field} />
-                </>
-              )}
-            />
-          </div>
 
           {!isFetchingSnNumPending && (
             <>
+              <div>
+                <form.Field
+                  name="sn_num"
+                  children={(field) => (
+                    <>
+                      <label
+                        htmlFor="sn_num"
+                        className="relative flex h-full items-center justify-between gap-4 p-2"
+                      >
+                        <span className="w-1/4">唯一碼 *</span>
+                        <span className="w-3/4">
+                          <Input
+                            type="text"
+                            readOnly
+                            value={snNumData && snNumData[0]}
+                            onChange={() => {
+                              snNumData && field.handleChange(snNumData[0]);
+                            }}
+                            onBlur={() => {
+                              snNumData && field.handleChange(snNumData[0]);
+                            }}
+                          />
+                        </span>
+                      </label>
+                      <FieldInfo field={field} />
+                    </>
+                  )}
+                />
+              </div>
               <div>
                 <form.Field
                   name="prod_name_board"
@@ -233,20 +306,12 @@ export default function CreateMoldTanstackForm({
                   }}
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="prod_name_board"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">名板 *</span>
-                        <span className="w-3/4">
-                          <Input
-                            type="text"
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            value={field.state.value}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        type="text"
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        value={field.state.value}
+                      />
                     </>
                   )}
                 />
@@ -267,22 +332,14 @@ export default function CreateMoldTanstackForm({
                   }}
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="prod_name_nocolor"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">定義品名 *</span>
-                        <span className="w-3/4">
-                          <Input
-                            type="text"
-                            onChange={(e) =>
-                              field.handleChange(e.target.value as string)
-                            }
-                            value={field.state.value}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        type="text"
+                        onChange={(e) =>
+                          field.handleChange(e.target.value as string)
+                        }
+                        value={field.state.value}
+                      />
                     </>
                   )}
                 />
@@ -292,15 +349,8 @@ export default function CreateMoldTanstackForm({
                   name="hole_num"
                   validators={{
                     onChange: ({ value }) => {
-                      if (
-                        !regexForNumberOnlyInput.test(
-                          value as unknown as string,
-                        )
-                      ) {
-                        return "模穴數格式錯誤";
-                      }
-                      if ((value as any) === "") {
-                        return "模穴數為必填";
+                      if (!regexForNumberOnlyInput.test(String(value))) {
+                        return "模穴數需為數字";
                       }
                       if (!value) {
                         return "模穴數為必填";
@@ -310,27 +360,15 @@ export default function CreateMoldTanstackForm({
                   }}
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="hole_num"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">模穴數 *</span>
-                        <span className="w-3/4">
-                          <Input
-                            type="text"
-                            pattern="^[0-9]*$"
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (!!value)
-                                if (!!Number(value)) {
-                                  field.handleChange(Number(value));
-                                }
-                            }}
-                            value={field.state.value}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        type="text"
+                        pattern="^[0-9]*$"
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        value={field.state.value}
+                      />
                     </>
                   )}
                 />
@@ -341,23 +379,16 @@ export default function CreateMoldTanstackForm({
                   validators={{
                     onChangeListenTo: ["hole_num"],
                     onChange: ({ value, fieldApi }) => {
+                      if (!regexForNumberOnlyInput.test(value)) {
+                        return "模穴數需為數字且不可小於0";
+                      }
+                      if (value === "") {
+                        return "塞穴數為必填";
+                      }
                       if (
-                        !regexForNumberOnlyInput.test(
-                          value as unknown as string,
-                        )
+                        Number(value) >
+                        Number(fieldApi.form.getFieldValue("hole_num"))
                       ) {
-                        return "模穴數格式錯誤";
-                      }
-                      if ((value as any) === "") {
-                        return "塞穴數為必填";
-                      }
-                      if (value !== 0 && !value) {
-                        return "塞穴數為必填";
-                      }
-                      if (value < 0) {
-                        return "塞穴數不可為負數";
-                      }
-                      if (value > fieldApi.form.getFieldValue("hole_num")) {
                         return "塞穴數不可大於模穴數";
                       }
 
@@ -366,28 +397,15 @@ export default function CreateMoldTanstackForm({
                   }}
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="block_num"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">塞穴數 *</span>
-                        <span className="w-3/4">
-                          <Input
-                            type="text"
-                            pattern="[0-9]*"
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (!!value)
-                                if (!!Number(value)) {
-                                  field.handleChange(Number(value));
-                                }
-                            }}
-                            placeholder={field.state.value === 0 ? "" : "0"}
-                            value={field.state.value}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        type="text"
+                        pattern="[0-9]*"
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        value={field.state.value}
+                      />
                     </>
                   )}
                 />
@@ -409,19 +427,12 @@ export default function CreateMoldTanstackForm({
                   }}
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="property_num"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">財產編號 *</span>
-                        <span className="relative w-3/4">
-                          <Input
-                            type="text"
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        type="text"
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        value={field.state.value}
+                      />
                     </>
                   )}
                 />
@@ -431,22 +442,15 @@ export default function CreateMoldTanstackForm({
                   name="pnb_state"
                   validators={{
                     onChange: ({ value }) => {
-                      if ((value as any) === "") {
+                      if (value === "") {
                         return "名版狀態為必填";
                       }
-                      if (!value) {
-                        return "名版狀態為必填";
-                      }
-
-                      if (value !== "done" && value !== "incomplete") {
-                        return "名版狀態為必填";
-                      }
-
                       return undefined;
                     },
                   }}
                   children={(field) => (
                     <>
+                      {/*  */}
                       <label
                         htmlFor="pnb_state"
                         className="relative flex h-full items-center justify-between gap-4 p-2"
@@ -456,7 +460,7 @@ export default function CreateMoldTanstackForm({
                           <Select<"done" | "incomplete" | "">
                             onSelect={(e) => field.handleChange(e.value)}
                             options={[
-                              { id: "1", text: "無", value: "" },
+                              { id: "無", text: "無", value: "" },
                               {
                                 id: "incomplete",
                                 text: "未完成",
@@ -464,6 +468,9 @@ export default function CreateMoldTanstackForm({
                               },
                               { id: "done", text: "完成", value: "done" },
                             ]}
+                            value={
+                              field.state.value as "done" | "incomplete" | ""
+                            }
                           />
                         </span>
                         <FieldInfo field={field} />
@@ -497,15 +504,11 @@ export default function CreateMoldTanstackForm({
                         <span className="w-3/4">
                           <Select<number>
                             onSelect={(e) => {
-                              console.log(e);
-
-                              field.handleChange(Number(e));
+                              field.handleChange(e.value);
                             }}
                             value={field.state.value}
                             onChange={(e) => {
-                              console.log(e);
-
-                              field.handleChange(Number(e));
+                              field.handleChange(e.value);
                             }}
                             options={[
                               { id: "1", text: "無", value: 0 },
@@ -672,26 +675,24 @@ export default function CreateMoldTanstackForm({
                   name="dutydate_month"
                   children={(field) => (
                     <>
-                      <label
-                        htmlFor="dutydate_month"
-                        className="relative flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        <span className="w-1/4">開模日期</span>
-                        <span className="w-3/4">
-                          <Input
-                            id="dutydate_month"
-                            type="date"
-                            name="dutydate_month"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
+                      <FormInputFiled
+                        field={field}
+                        id="dutydate_month"
+                        type="date"
+                        name="dutydate_month"
+                        value={
+                          field.state.value === "0000-00-00"
+                            ? ""
+                            : field.state.value
+                        }
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
                     </>
                   )}
                 />
               </div>
+              {/* TODO: See if I need to create a new component. */}
+              {/* TODO: The current component might need a new props to include how col-span affects its layout */}
               <div className="col-span-2">
                 <form.Field
                   name="dutydate_month"
@@ -760,68 +761,3 @@ export default function CreateMoldTanstackForm({
     </div>
   );
 }
-
-function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
-  return (
-    <>
-      {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <em className="absolute left-24 top-12 text-red-500">
-          {field.state.meta.errors.join(", ")}
-        </em>
-      ) : null}
-      {field.state.meta.isValidating ? "Validating..." : null}
-    </>
-  );
-}
-
-// function requiredValidator(value: any) {
-//   if (!value) {
-//     return "必填";
-//   }
-//   return undefined;
-// }
-
-// function renderSelectField(
-//   field: FieldApi<any, any, any>,
-//   label: string,
-//   options: Option[],
-//   setFunc: Function,
-// ) {
-//   return (
-//     <div>
-//       <label htmlFor={field.name}>{label}</label>
-//       <Select
-//         value={field.state.value}
-//         onChange={(e) => field.handleChange(e.text)}
-//         onSelect={(e) => {
-//           field.handleChange(e.text);
-//           setFunc((prev: any) => {
-//             return { ...prev, [field.name]: e.text };
-//           });
-//         }}
-//         onBlur={field.handleBlur}
-//         options={options}
-//       />
-//       <FieldInfo field={field} />
-//     </div>
-//   );
-// }
-// function renderInputField(
-//   field: FieldApi<any, any, any>,
-//   label: string,
-//   readOnly = false,
-// ) {
-//   return (
-//     <div>
-//       <label htmlFor={field.name}>{label}</label>
-//       <Input
-//         id={field.name}
-//         value={field.state.value}
-//         readOnly={readOnly}
-//         onBlur={field.handleBlur}
-//         onChange={(e) => field.handleChange(e.target.value)}
-//       />
-//       <FieldInfo field={field} />
-//     </div>
-//   );
-// }
