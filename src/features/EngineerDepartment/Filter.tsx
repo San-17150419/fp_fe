@@ -15,8 +15,17 @@ export default function Filter({
   siteOptions,
   propertyOptions,
 }: PreFilterData) {
-  const { isLoading, setSys, setProperty, setSite, data, postFilterOptions } =
-    usePreFilter();
+  const {
+    isLoading,
+    setSys,
+    setProperty,
+    setSite,
+    data,
+    postFilterOptions,
+    site,
+    property,
+    sys,
+  } = usePreFilter();
   return (
     <div className="flex flex-wrap justify-around gap-4">
       <>
@@ -25,8 +34,11 @@ export default function Filter({
             options={seriesOptions}
             name="series"
             onSelect={(option) =>
-              setSys(option.text === "全部系列" ? "" : (option.text as Sys))
+              setSys(
+                option.text === "全部系列" ? undefined : (option.text as Sys),
+              )
             }
+            value={sys}
           />
         </div>
 
@@ -37,6 +49,7 @@ export default function Filter({
             onSelect={(option) => {
               setProperty(option.value as string);
             }}
+            value={property}
           />
         </div>
         <div className="h-10 flex-grow basis-[100px]">
@@ -44,6 +57,7 @@ export default function Filter({
             options={siteOptions}
             name="site"
             onSelect={(option) => setSite(option.value as Site)}
+            value={site}
           />
         </div>
 
