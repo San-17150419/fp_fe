@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import cn from "../../../util/cn";
-interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input = forwardRef<HTMLInputElement, InputBaseProps>((props, ref) => {
   return (
