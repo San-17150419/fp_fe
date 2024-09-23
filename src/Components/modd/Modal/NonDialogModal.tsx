@@ -75,23 +75,23 @@ export default function Modal({
             // exit={currentVariant.exit}
             // transition={currentVariant.transition}
             transition={{ ease: "easeOut", duration: 0.4 }}
-            className="max-h-[90%] max-w-[70%] rounded-md bg-white p-2"
+            className="max-h-[90%] max-w-[75%] rounded-md bg-white"
             ref={modalRef}
             role="dialog"
             aria-modal="true"
             onClick={(e) => e.stopPropagation()} // Prevent clicks inside the modal from closing it
           >
-            <div className="">
+            <div className="p-1">
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close modal"
-                className="z-10 ml-auto block h-10 w-10 rounded-full text-base hover:bg-gray-300"
+                className="z-10 ml-auto block h-10 w-10 rounded-full text-base text-black hover:bg-gray-300 hover:opacity-70"
               >
                 X
               </button>
             </div>
-            <div className="max-h-[90vh] max-w-full overflow-auto">
+            <div className="mb-4 max-h-[80vh] max-w-full overflow-auto border-y px-2">
               {children}
             </div>
             {/* <div className="relative mx-3 mt-4  rounded-md outline">
