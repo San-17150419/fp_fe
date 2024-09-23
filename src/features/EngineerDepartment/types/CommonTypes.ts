@@ -22,7 +22,10 @@ const moldStatus = [
   "已報廢",
 ] as const;
 
-export type MoldStatus = typeof moldStatus[number];
+// https://stackoverflow.com/questions/75317224/how-to-validate-a-string-literal-type-using-zod
+// https://github.com/colinhacks/zod#zod-enums TODO: Do research. Maybe this can replace literal type and the value can be checked in runtime
+
+export type MoldStatus = (typeof moldStatus)[number];
 
 export type BlockNum = PostData["data"][number]["block_num"];
 

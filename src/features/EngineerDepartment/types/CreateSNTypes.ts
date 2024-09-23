@@ -8,12 +8,12 @@ export type BaseRequest = {
 type SeriesRequest = BaseRequest & {
   sys: Exclude<Sys, "模仁">;
   mold_num: MoldNum;
-  sn_target?: "";
+  sn_target?: never;
 };
 
 type MurenRequest = BaseRequest & {
   sys: "模仁";
-  mold_num?: "";
+  mold_num?: never;
   sn_target: string;
 };
 

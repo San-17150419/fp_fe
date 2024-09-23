@@ -17,6 +17,8 @@ import {
   type Brand,
 } from "./CommonTypes";
 
+export type MoldCoreInfoInsertParams = Omit<MoldInfoInsertParams, "mold_num">;
+
 export type MoldInfoInsertParams = {
   // id_ms is auto generated in the database. It is not present in the post data. Get it from lastInsertedId
   sn_num: SnNum;
