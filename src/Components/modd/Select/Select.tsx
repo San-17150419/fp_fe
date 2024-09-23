@@ -29,11 +29,11 @@ export default function Select<T>({
   // TODO: The red border added when invalid is triggered did not disappear after the Select component loses focus. I am not sure if I want this behavior or not. It does tell the user that the input is invalid. But it does not behave like a native select. Either I add a another useEffect to remove the style after the input loses focus or modified how the style is applied or even have another state to control this. One thing I need to consider is do I want my Select component to behave like a native select or not. It might be easier to implement the required message in the Select component. But if I insist to show the required message after the submit button is clicked, I might not be able to implement the required message in the Select component. I might need to create a form component to encapsulate the logic. (composition component pattern plus context api)
   // If user wish to add a placeholder, add it to options.
   // TODO: Remove hidden select tag.
+  // TODO: Maybe value prop should be mandatory
   const defaultOption: Option<T> = options[0];
   const [selectedOption, setSelectedOption] = useState<Option<T>>(
     defaultValue || defaultOption,
   );
-  console.log(value);
   const selectRef = useRef<HTMLSelectElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -43,15 +43,17 @@ export default function Select<T>({
   useEffect(() => {
     // TODO: Test performance.
     if (value !== undefined) {
+
       const newSelectedOption = options.find(
         (option) => option.value === value,
       );
       if (newSelectedOption) {
         setSelectedOption(newSelectedOption);
       }
+    } else {
+      setSelectedOption(defaultValue || defaultOption);
     }
     // TODO: This is for when value is reset to undefined.
-    setSelectedOption(defaultValue || defaultOption);
   }, [value, options]);
   useEffect(() => {
     const transferFocusToButtonWhenInvalidEventFired = () => {
