@@ -33,7 +33,7 @@ export default function Filter({
           <Select<Sys>
             options={seriesOptions}
             name="series"
-            onSelect={(option) =>
+            onChange={(option) =>
               setSys(
                 option.text === "全部系列" ? undefined : (option.text as Sys),
               )
@@ -46,7 +46,7 @@ export default function Filter({
           <Select
             options={propertyOptions}
             name="property"
-            onSelect={(option) => {
+            onChange={(option) => {
               setProperty(option.value as string);
             }}
             value={property}
@@ -56,7 +56,7 @@ export default function Filter({
           <Select
             options={siteOptions}
             name="site"
-            onSelect={(option) => setSite(option.value as Site)}
+            onChange={(option) => setSite(option.value as Site)}
             value={site}
           />
         </div>

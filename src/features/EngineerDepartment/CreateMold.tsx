@@ -133,7 +133,7 @@ export default function CreateMold({ seriesOptions }: PreFilterData) {
                 // unable to reset.
                 required={true}
                 value={seriesOptions.find((option) => option.text === sys)?.value}
-                onSelect={(option) => {
+                onChange={(option) => {
                   setSys(option.text as Sys);
                 }}
               />

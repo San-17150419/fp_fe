@@ -36,7 +36,7 @@ export default function FactoryFilterItem({
           key={`key-${text}`}
           name={text}
           className="mt-1"
-          onSelect={(option) => onChange(option.value)}
+          onChange={(option) => onChange(option.value)}
           options={options} // TypeScript knows `options` exists here
         />
       ) : (

@@ -135,10 +135,6 @@ export default function CreateMoldTanstackForm({
                           console.log(e);
                           field.handleChange(e.value);
                         }}
-                        onSelect={(e) => {
-                          field.handleChange(e.value);
-                          setSys(e.value);
-                        }}
                         onBlur={() => field.handleBlur()}
                         options={seriesOptions}
                         disabled={!!snNumData}
@@ -458,7 +454,7 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">名版狀態 *</span>
                         <span className="w-3/4">
                           <Select<"done" | "incomplete" | "">
-                            onSelect={(e) => field.handleChange(e.value)}
+                            onChange={(e) => field.handleChange(e.value)}
                             options={[
                               { id: "無", text: "無", value: "" },
                               {
@@ -503,13 +499,10 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">品牌 *</span>
                         <span className="w-3/4">
                           <Select<number>
-                            onSelect={(e) => {
-                              field.handleChange(e.value);
-                            }}
-                            value={field.state.value}
                             onChange={(e) => {
                               field.handleChange(e.value);
                             }}
+                            value={field.state.value}
                             options={[
                               { id: "1", text: "無", value: 0 },
                               { id: "2", text: "第一品牌", value: 1 },
@@ -547,7 +540,7 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">財產歸屬 *</span>
                         <span className="w-3/4">
                           <Select<string>
-                            onSelect={(e) => field.handleChange(e.value)}
+                            onChange={(e) => field.handleChange(e.value)}
                             options={propertyOptions}
                           />
                         </span>
@@ -581,7 +574,7 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">位置 *</span>
                         <span className="w-3/4">
                           <Select<Site>
-                            onSelect={(e) => {
+                            onChange={(e) => {
                               console.log(e);
                               console.log(e.value);
                               field.handleChange(e.value);
@@ -620,7 +613,7 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">狀態 *</span>
                         <span className="w-3/4">
                           <Select<MoldInfoInsertParams["state"]>
-                            onSelect={(e) => field.handleChange(e.value)}
+                            onChange={(e) => field.handleChange(e.value)}
                             options={statusOptions}
                             value={
                               field.state.value as MoldInfoInsertParams["state"]
@@ -657,7 +650,7 @@ export default function CreateMoldTanstackForm({
                         <span className="w-1/4">廠商代號 *</span>
                         <span className="w-3/4">
                           <Select<MoldInfoInsertParams["maker"]>
-                            onSelect={(e) => field.handleChange(e.value)}
+                            onChange={(e) => field.handleChange(e.value)}
                             options={makerOptions}
                             value={
                               field.state.value as MoldInfoInsertParams["maker"]

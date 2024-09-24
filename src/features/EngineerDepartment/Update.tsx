@@ -11,6 +11,7 @@ type UpdateProps = {
   currentMoldData: FilterData["data"][number];
 } & PreFilterData;
 
+// TODO: Disallow update value to undefined or empty
 export default function Update({
   currentMoldData,
   makerOptions,
@@ -60,7 +61,7 @@ export default function Update({
               options={options}
               data={currentMoldData}
               disabled={disabled}
-              onSelect={(option) => handleChange(name, option.value as string)}
+              onChange={(option) => handleChange(name, option.value as string)}
             />
           ))}
 
@@ -105,7 +106,7 @@ type SelectFieldProps<T> = {
   name: keyof FilterData["data"][number];
   options: Option<T>[];
   data: FilterData["data"][number];
-  onSelect?: (option: Option<T>) => void;
+  onChange?: (option: Option<T>) => void;
   text: string;
   disabled?: boolean;
 };
@@ -115,7 +116,7 @@ function SelectField<T>({
   text,
   options,
   data,
-  onSelect,
+  onChange,
   disabled,
 }: SelectFieldProps<T>) {
   return (
@@ -130,7 +131,7 @@ function SelectField<T>({
             ? { id: data.state, text: data.state, value: data.state as T }
             : options.find((option) => option.value === data[name]) ?? undefined
         }
-        onSelect={onSelect}
+        onChange={onChange}
       />
     </Field>
   );
