@@ -5,7 +5,7 @@ import {
   type FilterData,
   type MoldInfoUpdateResponse,
 } from "../types";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import inferSecondSnNum from "../utils/inferSecondSnNum";
 import { toast } from "react-toastify";
@@ -140,7 +140,10 @@ export default function useUpdate({ currentMoldData }: Params) {
       );
     },
     onError: (error) => {
-      toast.error(error.message, {
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data.info_check.detail
+        : error;
+      toast.error(`更新失敗 ${errorMessage}`, {
         position: "top-center",
         autoClose: 5000,
         closeButton: true,

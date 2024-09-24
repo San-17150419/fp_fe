@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import {
   type MoldInfoInsertParams,
   type MoldInfoInsertSuccessResponse,
@@ -116,6 +116,17 @@ export default function useCreateMold() {
           return [...(oldData || []), ...newMolds];
         },
       );
+    },
+    onError: (error) => {
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data.info_check.detail
+        : error;
+      console.log(error);
+      toast.error(`新增失敗 ${errorMessage}`, {
+        position: "top-center",
+        autoClose: 5000,
+        closeButton: true,
+      });
     },
   });
 
