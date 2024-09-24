@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import FieldInfo from "./FieldInfo";
 import FormSelectField from "./FormSelectField";
 import { type PreFilterData } from "../../hooks/useENGDepartmentPreData";
-import { Site, type MoldInfoInsertParams } from "../../types";
+import { type MoldInfoInsertParams } from "../../types";
 import Modal from "../../../../Components/modd/Modal/NonDialogModal";
 import { useForm } from "@tanstack/react-form";
 import useCreateMold from "../../hooks/useCreateMold";
@@ -15,26 +15,13 @@ export default function CreateMoldTanstackForm({
   siteOptions,
   statusOptions,
 }: PreFilterData) {
-  const {
-    setMoldNum,
-    mold_num,
-    setSys,
-    sys,
-    snNumData,
-    isFetchingSnNumPending,
-    setUserIsStillEditing,
-    mutate,
-    clearForm,
-    setSnTarget,
-    isSnTargetInExistingData,
-  } = useCreateMold();
   const regexForMoldNumInput = /^[A-Za-z]$|^A1$/;
   const regexForNumberOnlyInput = /^[0-9]*$/;
   const [showModal, setShowModal] = useState(false);
   const form = useForm({
     defaultValues: {
-      sys: sys,
-      mold_num: mold_num,
+      sys: "",
+      mold_num: "",
       sn_target: "",
       sn_num: "",
       prod_name_board: "",
@@ -52,26 +39,58 @@ export default function CreateMoldTanstackForm({
       spare: "",
     },
     onSubmit: (values) => {
-      if (snNumData === undefined) return;
-      const newValues: MoldInfoInsertParams = {
-        ...values.value,
-        hole_num: Number(values.value["hole_num"]),
-        block_num: Number(values.value.block_num),
-        sys: values.value.sys as MoldInfoInsertParams["sys"],
-        site: values.value.site as MoldInfoInsertParams["site"],
-        state: values.value.state as MoldInfoInsertParams["state"],
-        pnb_state: values.value.pnb_state as MoldInfoInsertParams["pnb_state"],
-        //
-        sn_num: snNumData[0],
-      };
-      // I am not sure if I need to using type guard here since the form already validates the value.
-      mutate(newValues);
+      console.log(Array(values.value.sn_num));
+      console.log(values.value.sn_num.split(","));
+
+      const moldDataArray: MoldInfoInsertParams[] = [
+        {
+          ...values.value,
+          hole_num: Number(values.value["hole_num"]),
+          block_num: Number(values.value.block_num),
+          sys: values.value.sys as MoldInfoInsertParams["sys"],
+          site: values.value.site as MoldInfoInsertParams["site"],
+          state: values.value.state as MoldInfoInsertParams["state"],
+          pnb_state: values.value
+            .pnb_state as MoldInfoInsertParams["pnb_state"],
+          sn_num: values.value.sn_num[0],
+        },
+      ];
+
+      if (values.value.sn_num.length > 1) {
+        moldDataArray.push({
+          ...values.value,
+          hole_num: Number(values.value["hole_num"]),
+          block_num: Number(values.value.block_num),
+          sys: values.value.sys as MoldInfoInsertParams["sys"],
+          site: values.value.site as MoldInfoInsertParams["site"],
+          state: values.value.state as MoldInfoInsertParams["state"],
+          pnb_state: values.value
+            .pnb_state as MoldInfoInsertParams["pnb_state"],
+          sn_num: values.value.sn_num[1],
+        });
+      }
+      moldDataArray.forEach((moldData) => {
+        if ("sn_target" in moldData) {
+          delete moldData.sn_target;
+        }
+      });
+      console.log(moldDataArray);
+      mutate(moldDataArray);
     },
   });
+
+  const {
+    isFetchingSnNumPending,
+    setUserIsStillEditing,
+    mutate,
+    clearForm,
+    isSnTargetInExistingData,
+    snNumData,
+    sys
+  } = useCreateMold(form);
   const handleReset = () => {
     // call clearForm() first. Otherwise, the default value form.reset() reset to is still the old value.
     clearForm();
-    form.reset();
   };
   useEffect(() => {
     if (!showModal) {

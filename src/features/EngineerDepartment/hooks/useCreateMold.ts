@@ -1,27 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { isAxiosError } from "axios";
 import {
   type MoldInfoInsertParams,
   type MoldInfoInsertSuccessResponse,
-  type Sys,
   type GetNewSNPForSysResponse,
   type GetNewSNPForSys,
   FilterData,
 } from "../types";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import inferSecondSnNum from "../utils/inferSecondSnNum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { ReactFormApi, type FormApi } from "@tanstack/react-form";
 const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "createSN/";
 
 // TODO: Note! In `CreateMold` component, option for 模仁 in sys is not shown. This case required addtional api call. It is possible that I will be forced to write a separate function to get sn_num for 模仁 if I can't fit it into getNewSnNum function.
 // TODO: I still have almost 2000 event listeners in the app.
 // TODO: BUG! When switching between factory log and engineer department, the number of event listener and DOM Nodes skyrockets. It does drop down
-export default function useCreateMold() {
-  const [mold_num, setMoldNum] = useState<string>("");
-  const [sys, setSys] = useState<Sys>();
-  const [sn_target, setSnTarget] = useState<string>("");
+
+type Form = FormApi<any, any> & ReactFormApi<any, any>;
+export default function useCreateMold(form: Form) {
+  const formValues = form?.state.values;
+  const mold_num = formValues?.mold_num;
+  const sys = formValues?.sys;
+  const sn_target = formValues?.sn_target;
   const [userIsStillEditing, setUserIsStillEditing] = useState(false);
   const [isSnTargetValid, setIsSnTargetValid] = useState<boolean>(false);
 
@@ -83,6 +84,14 @@ export default function useCreateMold() {
 
     enabled: canFetchSnNum,
   });
+
+  // Use derived states
+  // form.setFieldValue("sn_num", String(snNumData));
+  useEffect(() => {
+    console.log(snNumData);
+    form.setFieldValue("sn_num", String(snNumData));
+  }, [snNumData]);
+
   // crud
   const { mutate, isPending, error, isSuccess } = useMutation({
     mutationFn: createNewMold,
@@ -131,22 +140,21 @@ export default function useCreateMold() {
     },
   });
 
+  useEffect;
   const clearForm = () => {
+    // by using both reset and removeQueries, we can successfully reset the form
+    // TODO: Understand why I need to use both
+    queryClient.resetQueries({ queryKey: ["newMoldSnNum"] });
     queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
-    setSnTarget("");
-    setMoldNum("");
-    setSys(undefined);
+    form.reset();
   };
   return {
     isSuccess,
     newMoldParams,
     setNewMoldParams,
     mold_num, //
-    setMoldNum, //
     sys, //
-    setSys, //
     sn_target,
-    setSnTarget,
     snNumData, //
     isFetchingSnNumPending, //
     clearForm, //
@@ -172,27 +180,26 @@ const getNewSnNum = async <T>(
 // TODO: Add error handling. See MoldInfoInsertErrorResponse. I am not sure how it interacts with react query.
 // 像是missing key, duplicate key 或是多次寫入
 async function createNewMold(
-  moldData: MoldInfoInsertParams,
+  moldData: Array<MoldInfoInsertParams>,
 ): Promise<MoldInfoInsertSuccessResponse[]> {
   // TODO: dutydate_month is required?
   const api =
     import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "mold-info-insert/";
-  if (moldData.sys === "雙色系列") {
-    const moldDataForSecondMold = {
-      ...moldData,
-      sn_num: inferSecondSnNum(moldData.sn_num),
-    };
-    const promise1 = axios.post<MoldInfoInsertSuccessResponse>(api, moldData);
+  if (moldData[0].sys === "雙色系列") {
+    const promise1 = axios.post<MoldInfoInsertSuccessResponse>(
+      api,
+      moldData[0],
+    );
     const promise2 = axios.post<MoldInfoInsertSuccessResponse>(
       api,
-      moldDataForSecondMold,
+      moldData[1],
     );
     const response = await Promise.all([promise1, promise2]);
     return [response[0].data, response[1].data];
   } else {
     const response = await axios.post<MoldInfoInsertSuccessResponse>(
       api,
-      moldData,
+      moldData[0],
     );
     return [response.data];
   }
