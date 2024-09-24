@@ -87,22 +87,21 @@ export default function useCreateMold() {
   const { mutate, isPending, error, isSuccess } = useMutation({
     mutationFn: createNewMold,
     onSuccess: ([responseData1, responseData2]) => {
-      const notify = () =>
-        toast.success("新增成功", {
-          position: "top-center",
-          autoClose: 5000,
-          closeButton: true,
-        });
-      notify();
+      toast.success("新增成功", {
+        position: "top-center",
+        autoClose: 5000,
+        closeButton: true,
+      });
       queryClient.setQueriesData(
         { queryKey: ["preFilterData"] },
-        (oldData: FilterData["data"] | undefined) => {
-          const newMolds = [
+        (oldData: FilterData | undefined) => {
+          if (!oldData) return oldData;
+          const newMolds: Array<FilterData["data"][number]> = [
             {
               ...responseData1.post,
               dutydate_last: "",
               id_ms: responseData1.info_insert.lastInsertedId,
-            },
+            } as FilterData["data"][number],
           ];
           if (responseData2) {
             newMolds.push({
@@ -111,12 +110,14 @@ export default function useCreateMold() {
               id_ms: responseData2.info_insert.lastInsertedId,
             });
           }
-          if (!oldData) return newMolds;
-
-          return [...(oldData || []), ...newMolds];
+          return {
+            post: oldData.post,
+            data: [...oldData.data, ...newMolds],
+          };
         },
       );
     },
+
     onError: (error) => {
       const errorMessage = isAxiosError(error)
         ? error.response?.data.info_check.detail
