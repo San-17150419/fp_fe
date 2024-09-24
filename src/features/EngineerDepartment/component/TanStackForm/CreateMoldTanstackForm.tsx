@@ -134,6 +134,7 @@ export default function CreateMoldTanstackForm({
                         onChange={(e) => {
                           console.log(e);
                           field.handleChange(e.value);
+                          setSys(e.value);
                         }}
                         onBlur={() => field.handleBlur()}
                         options={seriesOptions}
