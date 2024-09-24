@@ -27,6 +27,7 @@ export default function CreateMoldTanstackForm({
     mutate,
     clearForm,
     setSnTarget,
+    isSnTargetInExistingData,
   } = useCreateMold();
   const regexForMoldNumInput = /^[A-Za-z]$|^A1$/;
   const regexForNumberOnlyInput = /^[0-9]*$/;
@@ -168,6 +169,9 @@ export default function CreateMoldTanstackForm({
                   if (!value) {
                     return "目標唯一碼為必填";
                   }
+                  if (!isSnTargetInExistingData(value)) {
+                    return "目標唯一碼不存在";
+                  }
                   return undefined;
                 },
               }}
@@ -184,17 +188,18 @@ export default function CreateMoldTanstackForm({
                       <Input
                         type="text"
                         disabled={!!snNumData}
-                        maxLength={2}
                         value={field.state.value}
                         onChange={(e) => {
-                          field.handleChange(e.target.value);
                           setSnTarget(e.target.value);
+                          field.handleChange(e.target.value);
                         }}
                       />
                     </span>
+                    <FieldInfo
+                      className="absolute left-28 top-12 text-red-500"
+                      field={field}
+                    />
                   </label>
-
-                  <FieldInfo field={field} />
                 </>
               )}
             />

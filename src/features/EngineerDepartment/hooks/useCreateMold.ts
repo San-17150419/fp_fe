@@ -23,10 +23,37 @@ export default function useCreateMold() {
   const [sys, setSys] = useState<Sys>();
   const [sn_target, setSnTarget] = useState<string>("");
   const [userIsStillEditing, setUserIsStillEditing] = useState(false);
+  const [isSnTargetValid, setIsSnTargetValid] = useState<boolean>(false);
+
+  const canFetchSnNum =
+    !!sys &&
+    !userIsStillEditing &&
+    (sys === "模仁" ? !!sn_target && isSnTargetValid : !!mold_num);
   const [newMoldParams, setNewMoldParams] =
     useState<MoldInfoInsertParams | null>(null);
 
   const queryClient = useQueryClient();
+  const allMoldData = queryClient.getQueryData<FilterData>([
+    "preFilterData",
+    {
+      mold_num: "",
+      prod_name_board: "",
+      property: "",
+      site: "",
+      sn_num: "",
+      sys: "",
+    },
+  ])?.data;
+
+  function isSnTargetInExistingData(sn_target: string) {
+    if (!allMoldData) {
+      setIsSnTargetValid(false);
+      return false;
+    }
+    const isSnTargetValid = allMoldData.some((d) => d.sn_num === sn_target);
+    setIsSnTargetValid(isSnTargetValid);
+    return isSnTargetValid;
+  }
   const {
     data: snNumData,
     // isLoading: isFetchingSnNum,
@@ -40,9 +67,7 @@ export default function useCreateMold() {
         throw new Error("sn_target is empty");
       }
       if (sys !== "模仁" && !mold_num) {
-        throw new Error(
-          "mold_num is empty when sys is not 模仁",
-        );
+        throw new Error("mold_num is empty when sys is not 模仁");
       }
       // if (!sys || !mold_num) return;
       if (sys === "模仁") {
@@ -56,10 +81,7 @@ export default function useCreateMold() {
       }
     },
 
-    enabled:
-      !!sys &&
-      !userIsStillEditing &&
-      (sys === "模仁" ? !!sn_target : !!mold_num),
+    enabled: canFetchSnNum,
   });
   // crud
   const { mutate, isPending, error, isSuccess } = useMutation({
@@ -120,6 +142,7 @@ export default function useCreateMold() {
     mutate, //
     isPending,
     error,
+    isSnTargetInExistingData,
   };
 }
 
