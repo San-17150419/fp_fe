@@ -95,7 +95,7 @@ export default function CreateMoldTanstackForm({
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="grid grid-flow-row grid-cols-2 gap-4 text-nowrap p-2"
+          className="grid grid-flow-row grid-cols-2 gap-4 text-nowrap px-2 pt-2 pb-6"
         >
           <div>
             <form.Field
