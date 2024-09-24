@@ -30,13 +30,11 @@ export default function Filter({
     <div className="flex flex-wrap justify-around gap-4">
       <>
         <div className="h-10 flex-grow basis-[100px]">
-          <Select<Sys>
+          <Select<Sys | "">
             options={seriesOptions}
             name="series"
             onChange={(option) =>
-              setSys(
-                option.text === "全部系列" ? undefined : (option.text as Sys),
-              )
+              setSys(option.text === "全部系列" ? "" : (option.text as Sys))
             }
             value={sys}
           />
