@@ -5,24 +5,22 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { PiCaretDownBold } from "react-icons/pi";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import cn from "../../../util/cn";
 import clsx from "clsx";
 
 // TODO: Make is controlled component. I should be able to reset the value from outside
 
+// TODO: Considering to remove some advanced feature to another component. I should not include all features in this component.
 export default function Select<T>({
   options,
   className,
-  onSelect,
   onChange,
   name,
   defaultValue,
   disabled = false,
-  required = false,
-  reuquiredText = "Required",
-  value,
+  value
 }: SelectProps<T>) {
   const { t } = useTranslation();
 
@@ -34,8 +32,6 @@ export default function Select<T>({
   const [selectedOption, setSelectedOption] = useState<Option<T>>(
     defaultValue || defaultOption,
   );
-  const selectRef = useRef<HTMLSelectElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const [isInvalid, setIsInvalid] = useState(false);
 
@@ -43,7 +39,6 @@ export default function Select<T>({
   useEffect(() => {
     // TODO: Test performance.
     if (value !== undefined) {
-
       const newSelectedOption = options.find(
         (option) => option.value === value,
       );
@@ -55,29 +50,9 @@ export default function Select<T>({
     }
     // TODO: This is for when value is reset to undefined.
   }, [value, options]);
-  useEffect(() => {
-    const transferFocusToButtonWhenInvalidEventFired = () => {
-      if (!selectRef.current?.validity.valid) {
-        setIsInvalid(true); // Trigger invalid state
-      }
-    };
-    selectRef.current?.addEventListener(
-      "invalid",
-      transferFocusToButtonWhenInvalidEventFired,
-    );
-    return () => {
-      selectRef.current?.removeEventListener(
-        "invalid",
-        transferFocusToButtonWhenInvalidEventFired,
-      );
-    };
-  }, [required, selectedOption]);
 
   const handleSelect = (option: Option<T>) => {
     setIsInvalid(false); // reset
-    if (onSelect) {
-      onSelect(option);
-    }
     if (onChange) {
       onChange(option);
     }
@@ -85,19 +60,6 @@ export default function Select<T>({
   };
   return (
     <div className="relative w-full">
-      {required && (
-        <select
-          className="absolute left-0 h-full w-full opacity-0"
-          name={name}
-          id={`${name}-create-new-mold`}
-          title={reuquiredText}
-          required
-          tabIndex={-1}
-          ref={selectRef}
-        >
-          <option value={selectedOption.value as string}></option>
-        </select>
-      )}
       <Listbox
         value={options.find((option) => option.value === selectedOption)}
         onChange={(option) => handleSelect(option)}
@@ -113,7 +75,6 @@ export default function Select<T>({
         {({ open }) => (
           <>
             <ListboxButton
-              ref={buttonRef}
               id={name}
               className={clsx(
                 "box-border flex w-full items-center overflow-clip text-nowrap rounded-md border border-gray-300 bg-white px-2 py-1 text-left shadow shadow-slate-300 desktop:px-3 desktop:py-4",
@@ -167,12 +128,10 @@ type SelectProps<T> = {
   options: Option<T>[];
   name?: string;
   className?: string;
-  onSelect?: (option: Option<T>) => void;
   defaultValue?: Option<T>;
   disabled?: boolean;
   required?: boolean;
   value?: Option<T>["value"];
-  reuquiredText?: string;
   onBlur?: () => void;
   onFocus?: () => void;
   //TODO: I think onSelect and onChange are the same. Choose one.
