@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 // TODO: Not sure yet. But I think I should ensure select in preFilter and combobox in postFilter are in sync. They should be rendered in the same time. So visually, they should appear in the same time. Not the first three is rendered first, then the rest show up.
 
 export default function usePreFilter() {
-  const [sys, setSys] = useState<Sys >();
+  const [sys, setSys] = useState<Sys | "">("");
   const [property, setProperty] = useState<string>("");
   const [site, setSite] = useState<Site | "">("");
 
