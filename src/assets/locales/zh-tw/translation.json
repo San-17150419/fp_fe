@@ -103,5 +103,7 @@
   "spare": "備註",
   "id_ms": "資料表id",
   "No Data": "查無資料",
-  "OEM": "代工(國登)"
+  "OEM": "代工(國登)",
+  "property_num": "財產編號",
+  "account": "帳號"
 }

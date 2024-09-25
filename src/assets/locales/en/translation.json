@@ -98,5 +98,8 @@
   "周期": "mold_time",
   "作业(H)": "work_time",
   "开台": "prod_amt",
-  "产能": "mold_amt"
+  "产能": "mold_amt",
+  "帐号": "account",
+  "密码": "password",
+  "帳號": "account"
 }
