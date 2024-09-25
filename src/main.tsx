@@ -8,10 +8,26 @@ import AuthProvider from "./stores/AuthContext";
 import "./i18n";
 import { ErrorPage, FactoryLogPage, Loading, ModelOverview } from "./pages";
 import { ThemeProvider } from "./stores/ThemeContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const queryClient = new QueryClient();
+import { toast } from "react-toastify";
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      // Set custom error message through query meta
+      const errorMessage = query.meta?.errorMmessage || error.message;
+      toast.error(`something went wrong ${errorMessage}`, {
+        position: "top-center",
+        autoClose: 5000,
+        closeButton: true,
+      });
+    },
+  }),
+});
 const router = createBrowserRouter([
   {
     path: "/",
