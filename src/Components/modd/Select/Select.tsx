@@ -124,7 +124,7 @@ export type Option<T> = {
   value: T;
   id: string | number;
 };
-type SelectProps<T> = {
+export type SelectProps<T> = {
   options: Option<T>[];
   name?: string;
   className?: string;
