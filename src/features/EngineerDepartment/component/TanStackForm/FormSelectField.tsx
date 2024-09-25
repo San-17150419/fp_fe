@@ -10,14 +10,16 @@ export type FormSelectFieldProps<T> = Omit<
   "value" | "onChange"
 > & {
   field: FieldApi<any, any, any, any>;
-  value?: BaseSelectProps<T>["value"];
-  onChange?: (option: Option<T>) => void;
-} & (BaseSelectProps<T>["onChange"] extends undefined
-    ? {} // If onChange is not provided, value can be optional
-    : {
-        value: BaseSelectProps<T>["value"];
-        onChange: (option: Option<T>) => void;
-      }); // If onChange is provided, value must be required
+} & (
+    | {
+        value?: Option<T>["value"];
+        onChange?: (value: Option<T>) => void;
+      }
+    | {
+        value: Option<T>["value"];
+        onChange: (value: Option<T>) => void;
+      }
+  );
 
 export default function FormSelectField<T>({
   field,
@@ -29,11 +31,11 @@ export default function FormSelectField<T>({
         {...selectProps}
         // By default, the `value` of the select is the `value` of the field. But we can override that with the `value` prop if the consumer wants to control the value of the select.(for examlpe, add specific logic to control the value of the select when the field changes)
 
-        // 
+        //
         value={selectProps.value ?? field.state.value}
         // By default, the `value` is updated internally, so the value of field and select are the same. This cannot be overridden. But if the consumer needs to keep the value in sync with an external state, they can use the `onChange` prop to do that.
         onChange={(e) => {
-          field.handleChange(e);
+          field.handleChange(e.value);
           selectProps.onChange?.(e);
         }}
       />
