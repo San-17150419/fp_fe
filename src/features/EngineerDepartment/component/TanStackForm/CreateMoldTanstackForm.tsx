@@ -87,7 +87,6 @@ export default function CreateMoldTanstackForm({
     sys,
   } = useCreateMold(form);
   const handleReset = () => {
-    // call clearForm() first. Otherwise, the default value form.reset() reset to is still the old value.
     clearForm();
   };
   useEffect(() => {
@@ -139,10 +138,6 @@ export default function CreateMoldTanstackForm({
                 <FormSelectField
                   field={field}
                   disabled={!!snNumData}
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.value);
-                  }}
                   options={seriesOptions}
                 />
               )}
@@ -183,10 +178,6 @@ export default function CreateMoldTanstackForm({
                   field={field}
                   type="text"
                   disabled={snNumData?.length === 0}
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
                 />
               )}
             />
@@ -227,10 +218,7 @@ export default function CreateMoldTanstackForm({
                   type="text"
                   disabled={!!snNumData}
                   maxLength={2}
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
+               
                 />
               )}
             />
@@ -245,10 +233,6 @@ export default function CreateMoldTanstackForm({
                   type="text"
                   readOnly
                   defaultValue={snNumData ? String(snNumData) : ""}
-                  // value={snNum ? String(snNum) : ""}
-                  // onChange={() => {
-                  //   field.handleChange(snNum ? String(snNum) : "");
-                  // }}
                 />
               )}
             />
@@ -274,8 +258,6 @@ export default function CreateMoldTanstackForm({
                     <FormInputFiled
                       field={field}
                       type="text"
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -299,10 +281,6 @@ export default function CreateMoldTanstackForm({
                     <FormInputFiled
                       field={field}
                       type="text"
-                      onChange={(e) =>
-                        field.handleChange(e.target.value as string)
-                      }
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -327,10 +305,6 @@ export default function CreateMoldTanstackForm({
                       field={field}
                       type="text"
                       pattern="^[0-9]*$"
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                      }}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -363,10 +337,6 @@ export default function CreateMoldTanstackForm({
                       field={field}
                       type="text"
                       pattern="[0-9]*"
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                      }}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -391,8 +361,6 @@ export default function CreateMoldTanstackForm({
                     <FormInputFiled
                       field={field}
                       type="text"
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -412,7 +380,6 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField
                       field={field}
-                      value={field.state.value}
                       options={[
                         { id: "無", text: "無", value: "" },
                         {
@@ -422,7 +389,6 @@ export default function CreateMoldTanstackForm({
                         },
                         { id: "done", text: "完成", value: "done" },
                       ]}
-                      onChange={(e) => field.handleChange(e.value)}
                     />
                   )}
                 />
@@ -446,10 +412,6 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField
                       field={field}
-                      onChange={(e) => {
-                        field.handleChange(e.value);
-                      }}
-                      value={field.state.value}
                       options={[
                         { id: "1", text: "無", value: 0 },
                         { id: "2", text: "第一品牌", value: 1 },
@@ -478,9 +440,7 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField
                       field={field}
-                      onChange={(e) => field.handleChange(e.value)}
                       options={propertyOptions}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -504,9 +464,7 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField
                       field={field}
-                      onChange={(e) => field.handleChange(e.value)}
                       options={siteOptions}
-                      value={field.state.value}
                     />
                   )}
                 />
@@ -530,8 +488,6 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField
                       field={field}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.value)}
                       options={statusOptions}
                     />
                   )}
@@ -556,9 +512,7 @@ export default function CreateMoldTanstackForm({
                   children={(field) => (
                     <FormSelectField<MoldInfoInsertParams["maker"]>
                       field={field}
-                      onChange={(e) => field.handleChange(e.value)}
                       options={makerOptions}
-                      value={field.state.value}
                     />
                   )}
                 />
