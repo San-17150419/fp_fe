@@ -39,9 +39,7 @@ export default function CreateMoldTanstackForm({
       spare: "",
     },
     onSubmit: (values) => {
-      console.log(Array(values.value.sn_num));
-      console.log(values.value.sn_num.split(","));
-
+      const sn_nums = values.value.sn_num.split(",");
       const moldDataArray: MoldInfoInsertParams[] = [
         {
           ...values.value,
@@ -52,11 +50,11 @@ export default function CreateMoldTanstackForm({
           state: values.value.state as MoldInfoInsertParams["state"],
           pnb_state: values.value
             .pnb_state as MoldInfoInsertParams["pnb_state"],
-          sn_num: values.value.sn_num[0],
+          sn_num: sn_nums[0],
         },
       ];
 
-      if (values.value.sn_num.length > 1) {
+      if (sn_nums.length > 1) {
         moldDataArray.push({
           ...values.value,
           hole_num: Number(values.value["hole_num"]),
@@ -66,7 +64,7 @@ export default function CreateMoldTanstackForm({
           state: values.value.state as MoldInfoInsertParams["state"],
           pnb_state: values.value
             .pnb_state as MoldInfoInsertParams["pnb_state"],
-          sn_num: values.value.sn_num[1],
+          sn_num: sn_nums[1],
         });
       }
       moldDataArray.forEach((moldData) => {
@@ -74,7 +72,7 @@ export default function CreateMoldTanstackForm({
           delete moldData.sn_target;
         }
       });
-      console.log(moldDataArray);
+      // console.log(moldDataArray);
       mutate(moldDataArray);
     },
   });
@@ -86,7 +84,7 @@ export default function CreateMoldTanstackForm({
     clearForm,
     isSnTargetInExistingData,
     snNumData,
-    sys
+    sys,
   } = useCreateMold(form);
   const handleReset = () => {
     // call clearForm() first. Otherwise, the default value form.reset() reset to is still the old value.
@@ -120,6 +118,7 @@ export default function CreateMoldTanstackForm({
             onBlur={() => setUserIsStillEditing(false)}
             onFocus={() => setUserIsStillEditing(true)}
           >
+            {/* 系統 */}
             <form.Field
               name="sys"
               validators={{
@@ -137,19 +136,19 @@ export default function CreateMoldTanstackForm({
                 },
               }}
               children={(field) => (
-                <>
-                  <FormSelectField
-                    field={field}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.value);
-                    }}
-                    options={seriesOptions}
-                  />
-                </>
+                <FormSelectField
+                  field={field}
+                  disabled={!!snNumData}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.value);
+                  }}
+                  options={seriesOptions}
+                />
               )}
             />
           </div>
+          {/* 目標唯一碼 */}
           <div
             className={!sys || sys !== "模仁" ? "hidden" : ""}
             onBlur={() => setUserIsStillEditing(false)}
@@ -180,20 +179,19 @@ export default function CreateMoldTanstackForm({
                 },
               }}
               children={(field) => (
-                <>
-                  <FormInputFiled
-                    field={field}
-                    type="text"
-                    disabled={!!snNumData}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                  />
-                </>
+                <FormInputFiled
+                  field={field}
+                  type="text"
+                  disabled={snNumData?.length === 0}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                />
               )}
             />
           </div>
+          {/* 模號 */}
           <div
             className={!sys || sys === "模仁" ? "hidden" : ""}
             onBlur={() => setUserIsStillEditing(false)}
@@ -224,54 +222,40 @@ export default function CreateMoldTanstackForm({
                 },
               }}
               children={(field) => (
-                <>
-                  <FormInputFiled
-                    field={field}
-                    type="text"
-                    // disabled={!!snNumData}
-                    maxLength={2}
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                  />
-                </>
+                <FormInputFiled
+                  field={field}
+                  type="text"
+                  disabled={!!snNumData}
+                  maxLength={2}
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                />
               )}
             />
           </div>
-
-          {!isFetchingSnNumPending  && (
-            <>
-              <div>
-                <form.Field
-                  name="sn_num"
-                  children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        readOnly
-                        value={String(snNumData)}
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                        }}
-                      />
-                      {/* <FormInputFiled
-                        field={field}
-                        type="text"
-                        readOnly
-                        value={snNumData && snNumData[0]}
-                        onChange={() => {
-                          snNumData && field.handleChange(snNumData[0]);
-                        }}
-                        onBlur={() => {
-                          snNumData && field.handleChange(snNumData[0]);
-                        }}
-                      /> */}
-                    </>
-                  )}
+          {/* 模具唯一碼 */}
+          <div>
+            <form.Field
+              name="sn_num"
+              children={(field) => (
+                <FormInputFiled
+                  field={field}
+                  type="text"
+                  readOnly
+                  defaultValue={snNumData ? String(snNumData) : ""}
+                  // value={snNum ? String(snNum) : ""}
+                  // onChange={() => {
+                  //   field.handleChange(snNum ? String(snNum) : "");
+                  // }}
                 />
-              </div>
+              )}
+            />
+          </div>
+          {!isFetchingSnNumPending && snNumData && (
+            <>
+              {/* 名板 */}
               <div>
                 <form.Field
                   name="prod_name_board"
@@ -287,17 +271,16 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      type="text"
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 定義品名 */}
               <div>
                 <form.Field
                   name="prod_name_nocolor"
@@ -313,19 +296,18 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        onChange={(e) =>
-                          field.handleChange(e.target.value as string)
-                        }
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      type="text"
+                      onChange={(e) =>
+                        field.handleChange(e.target.value as string)
+                      }
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 模穴數 */}
               <div>
                 <form.Field
                   name="hole_num"
@@ -341,20 +323,19 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        pattern="^[0-9]*$"
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                        }}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      type="text"
+                      pattern="^[0-9]*$"
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 塞穴數 */}
               <div>
                 <form.Field
                   name="block_num"
@@ -378,20 +359,19 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        pattern="[0-9]*"
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                        }}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      type="text"
+                      pattern="[0-9]*"
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 財產編號 */}
               <div>
                 <form.Field
                   name="property_num"
@@ -408,17 +388,16 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        type="text"
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      type="text"
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 名版狀態 */}
               <div>
                 <form.Field
                   name="pnb_state"
@@ -431,26 +410,24 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      {/*  */}
-                      <FormSelectField
-                        field={field}
-                        value={field.state.value}
-                        options={[
-                          { id: "無", text: "無", value: "" },
-                          {
-                            id: "incomplete",
-                            text: "未完成",
-                            value: "incomplete",
-                          },
-                          { id: "done", text: "完成", value: "done" },
-                        ]}
-                        onChange={(e) => field.handleChange(e.value)}
-                      />
-                    </>
+                    <FormSelectField
+                      field={field}
+                      value={field.state.value}
+                      options={[
+                        { id: "無", text: "無", value: "" },
+                        {
+                          id: "incomplete",
+                          text: "未完成",
+                          value: "incomplete",
+                        },
+                        { id: "done", text: "完成", value: "done" },
+                      ]}
+                      onChange={(e) => field.handleChange(e.value)}
+                    />
                   )}
                 />
               </div>
+              {/* 品牌 */}
               <div>
                 <form.Field
                   name="brand"
@@ -467,23 +444,22 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormSelectField
-                        field={field}
-                        onChange={(e) => {
-                          field.handleChange(e.value);
-                        }}
-                        value={field.state.value}
-                        options={[
-                          { id: "1", text: "無", value: 0 },
-                          { id: "2", text: "第一品牌", value: 1 },
-                          { id: "3", text: "第二品牌", value: 2 },
-                        ]}
-                      />
-                    </>
+                    <FormSelectField
+                      field={field}
+                      onChange={(e) => {
+                        field.handleChange(e.value);
+                      }}
+                      value={field.state.value}
+                      options={[
+                        { id: "1", text: "無", value: 0 },
+                        { id: "2", text: "第一品牌", value: 1 },
+                        { id: "3", text: "第二品牌", value: 2 },
+                      ]}
+                    />
                   )}
                 />
               </div>
+              {/* 財產歸屬 */}
               <div>
                 <form.Field
                   name="property"
@@ -500,17 +476,16 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormSelectField
-                        field={field}
-                        onChange={(e) => field.handleChange(e.value)}
-                        options={propertyOptions}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormSelectField
+                      field={field}
+                      onChange={(e) => field.handleChange(e.value)}
+                      options={propertyOptions}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 位置 */}
               <div>
                 <form.Field
                   name="site"
@@ -527,17 +502,16 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormSelectField
-                        field={field}
-                        onChange={(e) => field.handleChange(e.value)}
-                        options={siteOptions}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormSelectField
+                      field={field}
+                      onChange={(e) => field.handleChange(e.value)}
+                      options={siteOptions}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 狀態 */}
               <div>
                 <form.Field
                   name="state"
@@ -554,17 +528,16 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormSelectField
-                        field={field}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.value)}
-                        options={statusOptions}
-                      />
-                    </>
+                    <FormSelectField
+                      field={field}
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.value)}
+                      options={statusOptions}
+                    />
                   )}
                 />
               </div>
+              {/* 製造商代號 */}
               <div>
                 <form.Field
                   name="maker"
@@ -581,61 +554,59 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <>
-                      <FormSelectField<MoldInfoInsertParams["maker"]>
-                        field={field}
-                        onChange={(e) => field.handleChange(e.value)}
-                        options={makerOptions}
-                        value={field.state.value}
-                      />
-                    </>
+                    <FormSelectField<MoldInfoInsertParams["maker"]>
+                      field={field}
+                      onChange={(e) => field.handleChange(e.value)}
+                      options={makerOptions}
+                      value={field.state.value}
+                    />
                   )}
                 />
               </div>
+              {/* 最後上機 */}
               <div>
                 <form.Field
                   name="dutydate_month"
                   children={(field) => (
-                    <>
-                      <FormInputFiled
-                        field={field}
-                        id="dutydate_month"
-                        type="date"
-                        name="dutydate_month"
-                        value={
-                          field.state.value === "0000-00-00"
-                            ? ""
-                            : field.state.value
-                        }
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </>
+                    <FormInputFiled
+                      field={field}
+                      id="dutydate_month"
+                      type="date"
+                      name="dutydate_month"
+                      value={
+                        field.state.value === "0000-00-00"
+                          ? ""
+                          : field.state.value
+                      }
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
                   )}
                 />
               </div>
               {/* TODO: See if I need to create a new component. */}
               {/* TODO: The current component might need a new props to include how col-span affects its layout */}
+              {/* 備註 */}
               <div className="col-span-2">
                 <form.Field
-                  name="dutydate_month"
+                  name="spare"
                   children={(field) => (
-                    <>
-                      <label
-                        htmlFor="spare"
-                        className="flex h-full items-center justify-between gap-4 p-2"
-                      >
-                        {/* 1/4 = 25% 25% / 2 = 12.5%  */}
-                        <span className="w-[12.5%]">備註</span>
-                        <span className="w-full">
-                          <textarea
-                            name="spare"
-                            id="spare"
-                            className="w-full rounded-md border"
-                          ></textarea>
-                        </span>
-                        <FieldInfo field={field} />
-                      </label>
-                    </>
+                    <label
+                      htmlFor="spare"
+                      className="flex h-full items-center justify-between gap-4 p-2"
+                    >
+                      {/* 1/4 = 25% 25% / 2 = 12.5%  */}
+                      <span className="w-[12.5%]">備註</span>
+                      <span className="w-full">
+                        <textarea
+                          name="spare"
+                          id="spare"
+                          className="w-full rounded-md border p-2"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        ></textarea>
+                      </span>
+                      <FieldInfo field={field} />
+                    </label>
                   )}
                 />
               </div>

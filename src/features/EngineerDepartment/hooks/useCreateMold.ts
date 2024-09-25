@@ -19,13 +19,11 @@ const api = import.meta.env.VITE_ENGINEER_DEPARTMENT_URL + "createSN/";
 
 type Form = FormApi<any, any> & ReactFormApi<any, any>;
 export default function useCreateMold(form: Form) {
-  const formValues = form?.state.values;
-  const mold_num = formValues?.mold_num;
-  const sys = formValues?.sys;
-  const sn_target = formValues?.sn_target;
+  const mold_num = form.useStore((state) => state.values.mold_num);
+  const sys = form.useStore((state) => state.values.sys);
+  const sn_target = form.useStore((state) => state.values.sn_target);
   const [userIsStillEditing, setUserIsStillEditing] = useState(false);
   const [isSnTargetValid, setIsSnTargetValid] = useState<boolean>(false);
-
   const canFetchSnNum =
     !!sys &&
     !userIsStillEditing &&
@@ -85,13 +83,11 @@ export default function useCreateMold(form: Form) {
     enabled: canFetchSnNum,
   });
 
-  // Use derived states
-  // form.setFieldValue("sn_num", String(snNumData));
   useEffect(() => {
-    console.log(snNumData);
-    form.setFieldValue("sn_num", String(snNumData));
-  }, [snNumData]);
-
+    if (snNumData !== undefined) {
+      form.setFieldValue("sn_num", snNumData.join(",")); // Update form state here
+    }
+  }, [snNumData, form]);
   // crud
   const { mutate, isPending, error, isSuccess } = useMutation({
     mutationFn: createNewMold,
@@ -131,7 +127,6 @@ export default function useCreateMold(form: Form) {
       const errorMessage = isAxiosError(error)
         ? error.response?.data.info_check.detail
         : error;
-      console.log(error);
       toast.error(`新增失敗 ${errorMessage}`, {
         position: "top-center",
         autoClose: 5000,
@@ -139,14 +134,9 @@ export default function useCreateMold(form: Form) {
       });
     },
   });
-
-  useEffect;
   const clearForm = () => {
-    // by using both reset and removeQueries, we can successfully reset the form
-    // TODO: Understand why I need to use both
-    queryClient.resetQueries({ queryKey: ["newMoldSnNum"] });
-    queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
     form.reset();
+    queryClient.removeQueries({ queryKey: ["newMoldSnNum"] });
   };
   return {
     isSuccess,
