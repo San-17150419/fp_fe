@@ -17,8 +17,8 @@ export default function FormField({
         htmlFor={field.name}
         className="relative flex h-full items-center justify-between gap-6 p-2"
       >
-        <span className="w-1/4">{t(field.name)}</span>
-        <span className="w-3/4">{children}</span>
+        <span className="w-[30%]">{t(field.name)}</span>
+        <span className="w-[70%]">{children}</span>
         <FieldInfo field={field} />
       </label>
     </>
