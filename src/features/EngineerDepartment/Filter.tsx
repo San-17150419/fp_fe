@@ -8,7 +8,6 @@ import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
 import { lazy } from "react";
 const PostFilter = lazy(() => import("./PostFilter"));
 import Select from "../../Components/modd/Select/Select";
-import Notification from "../../Components/modd/Modal/Notification";
 
 export default function Filter({
   seriesOptions,
@@ -65,8 +64,6 @@ export default function Filter({
           isLoading={isLoading}
         />
       </>
-
-      <Notification />
     </div>
   );
 }

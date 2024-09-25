@@ -4,9 +4,12 @@ import Navbar from "./Components/modd/Navbar/Navbar";
 import { Suspense } from "react";
 import Loading from "./Components/Loading";
 import ButtonsGroup from "./Components/modd/ButtonsGroup";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <>
+      <ToastContainer position="top-center" autoClose={3000}  />
       <Navbar>
         <Navbar.Logo src="/logo_banner5.png" />
         <Navbar.Items className="w-full">
@@ -30,6 +33,7 @@ function App() {
           </div>
         </div>
       </div>
+      <div id="modal-root"></div>
     </>
   );
 }
