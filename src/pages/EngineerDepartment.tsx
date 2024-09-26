@@ -12,5 +12,11 @@ export default function EngineerDepartment() {
   // call useENGDepartmentPreData at the highest level to ensure data is ready before children render.
   // should not use useENGDepartmentPreData in the children component. Everytime useENGDepartmentPreData is called, the useQuery will be called again, which will cause the component to rerender, even if the data is not changed.
   const { isPending } = useENGDepartmentPreData();
-  return <div className="-mx-10">{isPending ? <Loading /> : <Outlet />}</div>;
+  return (
+    <div className="-mx-10">
+      {isPending && <Loading />}
+      <Outlet />
+      {/* {isPending ? <Loading text="Data loading" /> : <Outlet />} */}
+    </div>
+  );
 }
