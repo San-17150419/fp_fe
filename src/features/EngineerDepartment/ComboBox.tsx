@@ -4,7 +4,7 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 type Option<T> = {
   id: string | number;
@@ -28,22 +28,19 @@ export default function ComboBox<T>({
   const [selected, setSelected] = useState<Option<T>>(defaultValue);
   const [query, setQuery] = useState<string>("");
 
-  const optionsWithNoDuplicateText = [
-    // remove options with duplicate text
-    ...new Map(options.map((option) => [option.text, option])).values(),
-  ]
-    // remove options with empty text (localeCompare can't compare empty strings)
-    .filter((option) => option.text)
-    // do sorting last to avoid unnessary operations
-    .toSorted((a, b) => a.text.localeCompare(b.text));
+  const optionsWithNoDuplicateText = useMemo(() => {
+    return [...new Map(options.map((option) => [option.text, option])).values()]
+      .filter((option) => option.text)
+      .sort((a, b) => a.text.localeCompare(b.text));
+  }, [options]);
 
-  const filteredValue =
-    query === ""
-      ? optionsWithNoDuplicateText
-      : // ? [defaultValue, ...options]
-        optionsWithNoDuplicateText.filter((item) => {
-          return item.text.toLowerCase().trim().includes(query.toLowerCase());
-        });
+  const filteredValue = useMemo(() => {
+    if (query === "") return optionsWithNoDuplicateText;
+    return optionsWithNoDuplicateText.filter((item) =>
+      item.text.toLowerCase().includes(query.toLowerCase().trim()),
+    );
+  }, [query, optionsWithNoDuplicateText]);
+
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
       // TODO: escape key does not clear the displayed value, but it does clear the combobox.
