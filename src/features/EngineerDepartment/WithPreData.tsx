@@ -1,16 +1,21 @@
-import useENGDepartmentPreData from "./hooks/useENGDepartmentPreData";
 import Loading from "../../Components/Loading";
-import ErrorPage from "../../pages/ErrorPage";
-import {type PreFilterData} from "./hooks/useENGDepartmentPreData";
-// A HOC that wraps a component with pre data from the server
-// encapsulates the usePreData hook and passes the data to the wrapped component 
-// 
-export default function withPreData<T>(Component: React.ComponentType<T & PreFilterData>) {
+import { type PreFilterData } from "./hooks/useENGDepartmentPreData";
+import { useQuery } from "@tanstack/react-query";
+export default function withPreData<T>(
+  Component: React.ComponentType<T & PreFilterData>,
+) {
   return function WrappedComponent(props: T) {
-    const { isPending, data, error } = useENGDepartmentPreData();
+    // You can call useQuery without queryFn with enabled: false.  This allows you to subscribe to a query without fetching it.
+    const { data } = useQuery<PreFilterData>({
+      queryKey: ["ENGDPreData"],
+      enabled: false,
+    });
 
-    if (isPending || !data) return <Loading />;
-    if (error) return <ErrorPage error={error} />;
+    // You can also use useQueryClient to access the data from the query cache. But this does not allow you to subscribe to a query. Meaning that if the data changes, the component won't be re-rendered. It's acceptable in this case because ENGDPreData is relatively static and unlikely to change during the lifetime of the app.
+
+    // const queryClient = useQueryClient();
+    // const data = queryClient.getQueryData<PreFilterData>(["ENGDPreData"]);
+    if (!data) return <Loading text="Component with pre data loading" />;
     return <Component {...props} {...data} />;
   };
 }
