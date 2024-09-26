@@ -1,26 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ComboBox from "./ComboBox";
-import { type FilterData } from "./types";
 import Table from "./Table";
+import { type FilterDataDictionary } from "./utils/createDictionary";
+import { type OptionDictionary } from "./hooks/usePreFilter";
+import Loading from "../../Components/Loading";
 
-// TODO
 // TODO: Centrailize type
-type OptionDictionary = {
-  [key: string]: { text: string; value: string; id: string };
-};
 
 type PostFilterProps = {
-  data: {
-    allData: {
-      [key: string]: FilterData["data"][number];
-    };
-    moldNumToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-    boardNameToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-  };
+  data: FilterDataDictionary;
   isLoading: boolean;
   postFilterOptions: {
     snNumOptions: OptionDictionary;
@@ -51,7 +39,7 @@ export default function PostFilter({
     setCurrentSnNum(selectedSnNum);
   };
 
-  const visibleList: Array<string> = (() => {
+  const visibleList: Array<string> = useMemo(() => {
     if (currentSnNum !== "") return [currentSnNum];
     const nameBoardSet = new Set(
       data["boardNameToId"][currentBoardName === "" ? "all" : currentBoardName],
@@ -62,7 +50,7 @@ export default function PostFilter({
     );
     const intersection = nameBoardSet.intersection(moldNumSet);
     return Array.from(intersection);
-  })();
+  }, [currentBoardName, currentMoldNum, currentSnNum, data]);
 
   return (
     <>
@@ -87,13 +75,13 @@ export default function PostFilter({
           name="模具唯一碼"
         />
       </div>
-      <div className="order-last flex h-full min-w-full flex-shrink flex-col">
-        <Table
-          data={Object.values(data.allData)}
-          visibleList={visibleList}
-          isLoading={isLoading}
-        />
-      </div>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className="order-last flex h-[70vh] min-w-full flex-shrink flex-col">
+          <Table data={Object.values(data.allData)} visibleList={visibleList} />
+        </div>
+      )}
     </>
   );
 }

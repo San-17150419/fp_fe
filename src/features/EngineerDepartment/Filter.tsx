@@ -15,7 +15,7 @@ export default function Filter({
   propertyOptions,
 }: PreFilterData) {
   const {
-    isLoading,
+    isPending,
     setSys,
     setProperty,
     setSite,
@@ -25,6 +25,7 @@ export default function Filter({
     property,
     sys,
   } = usePreFilter();
+
   return (
     <div className="flex flex-wrap justify-around gap-4">
       <>
@@ -57,11 +58,16 @@ export default function Filter({
             value={site}
           />
         </div>
-
         <PostFilter
-          data={data}
-          postFilterOptions={postFilterOptions}
-          isLoading={isLoading}
+          data={data ?? { allData: {}, boardNameToId: {}, moldNumToId: {} }}
+          postFilterOptions={
+            postFilterOptions ?? {
+              snNumOptions: {},
+              boardNameOptions: {},
+              moldNumOptions: {},
+            }
+          }
+          isLoading={isPending}
         />
       </>
     </div>
