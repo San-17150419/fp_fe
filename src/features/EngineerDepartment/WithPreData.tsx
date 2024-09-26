@@ -15,7 +15,7 @@ export default function withPreData<T>(
 
     // const queryClient = useQueryClient();
     // const data = queryClient.getQueryData<PreFilterData>(["ENGDPreData"]);
-    if (!data) return <Loading text="Component with pre data loading" />;
+    if (!data) return <Loading />;
     return <Component {...props} {...data} />;
   };
 }
