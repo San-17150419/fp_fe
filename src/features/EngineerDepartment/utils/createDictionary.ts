@@ -1,17 +1,23 @@
 import { MoldStatus, PnbState, type FilterData, type Site } from "../types";
 
+export type FilterDataDictionary = {
+  allData: {
+    [key: string]: FilterData["data"][number];
+  };
+  moldNumToId: {
+    [key: string]: Array<FilterData["data"][number]["sn_num"]>;
+  };
+  boardNameToId: {
+    [key: string]: Array<FilterData["data"][number]["sn_num"]>;
+  };
+};
+
 export const createDictionary = (data: FilterData["data"]) => {
-  const dictionary: {
-    allData: {
-      [key: string]: FilterData["data"][number];
-    };
-    moldNumToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-    boardNameToId: {
-      [key: string]: Array<FilterData["data"][number]["sn_num"]>;
-    };
-  } = { allData: {}, moldNumToId: {}, boardNameToId: {} };
+  const dictionary: FilterDataDictionary = {
+    allData: {},
+    moldNumToId: {},
+    boardNameToId: {},
+  };
 
   data.forEach((d) => {
     // create a dictionary that represents data in unfiltered form
