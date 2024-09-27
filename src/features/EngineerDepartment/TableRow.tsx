@@ -39,12 +39,11 @@ const TableRow = memo(
     ];
 
     return (
-      <>
+      <tr>
         {order.map((key) => {
           if (!visibleColumns[key]) {
             return null;
           }
-
           const cellContent = renderCellContent(key, data);
           return (
             <TableCell
@@ -55,7 +54,7 @@ const TableRow = memo(
             </TableCell>
           );
         })}
-      </>
+      </tr>
     );
   }),
 );
@@ -124,82 +123,15 @@ function renderCellContent(key: string, data: FilterData["data"][number]) {
 function getClassName(key: string) {
   switch (key) {
     case "sn_num":
-      return "text-blue-400 ";
-    case "sys":
-      return " ";
-    case "property":
-      return " ";
-    case "site":
-      return " ";
-    case "brand":
-      return "";
+      return "min-w-[130px] text-blue-400 ";
     case "prod_name_board":
-      return "text-red-400 ";
-    case "pnb_state":
-      return "";
-    case "prod_name_nocolor":
-      return " ";
-    case "mold_num":
-      return " ";
-    case "hole_num":
-      return " ";
-    case "block_num":
-      return " ";
-    case "dutydate_month":
-      return "text-sm ";
+      return "min-w-[185px] text-red-400 ";
+
     case "dutydate_last":
-      return "text-sm text-blue-400 ";
-    case "maker":
-      return "text-sm ";
-    case "state":
-      return "text-sm ";
-    case "spare":
-      return "text-sm ";
-    case "id_ms":
-      return "text-sm ";
+      return " text-blue-400 ";
     default:
       return "";
   }
 }
-// function getClassName(key: string, data: FilterData["data"][number]) {
-//   switch (key) {
-//     case "sn_num":
-//       return "text-blue-400 w-[155px]";
-//     case "sys":
-//       return " w-[90px]";
-//     case "property":
-//       return " w-[85px]";
-//     case "site":
-//       return " w-[60px]";
-//     case "brand":
-//       return "w-[60px]";
-//     case "prod_name_board":
-//       return "text-red-400 w-[215px]";
-//     case "pnb_state":
-//       return "w-[90px]";
-//     case "prod_name_nocolor":
-//       return " w-[160px]";
-//     case "mold_num":
-//       return " w-[70px]";
-//     case "hole_num":
-//       return " w-[70px]";
-//     case "block_num":
-//       return " w-[60px]";
-//     case "dutydate_month":
-//       return "text-sm w-[130px]";
-//     case "dutydate_last":
-//       return "text-sm text-blue-400 w-[130px]";
-//     case "maker":
-//       return "text-sm w-[100px]";
-//     case "state":
-//       return "text-sm w-[100px]";
-//     case "spare":
-//       return "text-sm w-[100px]";
-//     case "id_ms":
-//       return "text-sm w-[100px]";
-//     default:
-//       return "";
-//   }
-// }
 
 export default TableRow;

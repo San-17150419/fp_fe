@@ -79,7 +79,7 @@ export default function PostFilter({
         <Loading />
       ) : (
         <div className="order-last flex h-[70vh] min-w-full flex-shrink flex-col">
-          <Table data={Object.values(data.allData)} visibleList={visibleList} />
+          <Table dataRecord={data.allData} visibleList={visibleList} />
         </div>
       )}
     </>
