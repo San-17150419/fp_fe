@@ -20,7 +20,8 @@ export default function Select<T>({
   name,
   defaultValue,
   disabled = false,
-  value
+  value,
+  withBorder = true,
 }: SelectProps<T>) {
   const { t } = useTranslation();
 
@@ -83,6 +84,7 @@ export default function Select<T>({
                 !disabled &&
                   "cursor-pointer hover:border-sky-300 focus:border-2 focus:border-sky-400",
                 isInvalid && !open && "border border-red-500",
+                !withBorder && "border-none",
               )}
             >
               <p className="max-w-4/5 truncate">
@@ -99,7 +101,7 @@ export default function Select<T>({
               anchor="bottom"
               modal={false}
               className={clsx(
-                "z-[100] w-[var(--button-width)] origin-top rounded-md bg-white transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0",
+                "z-[100] w-[var(--button-width)] origin-top rounded-md border border-gray-300 bg-white transition duration-200 ease-out data-[closed]:scale-95 data-[enter]:border-blue-300 data-[closed]:opacity-0",
               )}
             >
               {options.map((option) => (
@@ -136,4 +138,5 @@ export type SelectProps<T> = {
   onFocus?: () => void;
   //TODO: I think onSelect and onChange are the same. Choose one.
   onChange?: (option: Option<T>) => void;
+  withBorder?: boolean;
 };
