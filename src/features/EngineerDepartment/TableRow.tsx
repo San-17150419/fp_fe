@@ -1,4 +1,4 @@
-import { memo, type PropsWithRef, forwardRef } from "react";
+import { memo } from "react";
 import { type FilterData } from "./types";
 import Update from "./Update";
 import MemoCell from "./MemoCell";
@@ -8,56 +8,49 @@ import withPreData from "./WithPreData";
 type TableRowProps = {
   data: FilterData["data"][number];
   visibleColumns: Record<string, boolean>;
-} & PropsWithRef<JSX.IntrinsicElements["tr"]>;
+};
 
 const UpdateWithPreData = withPreData(Update);
-const TableRow = memo(
-  forwardRef<HTMLTableRowElement, TableRowProps>(function TableRow({
-    data,
-    visibleColumns,
-    ref,
-  }: TableRowProps) {
-    console.log(ref);
-    const order = [
-      "sn_num",
-      "sys",
-      "property",
-      "site",
-      "brand",
-      "prod_name_board",
-      "pnb_state",
-      "prod_name_nocolor",
-      "mold_num",
-      "hole_num",
-      "block_num",
-      "dutydate_month",
-      "dutydate_last",
-      "maker",
-      "state",
-      "spare",
-      "id_ms",
-    ];
+const TableRow = memo(function TableRow({
+  data,
+  visibleColumns,
+}: TableRowProps) {
+  const order = [
+    "sn_num",
+    "sys",
+    "property",
+    "site",
+    "brand",
+    "prod_name_board",
+    "pnb_state",
+    "prod_name_nocolor",
+    "mold_num",
+    "hole_num",
+    "block_num",
+    "dutydate_month",
+    "dutydate_last",
+    "maker",
+    "state",
+    "spare",
+    "id_ms",
+  ];
 
-    return (
-      <tr>
-        {order.map((key) => {
-          if (!visibleColumns[key]) {
-            return null;
-          }
-          const cellContent = renderCellContent(key, data);
-          return (
-            <TableCell
-              key={`${key}-${data.id_ms}`}
-              className={getClassName(key)}
-            >
-              {cellContent}
-            </TableCell>
-          );
-        })}
-      </tr>
-    );
-  }),
-);
+  return (
+    <tr>
+      {order.map((key) => {
+        if (!visibleColumns[key]) {
+          return null;
+        }
+        const cellContent = renderCellContent(key, data);
+        return (
+          <TableCell key={`${key}-${data.id_ms}`} className={getClassName(key)}>
+            {cellContent}
+          </TableCell>
+        );
+      })}
+    </tr>
+  );
+});
 
 function TableCell({
   children,
