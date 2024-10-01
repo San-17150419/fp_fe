@@ -78,9 +78,9 @@ function renderCellContent(key: string, data: FilterData["data"][number]) {
       return data.prod_name_board;
     case "pnb_state":
       return data.pnb_state === "incomplete" ? (
-        <span className="text-red-600">未完成</span>
+        <div className="text-red-600">未完成</div>
       ) : (
-        <span className="text-blue-600">完成</span>
+        <div className="text-blue-600">完成</div>
       );
     case "prod_name_nocolor":
       return data.prod_name_nocolor;
