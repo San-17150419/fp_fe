@@ -85,7 +85,7 @@ export default function ComboBox<T>({
         // name={name}
         onChange={(event) => setQuery(event.target.value)}
         className={
-          "h-9 w-full rounded-md border border-gray-300 p-2 shadow-sm shadow-slate-300"
+          "h-9 w-full rounded-md border border-gray-300 p-2 shadow-sm shadow-slate-300 focus:outline-blue-300"
         }
       />
       <ComboboxOptions
