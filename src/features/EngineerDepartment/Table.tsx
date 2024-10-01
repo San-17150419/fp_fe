@@ -136,18 +136,18 @@ const memoizedTable = memo(function Table({
             </TabPanels>
           </table>
         </div>
-        <TabList className="mt-2 flex gap-2 justify-end ">
+        <TabList className="mt-6 flex justify-end gap-2">
           {paginatedList.map((_, pageIndex) => (
             <Tab
-              className="p-0 m-0 aspect-square w-6 border outline-none bg-white caret-transparent shadow-md"
+              className="m-0 aspect-square w-6 border bg-white p-0 caret-transparent shadow-md outline-none"
               key={`tab-${pageIndex}`}
             >
               {({ selected }) => (
-                <span
-                  className={`block  outline-none ${selected ? "bg-blue-500" : ""}`}
+                <div
+                  className={`block outline-none ${selected ? "bg-blue-500" : ""}`}
                 >
                   {pageIndex + 1}
-                </span>
+                </div>
               )}
             </Tab>
           ))}
