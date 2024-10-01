@@ -2,16 +2,22 @@ import { useState } from "react";
 import Modal from "../Components/modd/Modal/NonDialogModal";
 import { LuUpload } from "react-icons/lu";
 import clsx from "clsx";
-import Form from "../features/WareHouse/Form/Form";
 import InputField from "../features/WareHouse/Form/InputField";
-import FormFieldContent from "../features/WareHouse/Form/FormField";
-import { useForm, mergeForm, useTransform } from "@tanstack/react-form";
+import SelectField from "../features/WareHouse/Form/SelectField";
+import { type Option } from "../Components/modd/Select/Select";
+import { useForm } from "@tanstack/react-form";
 import axios from "axios";
 import { type CheckOrderNumResponseData } from "../features/WareHouse/types/CheckOrderNumTypes";
+import { type CheckDocNumResponse } from "../features/WareHouse/types";
 export default function Warehouse() {
   // const
   const [isOpen, setIsOpen] = useState(false);
-  // const [state, action] = useActionState(someAction, initialFormState)
+  const [orderDetails, setOrderDetails] = useState<
+    Array<CheckOrderNumResponseData["order"][number]>
+  >([]);
+  const [orderProductOptions, setOrderProductOptions] = useState<
+    Array<Option<string>>
+  >([]);
   const defaultData = {
     doc_num: "",
     supplier_code: "",
@@ -57,26 +63,26 @@ export default function Warehouse() {
             )}
           />
           <form.Field
-            asyncDebounceMs={1000}
+            asyncDebounceMs={200}
             validators={{
               onChangeAsync: async ({ value }) => {
-                console.log("A request is sent to server");
-                const response = await axios
-                  .post(
-                    "https://192.168.123.240:9000/api/rr-inv/check-docNum",
-                    {
-                      doc_num: value,
-                      // pattern: "return",
-                      pattern: "receive",
-                    },
-                  )
-                  .catch((e) => {
-                    console.log(e);
-                    return "驗收單號不存在";
+                try {
+                  const response = await axios.post<
+                    CheckDocNumResponse<"receive">
+                  >("https://192.168.123.240:9000/api/rr-inv/check-docNum", {
+                    doc_num: value,
+                    pattern: "receive",
                   });
-
-                console.log(response);
-                return undefined;
+                  console.log(response.data);
+                  if (!response.data.data.doc_exist) {
+                    return undefined;
+                  } else {
+                    return "文件編碼已存在";
+                  }
+                } catch (error) {
+                  console.log(error);
+                  return "文件編碼已存在";
+                }
               },
             }}
             key="doc_num"
@@ -84,34 +90,53 @@ export default function Warehouse() {
             children={(field) => <InputField field={field} span={2} />}
           />
           <form.Field
+            // TODO: Right now, in order to prevent sending requests too often, I am using asyncDebounceMs. But this might have negative effects on user experience. For example, when they copy and paste the order number, there will still be a 500ms delay. It is possible to reduce the delay so that it is negligible to the user, but still prevent sending requests too often. If this is still an issue, I might need to manually debounce the requests so the logic is more refined.
+            // TODO: Idealy, when the order number is changed ( for example, cleared), fields that are dependent on the order number should also be cleared.
             asyncDebounceMs={500}
             validators={{
               onChangeAsync: async ({ value }) => {
-                const response = await axios
-                  .post<CheckOrderNumResponseData>(
+                try {
+                  const response = await axios.post<CheckOrderNumResponseData>(
                     "https://192.168.123.240:9000/api/rr-inv/check-orderNum",
                     {
                       order_num: value,
                     },
-                  )
-                  .catch((e) => {
-                    console.log(e);
-                    return "訂單號碼不存在";
-                  });
-                if (typeof response !== "string") {
-                  console.log(response.data.order[0].supplier_code);
-                  const isOrderExist = response.data.order.length > 0;
-                  if (!isOrderExist) {
+                  );
+                  console.log(response.data);
+                  if (
+                    response &&
+                    response.data &&
+                    Array.isArray(response.data.order)
+                  ) {
+                    const isOrderExist = response.data.order.length > 0;
+                    const productOptions: Option<string>[] =
+                      response.data.order.map((item) => ({
+                        value: item.order_product,
+                        text: item.order_product,
+                        id: item.order_product,
+                      }));
+
+                    setOrderProductOptions(productOptions);
+                    setOrderDetails(response.data.order);
+                    if (!isOrderExist) {
+                      return "訂單號碼不存在";
+                    } else {
+                      // TODO: Maybe send a notification if total_delivered already exeeds amt_order? And lock the submit button.
+
+                      form.setFieldValue(
+                        "supplier_code",
+                        response.data.order[0].supplier_code,
+                      );
+                      return undefined;
+                    }
+                  } else {
+                    console.log("Unexpected response structure");
                     return "訂單號碼不存在";
                   }
-                  form.setFieldValue(
-                    "supplier_code",
-                    response.data.order[0].supplier_code,
-                  );
+                } catch (e) {
+                  console.log("Error occurred:", e);
+                  return "訂單號碼不存在"; // Catch any network or server errors
                 }
-
-                console.log(response);
-                return undefined;
               },
             }}
             key="order_num"
@@ -123,10 +148,88 @@ export default function Warehouse() {
             name="supplier_code"
             children={(field) => <InputField field={field} span={1} />}
           />
+
           <form.Field
             key="order_product"
             name="order_product"
-            children={(field) => <InputField field={field} span={1} />}
+            validators={{
+              onChange({ value }) {
+                const orderProdType = orderDetails.find((order) => {
+                  return order.order_product === value;
+                });
+                if (!orderProdType) {
+                  console.log("orderProdType not found");
+                  const meta = form.getFieldMeta("order_prodType");
+                  if (meta) {
+                    console.log("field meta");
+                    form.setFieldMeta("order_prodType", {
+                      ...meta,
+                      errors: [...meta?.errors, "訂單型號不存在"],
+                    });
+                  } else {
+                    console.log("field meta not found");
+                  }
+                } else {
+                  form.setFieldValue(
+                    "order_prodType",
+                    orderProdType.order_prodType,
+                  );
+                }
+                // TODO: I need to set deliver_product as well. I think this is from product_option
+
+                const orderProdModel = orderDetails.find((order) => {
+                  return order.order_product === value;
+                });
+                if (!orderProdModel) {
+                  console.log("orderProdModel not found");
+                  const meta = form.getFieldMeta("order_prodModel");
+                  if (meta) {
+                    console.log("field meta");
+                    form.setFieldMeta("order_prodModel", {
+                      ...meta,
+                      errors: [...meta?.errors, "訂單型號不存在"],
+                    });
+                  } else {
+                    console.log("field meta not found");
+                  }
+                } else {
+                  form.setFieldValue(
+                    "order_prodModel",
+                    orderProdModel.order_prodModel,
+                  );
+                }
+                //TODO: Remove redundant check. And the unit should be added to deliver_product, not amt_unit_sub
+                const amtUnit = orderDetails.find((order) => {
+                  return order.order_product === value;
+                })?.amt_unit;
+                if (!amtUnit) {
+                  console.log("amtUnit not found");
+                  const meta = form.getFieldMeta("amt_unit");
+                  if (meta) {
+                    console.log("field meta");
+                    form.setFieldMeta("amt_unit", {
+                      ...meta,
+                      errors: [...meta?.errors, "訂單型號不存在"],
+                    });
+                  } else {
+                    console.log("field meta not found");
+                  }
+                } else {
+                  form.setFieldValue("amt_unit", amtUnit);
+                }
+                // TODO: This is needed to reset deliver_product when order_product is changed. I am not sure this is the correct way to do so. form.Subscribe
+                form.setFieldValue("deliver_product", "");
+
+                return undefined;
+              },
+            }}
+            children={(field) => (
+              <SelectField
+                field={field}
+                options={orderProductOptions}
+                span={1}
+              />
+            )}
           />
           <form.Field
             key="order_prodType"
@@ -138,16 +241,96 @@ export default function Warehouse() {
             name="order_prodModel"
             children={(field) => <InputField field={field} span={1} />}
           />
-          <form.Field
-            key="deliver_product"
-            name="deliver_product"
-            children={(field) => <InputField field={field} span={2} />}
+          <form.Subscribe
+            selector={(state) => ({
+              currentOrderProduct: state.values.order_product,
+            })}
+            children={({ currentOrderProduct }) => {
+              console.log("this is render");
+              return (
+                <form.Field
+                  key="deliver_product"
+                  name="deliver_product"
+                  // TODO: This is not responsive as I hope. When currentProduct is changed, the value should be reset. But right now, I need to manually reset it in the onChange handler of the order_product field. (the options are updated, but the value is not changed. )
+                  // The value in form, field, FormInputField, formField, and Select is the same. So this is not caused by unsync data. So I probably don't need to worry about it. As long as the value in form is correctly set, all data is correct. But I still need to do more tests to confirm it.
+                  children={(field) => (
+                    <SelectField
+                      options={(() => {
+                        const options: Option<string>[] = [
+                          { value: "", text: "", id: "" },
+                        ];
+                        orderDetails
+                          .find(
+                            (order) =>
+                              order.order_product === currentOrderProduct,
+                          )
+                          ?.product_option.map((item) => ({
+                            value: item.item_code,
+                            text: item.item_name,
+                            id: item.item_code,
+                          }))
+                          .forEach((item) => options.push(item));
+
+                        // console.log(options);
+                        return options;
+                      })()}
+                      field={field}
+                      span={2}
+                    />
+                  )}
+                />
+              );
+            }}
           />
           <form.Field
+            // TODO: See where can I add amt_unit to this.  I think I need to modify InputField component to do so.
+            validators={{
+              onChangeListenTo: ["order_product"],
+              onChange: ({ value, fieldApi }) => {
+                if (!/^[0-9]*$/.test(value)) return "數字格式錯誤";
+                const currentOrderProduct =
+                  fieldApi.form.getFieldValue("order_product");
+                const history = orderDetails.find((order) => {
+                  return order.order_product === currentOrderProduct;
+                })?.history;
+                const amtOrder = orderDetails.find((order) => {
+                  return order.order_product === currentOrderProduct;
+                })?.amt_order;
+                if (!history) {
+                  // TODO: I need to think when this happens. If I lock this field untill order_product has a value, then history should always exist?
+                  console.log("history not found");
+                  return undefined;
+                }
+                console.log("history", history);
+                if (!!amtOrder) {
+                  console.log(
+                    amtOrder - Number(history.total_delivered) - Number(value) <
+                      0,
+                  );
+                }
+                // TODO: Refactor this.
+                if (!!history.total_delivered) {
+                  if (!!amtOrder) {
+                    if (
+                      amtOrder -
+                        Number(history.total_delivered) -
+                        Number(value) <
+                      0
+                    ) {
+                      return "訂單已達收取上限";
+                    } else {
+                      return undefined;
+                    }
+                  }
+                }
+                return undefined;
+              },
+            }}
             key="deliver_prodNum"
             name="deliver_prodNum"
             children={(field) => <InputField field={field} span={2} />}
           />
+
           <form.Field
             key="amt_delivered_sub"
             name="amt_delivered_sub"
@@ -158,7 +341,10 @@ export default function Warehouse() {
             name="amt_unit"
             children={(field) => <InputField field={field} span={1} />}
           />
+          {/* TODO: use form.Subscribe component to perform side effect. See if I can build a custom component on top of this. fields that are autofilled   */}
+          {/* TODO: Pay atttention to how many times form.Subscribe component is re-rendered. I am not sure if the selector inside the form.Subscribe component is functioning as the selector from redux. Allows you to subscribe to a specific part of the data to optimize rendering */}
           <div className="hidden">
+            {/* TODO: Check what fields are rendered or displayed to the user. If they don't need to be seen, I think I don't need to render them and simply update their value from the onChange handler in other fields (order_product and deliver_product) */}
             <form.Field
               key="amt_unit_sub"
               name="amt_unit_sub"
@@ -200,6 +386,7 @@ export default function Warehouse() {
             })}
             children={({ canSubmit, isSubmitting, isDirty }) => {
               const isBTNDisabled = !canSubmit || isSubmitting || !isDirty;
+              // TODO: Update isBTNDisabled logic to ensure the button is disabled when at least one field is not valid. (The problem is the validator in each fields is only run when the field is touched. So technically speaking, if field is not touched, then the field is valid.)
               return (
                 <>
                   <button
