@@ -5,10 +5,15 @@ import FieldInfoBase from "./FieldInfo";
 export default function FormField({
   field,
   span = 1,
+  isRequired = false,
+  labelStyle = "",
   children,
 }: {
   field: FieldApi<any, any, any, any>;
   span: number;
+  isRequired?: boolean;
+  labelStyle?: string;
+  // labelStyle?: React.CSSProperties;
   children: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -16,10 +21,12 @@ export default function FormField({
     <>
       <label
         htmlFor={field.name}
-        className={`col-span-${span} outline flex h-12 flex-col gap-4 border-b-2 text-sm`}
+        className={`col-span-${span} $ relative flex flex-col justify-start gap-4 border-b-2 text-sm`}
       >
-        <span className="w-[30%] outline">{t(field.name)}</span>
-        <span className="w-[70%]">{children}</span>
+        <span className={`text-nowrap ${labelStyle}`}>
+          {t(field.name)} {isRequired && "*"}
+        </span>
+        <span className="w-full pb-1">{children}</span>
         <FieldInfo field={field} />
       </label>
     </>
