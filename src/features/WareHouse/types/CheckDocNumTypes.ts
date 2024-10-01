@@ -84,7 +84,7 @@ export type CheckDocNumParams = {
 export type CheckDocNumResponse<T extends Pattern> = {
   post: T extends "receive" ? ReceivePost : ReturnPost;
   data: T extends "receive"
-    ? never
+    ? { doc_exist: boolean; result: "available" | "unavailable" }
     : {
         post: {
           pattern: "return";
@@ -92,5 +92,9 @@ export type CheckDocNumResponse<T extends Pattern> = {
         };
         data: ReturnData;
       };
+  result: T extends "receive" ? "available" | "unavailable" : never;
+  info_check: {
+    status: string;
+    message: "";
+  };
 };
-
