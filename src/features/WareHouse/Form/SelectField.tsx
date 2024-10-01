@@ -8,17 +8,30 @@ import clsx from "clsx";
 type FormInputFieldProps<T> = {
   field: FieldApi<any, any, any, any>;
   span: number;
+  labelStyle?: string;
+  // labelStyle?: React.CSSProperties;
+  isRequired?: boolean;
 } & SelectProps<T>;
+// TODO: I need to decrease the height of the select
 export default function FormInputField<T>({
   field,
   span,
+  labelStyle,
+  isRequired = false,
   ...selectProps
 }: FormInputFieldProps<T>) {
   return (
-    <FormFieldContent field={field} span={span}>
+    <FormFieldContent
+      field={field}
+      span={span}
+      isRequired={isRequired}
+      labelStyle={labelStyle}
+    >
       <Select
         value={field.state.value}
         onChange={(e) => field.handleChange(e.value)}
+        withBorder={false}
+        // withBorder={false}
         className="w-full border-none bg-transparent outline-none"
         {...selectProps}
       />
