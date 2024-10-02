@@ -6,7 +6,13 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "./stores/AuthContext";
 import "./i18n";
-import { ErrorPage, FactoryLogPage, Loading, ModelOverview } from "./pages";
+import {
+  ErrorPage,
+  FactoryLogPage,
+  Loading,
+  ModelOverview,
+  Warehouse,
+} from "./pages";
 import { ThemeProvider } from "./stores/ThemeContext";
 import {
   QueryCache,
@@ -158,12 +164,51 @@ const router = createBrowserRouter([
       },
       {
         path: "/Warehouse",
-        lazy: async () => {
-          let { default: Warehouse } = await import("./pages/Warehouse");
-          return {
-            Component: Warehouse,
-          };
-        },
+        element: <Warehouse />,
+        children: [
+          {
+            index: true,
+            lazy: async () => {
+              let { default: Warehouse } = await import("./pages/Warehouse");
+              return {
+                Component: Warehouse,
+              };
+            },
+          },
+          {
+            path: "product-recieve-form",
+            lazy: async () => {
+              let { default: RecieveForm } = await import(
+                "./features/WareHouse/pages/RecieveForm"
+              );
+              return {
+                Component: RecieveForm,
+              };
+            },
+          },
+          {
+            path: "product-return-form",
+            lazy: async () => {
+              let { default: ReturnForm } = await import(
+                "./features/WareHouse/pages/ReturnForm"
+              );
+              return {
+                Component: ReturnForm,
+              };
+            },
+          },
+          {
+            path: "deliver-history-query",
+            lazy: async () => {
+              let { default: HistoryQuery } = await import(
+                "./features/WareHouse/pages/HistoryQuery"
+              );
+              return {
+                Component: HistoryQuery,
+              };
+            },
+          },
+        ],
       },
     ],
   },
