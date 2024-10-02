@@ -15,10 +15,10 @@ export type CheckOrderNumResponseData = {
     amt_unit: string;
     amt_order: number;
     history: {
-      total_delivered: number;
-      total_received: number|null;
-      total_returned: number|null;
-    };
+      total_delivered: number | null;
+      total_received: number | null;
+      total_returned: number | null;
+    } | null;
     product_option: Array<{
       item_name: string;
       item_code: string;
