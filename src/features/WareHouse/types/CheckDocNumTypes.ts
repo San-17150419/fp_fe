@@ -8,9 +8,6 @@ type ReturnPost = {
   doc_num: string;
 };
 
-type ReceiveData = {
-  result: "available" | "unavailable";
-};
 
 type ReturnData = {
   receipt: {
