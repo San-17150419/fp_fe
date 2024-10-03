@@ -65,7 +65,7 @@ export default function OrderDetails({ data }: OrderDetailsProps) {
             ))}
         </TabPanel>
         <TabPanel>
-          <InspectionForm data={formatData} />
+          <InspectionForm data={formatData} isReadOnly />
         </TabPanel>
       </TabPanels>
     </TabGroup>
