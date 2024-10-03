@@ -1,24 +1,25 @@
 import { useEffect } from "react";
 
-/**
- * A custom hook that adds event listeners to the window for both click and escape key presses.
- * If the click event occurs outside of the element referenced by `ref`, or if the escape key is pressed,
- * the `onClose` function is called. Focus is also managed to ensure the trigger element is focused when closing.
- *
- * @param {React.RefObject<HTMLElement>} ref - A reference to the element that should be considered the boundary for the click event.
- * @param {() => void} onClose - A function that should be called when a click event occurs outside of the element referenced by `ref`, or when the escape key is pressed.
- * @param {boolean} isOpen - A boolean that indicates if the element is open and should be focusable.
- * @return {void} This function does not return anything.
- */
+// The event execution order is: mousedown -> mouseup -> click.
+// Choose the event type based on the desired behavior:
+//
+// click:
+//  -This is useful in cases like the sidebar, where using "click" ensures that navigation can occur before the sidebar closes.
+//  - For cases like the modal, because the timing issue, using "click" might cause the modal to close immediately after it is opened.
+
+type EventType = "mousedown" | "mouseup" | "click";
+
 export default function useCloseAndEscape(
   ref: React.RefObject<HTMLElement>,
   onClose: () => void,
   isOpen: boolean,
   returnFocusOnClose: boolean = true,
+  eventType: EventType = "mousedown",
 ) {
   // const triggerRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // TODO: Consider if I need to add toastify to the white list. Right now, if I click on the toast, the modal will close.
       const headlessUiPortal = document.getElementById(
         "headlessui-portal-root",
       );
@@ -29,10 +30,6 @@ export default function useCloseAndEscape(
         // a check to ensure that the click was not triggered from the headless ui portal
         !(headlessUiPortal && headlessUiPortal.contains(event.target as Node))
       ) {
-        // This is for preventing element other than the trigger element from being focused when closing
-        // Without this, the focus would be lost when clicking outside of the element
-        event.preventDefault();
-        event.stopPropagation();
         onClose();
       }
     };
@@ -43,10 +40,10 @@ export default function useCloseAndEscape(
       }
     };
     if (isOpen) {
-      window.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener(eventType, handleClickOutside);
       window.addEventListener("keydown", handleEscape);
       return () => {
-        window.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener(eventType, handleClickOutside);
         window.removeEventListener("keydown", handleEscape);
       };
     }
