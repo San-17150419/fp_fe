@@ -41,13 +41,26 @@ export default function ProductRecieveForm() {
   const form = useForm({
     defaultValues: defaultData,
   });
+
+  function resetFormDataRelatedToOrderNum() {
+    form.setFieldValue("order_product", "");
+    setOrderDetails([]);
+    form.setFieldValue("supplier_code", "");
+    form.setFieldValue("order_prodType", "");
+    form.setFieldValue("order_prodModel", "");
+    form.setFieldValue("deliver_product", "");
+    form.setFieldValue("amt_delivered", "");
+    form.setFieldValue("amt_unit", "");
+    form.setFieldValue("deliver_prodNum", 0);
+    form.setFieldValue("amt_order", 0);
+    form.setFieldValue("id_order", 0);
+  }
   console.log(form.store.state.values);
   return (
     <>
-   
       <form
         action=""
-        className="flex h-fit min-w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
+        className="mx-auto flex h-fit w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
       >
         <h1 className="border-b-2 border-black py-2 text-center text-2xl font-semibold">
           輸入驗收單
@@ -125,6 +138,7 @@ export default function ProductRecieveForm() {
                     setOrderProductOptions(productOptions);
                     setOrderDetails(response.data.order);
                     if (!isOrderExist) {
+                      resetFormDataRelatedToOrderNum();
                       return "訂單號碼不存在";
                     } else {
                       // TODO: Maybe send a notification if total_delivered already exeeds amt_order? And lock the submit button.
@@ -231,6 +245,7 @@ export default function ProductRecieveForm() {
               <SelectField
                 field={field}
                 isRequired={true}
+                
                 options={orderProductOptions}
                 span={1}
               />
@@ -285,7 +300,6 @@ export default function ProductRecieveForm() {
                           }))
                           .forEach((item) => options.push(item));
 
-                        // console.log(options);
                         return options;
                       })()}
                       field={field}
