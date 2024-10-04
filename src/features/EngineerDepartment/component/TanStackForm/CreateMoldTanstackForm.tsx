@@ -101,7 +101,7 @@ export default function CreateMoldTanstackForm({
         onClick={() => setShowModal(true)}
         className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
       >
-        新增模具 with Tanstack
+        新增模具
       </div>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <form
@@ -218,7 +218,6 @@ export default function CreateMoldTanstackForm({
                   type="text"
                   disabled={!!snNumData}
                   maxLength={2}
-               
                 />
               )}
             />
@@ -255,10 +254,7 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <FormInputFiled
-                      field={field}
-                      type="text"
-                    />
+                    <FormInputFiled field={field} type="text" />
                   )}
                 />
               </div>
@@ -278,10 +274,7 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <FormInputFiled
-                      field={field}
-                      type="text"
-                    />
+                    <FormInputFiled field={field} type="text" />
                   )}
                 />
               </div>
@@ -353,15 +346,11 @@ export default function CreateMoldTanstackForm({
                       if (!value) {
                         return "財產編號為必填";
                       }
-
                       return undefined;
                     },
                   }}
                   children={(field) => (
-                    <FormInputFiled
-                      field={field}
-                      type="text"
-                    />
+                    <FormInputFiled field={field} type="text" />
                   )}
                 />
               </div>
@@ -438,10 +427,7 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <FormSelectField
-                      field={field}
-                      options={propertyOptions}
-                    />
+                    <FormSelectField field={field} options={propertyOptions} />
                   )}
                 />
               </div>
@@ -462,10 +448,7 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <FormSelectField
-                      field={field}
-                      options={siteOptions}
-                    />
+                    <FormSelectField field={field} options={siteOptions} />
                   )}
                 />
               </div>
@@ -486,10 +469,7 @@ export default function CreateMoldTanstackForm({
                     },
                   }}
                   children={(field) => (
-                    <FormSelectField
-                      field={field}
-                      options={statusOptions}
-                    />
+                    <FormSelectField field={field} options={statusOptions} />
                   )}
                 />
               </div>
