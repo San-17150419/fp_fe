@@ -7,11 +7,13 @@ type FormInputFieldProps = {
   field: FieldApi<any, any, any, any>;
   span: number;
   isRequired?: boolean;
+  valueType?: "number" | "string";
 } & InputHTMLAttributes<HTMLInputElement>;
 export default function FormInputField({
   field,
   span,
   isRequired = false,
+  valueType = "string",
   ...inputProps
 }: FormInputFieldProps) {
   return (
@@ -22,7 +24,13 @@ export default function FormInputField({
         title={field.name}
         id={field.name}
         value={field.state.value}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) =>
+          field.handleChange(
+            valueType === "number"
+              ? Number(e.target.value)
+              : e.target.value,
+          )
+        }
         {...inputProps}
         className={clsx("w-full outline-none", inputProps.className)}
       />
