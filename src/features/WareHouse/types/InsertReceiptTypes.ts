@@ -12,7 +12,7 @@ export type InsertReceiptParams = {
   order_prodNum: string;
   amt_unit: string;
   amt_order: string;
-  amt_delivered: string;
+  amt_delivered: number;
   amt_delivered_sub: string;
   amt_unit_sub: string;
   net_weight: string;
