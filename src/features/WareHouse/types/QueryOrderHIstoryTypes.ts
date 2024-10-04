@@ -12,6 +12,7 @@ export type QueryOrderHistoryParams = {
 export type QueryOrderHIstoryResponseData = {
   post: QueryOrderHistoryParams;
   data: Array<{
+    date_accepted: string;
     doc_num: string;
     supplier_code: string;
     order_num: string;
@@ -19,9 +20,10 @@ export type QueryOrderHIstoryResponseData = {
     order_product: string;
     deliver_product: string;
     amt_delivered: number;
-    date_confirm: string;
-    amt_received: number;
-    status_IQC: number;
+    date_confirm: string | null;
+    amt_received: number | null;
+    amt_returned: number | null;
+    status_IQC: string | null;
     report_IQC: string;
   }>;
 };
