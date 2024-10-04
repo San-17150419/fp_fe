@@ -36,21 +36,19 @@ export default function Select<T>({
 
   const [isInvalid, setIsInvalid] = useState(false);
 
-  //  Sync selectedOption with external value (Enable consumer to set value such as reset )
   useEffect(() => {
-    // TODO: Test performance.
-    if (value !== undefined) {
-      const newSelectedOption = options.find(
-        (option) => option.value === value,
-      );
-      if (newSelectedOption) {
-        setSelectedOption(newSelectedOption);
-      }
+    // Check if the passed value exists in the options
+    const newSelectedOption = options.find((option) => option.value === value);
+  
+    // If the value is not found (or is an empty string), reset to default option or an empty option
+    if (newSelectedOption) {
+      setSelectedOption(newSelectedOption);
     } else {
+      // Reset to default or empty value when no valid value is passed
       setSelectedOption(defaultValue || defaultOption);
     }
-    // TODO: This is for when value is reset to undefined.
-  }, [value, options]);
+  }, [value, options, defaultValue, defaultOption]);
+  
 
   const handleSelect = (option: Option<T>) => {
     setIsInvalid(false); // reset
