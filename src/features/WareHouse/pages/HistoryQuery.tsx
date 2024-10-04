@@ -145,6 +145,7 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
                         [filter.key]: value.target.value,
                       }));
                     }}
+                    type={filter.type || "text"}
                   />
                 </label>
               );
