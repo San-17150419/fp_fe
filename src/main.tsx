@@ -6,13 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthProvider from "./stores/AuthContext";
 import "./i18n";
-import {
-  ErrorPage,
-  FactoryLogPage,
-  Loading,
-  ModelOverview,
-  Warehouse,
-} from "./pages";
+import { ErrorPage, FactoryLogPage, Loading, ModelOverview } from "./pages";
 import { ThemeProvider } from "./stores/ThemeContext";
 import {
   QueryCache,
@@ -164,7 +158,6 @@ const router = createBrowserRouter([
       },
       {
         path: "/Warehouse",
-        element: <Warehouse />,
         children: [
           {
             index: true,
@@ -204,7 +197,7 @@ const router = createBrowserRouter([
                 "./features/WareHouse/pages/HistoryQuery"
               );
               return {
-                Component: HistoryQuery,
+                Component: () => <HistoryQuery version={"inv"} />,
               };
             },
           },
