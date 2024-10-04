@@ -43,6 +43,7 @@ export default function ProductRecieveForm() {
   });
 
   function resetFormDataRelatedToOrderNum() {
+    if (orderDetails.length === 0) return;
     form.setFieldValue("order_product", "");
     setOrderDetails([]);
     form.setFieldValue("supplier_code", "");
@@ -113,6 +114,7 @@ export default function ProductRecieveForm() {
             asyncDebounceMs={500}
             validators={{
               onChangeAsync: async ({ value }) => {
+                if (!value) return undefined;
                 try {
                   const response = await axios.post<CheckOrderNumResponseData>(
                     "https://192.168.123.240:9000/api/rr-inv/check-orderNum",
@@ -245,7 +247,6 @@ export default function ProductRecieveForm() {
               <SelectField
                 field={field}
                 isRequired={true}
-                
                 options={orderProductOptions}
                 span={1}
               />
