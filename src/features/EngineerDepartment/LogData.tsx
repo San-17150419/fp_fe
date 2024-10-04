@@ -32,7 +32,7 @@ export default function LogData({ sn_num, site, dutydate_last }: EventProps) {
       });
       return response.data;
     },
-    enabled: false,
+    enabled: open === true,
   });
   const { t } = useTranslation();
 
@@ -57,7 +57,7 @@ export default function LogData({ sn_num, site, dutydate_last }: EventProps) {
         <Modal isOpen={open} onClose={() => setOpen(false)}>
           {/* <p>{JSON.stringify(postData, null, 2)}</p> */}
           {isSuccess && (
-            <div className="mx-auto min-w-[50vw] px-1 py-4">
+            <div className="mx-auto min-w-[60vw] px-1 py-4">
               <div className="relative mx-auto max-h-[70vh] max-w-full overflow-auto px-2">
                 <table className="h-full w-full table-auto border-separate border-spacing-0">
                   <thead className="sticky top-0 z-10 backdrop-opacity-0">
