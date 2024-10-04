@@ -23,7 +23,7 @@ export default function ProductRecieveForm() {
     supplier_code: "",
     date_accepted: "",
     deliver_product: "",
-    deliver_prodNum: 0,
+    deliver_prodNum: "",
     id_order: 0,
     order_num: "",
     order_product: "",
@@ -32,7 +32,7 @@ export default function ProductRecieveForm() {
     order_prodNum: "",
     amt_unit: "",
     amt_order: 0,
-    amt_delivered: "",
+    amt_delivered: 0,
     amt_delivered_sub: "",
     amt_unit_sub: "PCS",
     net_weight: "",
@@ -50,11 +50,12 @@ export default function ProductRecieveForm() {
     form.setFieldValue("order_prodType", "");
     form.setFieldValue("order_prodModel", "");
     form.setFieldValue("deliver_product", "");
-    form.setFieldValue("amt_delivered", "");
+    form.setFieldValue("amt_delivered", 0);
     form.setFieldValue("amt_unit", "");
-    form.setFieldValue("deliver_prodNum", 0);
+    form.setFieldValue("deliver_prodNum", "");
     form.setFieldValue("amt_order", 0);
     form.setFieldValue("id_order", 0);
+    form.setFieldValue("order_num", "");
   }
   console.log(form.store.state.values);
   return (
@@ -183,10 +184,6 @@ export default function ProductRecieveForm() {
                 const detailsOfCurrentOrder = orderDetails.find(
                   (order) => order.order_product === value,
                 );
-                console.log("********************************");
-                console.log(detailsOfCurrentOrder);
-                console.log("********************************");
-                // TODO: I think when order_num is first set, there is a bug
                 if (!detailsOfCurrentOrder) {
                   // if the order_product can't be found in the orderDetails, something is very wrong.
                   throw new Error(
@@ -239,6 +236,10 @@ export default function ProductRecieveForm() {
 
                 // TODO: This is needed to reset deliver_product when order_product is changed. I am not sure this is the correct way to do so. form.Subscribe
                 form.setFieldValue("deliver_product", "");
+                form.setFieldValue(
+                  "order_prodNum",
+                  detailsOfCurrentOrder.order_prodNum,
+                );
 
                 return undefined;
               },
@@ -276,6 +277,24 @@ export default function ProductRecieveForm() {
                 <form.Field
                   validators={{
                     onChange({ value }) {
+                      const deliverProductOption = orderDetails
+                        .find(
+                          (order) =>
+                            order.order_product === currentOrderProduct,
+                        )
+                        ?.product_option.find(
+                          (option) => option.item_name === value,
+                        );
+                      deliverProductOption &&
+                        form.setFieldValue(
+                          "deliver_prodNum",
+                          deliverProductOption?.item_code,
+                        ) &&
+                        form.setFieldValue(
+                          "deliver_product",
+                          deliverProductOption?.item_name,
+                        );
+
                       return undefined;
                     },
                   }}
@@ -295,7 +314,7 @@ export default function ProductRecieveForm() {
                               order.order_product === currentOrderProduct,
                           )
                           ?.product_option.map((item) => ({
-                            value: item.item_code,
+                            value: item.item_name,
                             text: item.item_name,
                             id: item.item_code,
                           }))
@@ -347,10 +366,15 @@ export default function ProductRecieveForm() {
                 return undefined;
               },
             }}
-            key="deliver_prodNum"
-            name="deliver_prodNum"
+            key="amt_delivered"
+            name="amt_delivered"
             children={(field) => (
-              <InputField isRequired={true} field={field} span={2} />
+              <InputField
+                isRequired={true}
+                field={field}
+                span={2}
+                valueType="number"
+              />
             )}
           />
 
@@ -373,39 +397,6 @@ export default function ProductRecieveForm() {
               <InputField isRequired={true} field={field} span={1} />
             )}
           />
-          {/* TODO: use form.Subscribe component to perform side effect. See if I can build a custom component on top of this. fields that are autofilled   */}
-          {/* TODO: Pay atttention to how many times form.Subscribe component is re-rendered. I am not sure if the selector inside the form.Subscribe component is functioning as the selector from redux. Allows you to subscribe to a specific part of the data to optimize rendering */}
-          <div className="hidden">
-            {/* TODO: Check what fields are rendered or displayed to the user. If they don't need to be seen, I think I don't need to render them and simply update their value from the onChange handler in other fields (order_product and deliver_product) */}
-
-            <form.Field
-              key="id_order"
-              name="id_order"
-              children={(field) => <InputField field={field} span={2} />}
-            />
-            <form.Field
-              key="order_prodNum"
-              name="order_prodNum"
-              children={(field) => <InputField field={field} span={2} />}
-            />
-
-            <form.Field
-              key="amt_order"
-              name="amt_order"
-              children={(field) => <InputField field={field} span={2} />}
-            />
-            <form.Field
-              key="amt_delivered"
-              name="amt_delivered"
-              children={(field) => <InputField field={field} span={2} />}
-            />
-
-            <form.Field
-              key="net_weight"
-              name="net_weight"
-              children={(field) => <InputField field={field} span={2} />}
-            />
-          </div>
           <form.Subscribe
             selector={(state) => ({
               ...state,
