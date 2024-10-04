@@ -28,7 +28,6 @@ export default function Update({
     siteOptions,
     statusOptions,
   );
-  // console.log(error);
   return (
     <>
       <button
