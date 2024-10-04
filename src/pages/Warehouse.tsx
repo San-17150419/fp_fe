@@ -1,15 +1,13 @@
 import { NavLink, Outlet } from "react-router-dom";
-
 export default function Warehouse() {
   // const
-
   const links = [
     { label: "退貨驗收單", path: "/Warehouse/product-return-form" },
     { label: "交貨驗收單", path: "/Warehouse/product-recieve-form" },
     { label: "檢索驗收單", path: "/Warehouse/deliver-history-query" },
   ];
   return (
-    <div className="flex flex-col gap-2 ">
+    <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         {links.map((link) => (
           <NavLink
