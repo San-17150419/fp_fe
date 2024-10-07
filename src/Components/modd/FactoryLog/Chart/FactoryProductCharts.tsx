@@ -40,7 +40,7 @@ export default function ProductChart({
   const fetchEventData = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.123.240:9000/api/fj/event-data/",
+        "https://192.168.123.240:9000/api/fj/event-data/",
         {
           factory: factory,
           department,
