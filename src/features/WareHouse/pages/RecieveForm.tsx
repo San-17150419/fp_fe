@@ -472,7 +472,29 @@ export default function ProductRecieveForm() {
               isSubmitting: state.isSubmitting,
             })}
             children={({ canSubmit, isSubmitting, isDirty, ...state }) => {
-              const isBTNDisabled = !canSubmit || isSubmitting || !isDirty;
+              const requiredFields = [
+                "amt_delivered",
+                "amt_order",
+                "amt_unit",
+                "date_accepted",
+                "deliver_prodNum",
+                "deliver_product",
+                "doc_num",
+                "id_order",
+                "order_num",
+                "order_prodModel",
+                "order_prodNum",
+                "order_product",
+                "supplier_code",
+              ];
+              const isRequiredFieldsFilled = requiredFields.every(
+                (field) => state.values[field as keyof typeof state.values],
+              );
+              const isBTNDisabled =
+                !canSubmit ||
+                isSubmitting ||
+                !isDirty ||
+                !isRequiredFieldsFilled;
               console.log(state.values);
               // TODO: Update isBTNDisabled logic to ensure the button is disabled when at least one field is not valid. (The problem is the validator in each fields is only run when the field is touched. So technically speaking, if field is not touched, then the field is valid.)
 
