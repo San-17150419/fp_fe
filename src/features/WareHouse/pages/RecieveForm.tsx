@@ -6,7 +6,7 @@ import InputField from "../Form/InputField";
 import SelectField from "../Form/SelectField";
 import { type Option } from "../../../Components/modd/Select/Select";
 import { useForm } from "@tanstack/react-form";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { type CheckOrderNumResponseData } from "../types/CheckOrderNumTypes";
 import { type CheckDocNumResponse } from "../types";
 
@@ -40,6 +40,29 @@ export default function ProductRecieveForm() {
 
   const form = useForm({
     defaultValues: defaultData,
+    onSubmit: async (values) => {
+      const value = {
+        ...values.value,
+        amt_delivered: Number(values.value.amt_delivered),
+      };
+      console.log("this is from submit ");
+      const api = "https://192.168.123.240:9000/api/rr-inv/insert-receipt";
+      try {
+        const response = await axios.post(api, value);
+        console.log(values.value);
+        console.log(response);
+        toast.success("Success");
+      } catch (error) {
+        console.log(error);
+        if (isAxiosError(error)) {
+          console.log(error?.response?.data?.info_check?.message);
+          toast.error(`Error ${error?.response?.data?.info_check?.message}`);
+        } else {
+          toast.error(`Error ${error}`);
+        }
+        // toast.error(`Error ${error.data.info_check.message}`);
+      }
+    },
   });
 
   function resetFormDataRelatedToOrderNum() {
@@ -62,6 +85,11 @@ export default function ProductRecieveForm() {
     <>
       <form
         action=""
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
         className="mx-auto flex h-fit w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
       >
         <h1 className="border-b-2 border-black py-2 text-center text-2xl font-semibold">
