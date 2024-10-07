@@ -20,7 +20,7 @@ export default function ProductRecieveForm() {
   >([]);
   const [orderProductOptions, setOrderProductOptions] = useState<
     Array<Option<string>>
-  >([]);
+  >([{ id: 0, text: "請選擇", value: "" }]);
   const defaultData = {
     doc_num: "",
     supplier_code: "",
@@ -169,7 +169,10 @@ export default function ProductRecieveForm() {
                         id: item.order_product,
                       }));
 
-                    setOrderProductOptions(productOptions);
+                    setOrderProductOptions([
+                      { id: 0, text: "請選擇", value: "" },
+                      ...productOptions,
+                    ]);
                     setOrderDetails(response.data.order);
                     if (!isOrderExist) {
                       resetFormDataRelatedToOrderNum();
@@ -337,7 +340,7 @@ export default function ProductRecieveForm() {
                     <SelectField
                       options={(() => {
                         const options: Option<string>[] = [
-                          { value: "", text: "", id: "" },
+                          { value: "", text: "請選擇", id: 0 },
                         ];
                         orderDetails
                           .find(
