@@ -9,9 +9,12 @@ import { useForm } from "@tanstack/react-form";
 import axios, { isAxiosError } from "axios";
 import { type CheckOrderNumResponseData } from "../types/CheckOrderNumTypes";
 import { type CheckDocNumResponse } from "../types";
+import { FaCaretRight } from "react-icons/fa";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function ProductRecieveForm() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdditonalOptionsOpen, setIsAdditonalOptionsOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState<
     Array<CheckOrderNumResponseData["order"][number]>
   >([]);
@@ -418,13 +421,47 @@ export default function ProductRecieveForm() {
               <InputField isRequired={true} field={field} span={1} />
             )}
           />
-          <form.Field
-            key="amt_unit_sub"
-            name="amt_unit_sub"
-            children={(field) => (
-              <InputField isRequired={true} field={field} span={1} />
+          <div className="col-span-2">
+            <button
+              title="open"
+              type="button"
+              className={`${isAdditonalOptionsOpen ? "rotate-90" : ""} text-xl`}
+              onClick={() => setIsAdditonalOptionsOpen(!isAdditonalOptionsOpen)}
+            >
+              <FaCaretRight />
+            </button>
+          </div>
+          <AnimatePresence>
+            {isAdditonalOptionsOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="col-span-2 grid grid-cols-2 gap-x-4 gap-y-2"
+              >
+                <form.Field
+                  key="amt_delivered_sub"
+                  name="amt_delivered_sub"
+                  children={(field) => <InputField field={field} span={1} />}
+                />
+                <form.Field
+                  key="amt_unit_sub"
+                  name="amt_unit_sub"
+                  children={(field) => (
+                    <InputField isRequired={true} field={field} span={1} />
+                  )}
+                />
+                <form.Field
+                  key="net_weight"
+                  name="net_weight"
+                  children={(field) => (
+                    <InputField isRequired={true} field={field} span={1} />
+                  )}
+                />
+              </motion.div>
             )}
-          />
+          </AnimatePresence>
+
           <form.Subscribe
             selector={(state) => ({
               ...state,
