@@ -11,11 +11,11 @@ export default function InspectionForm({
   isReadOnly = false,
 }: InspectionFormProps) {
   return (
-    <>
-      <h1 className="mx-2 mb-2 bg-stone-600 p-2 text-center text-xl font-semibold text-white outline">
+    <div className="p-2">
+      <h1 className="mb-2 py-4 bg-stone-600 text-center text-xl font-semibold text-white outline">
         {data.doc_class}| {data.order_prodModel}| {data.order_prodNum}
       </h1>
-      <table className="min-w-[700px] table-fixed text-center">
+      <table className="min-w-[700px] table-auto text-center">
         <thead>
           <tr>
             <th rowSpan={2}>檢驗項目</th>
@@ -32,43 +32,51 @@ export default function InspectionForm({
             <th>次要</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-sm">
           {Array.from({ length: 10 }).map((_, index) => (
             <tr key={index} className="border-b even:bg-slate-100">
-              <td className="w-[80px]">A</td>
-              <td className="w-[80px]">
-                <Input
-                  type="text"
-                  title="抽樣數"
-                  disabled={isReadOnly}
-                  className="text-center"
-                />
+              <td className="">A</td>
+              <td>
+                <div className="m-1 px-2 py-1">
+                  <Input
+                    type="text"
+                    title="抽樣數"
+                    disabled={isReadOnly}
+                    className="text-center"
+                  />
+                </div>
               </td>
-              <td className="w-[50px]">
-                <Input
-                  type="number"
-                  title="嚴重"
-                  disabled={isReadOnly}
-                  className=""
-                />
+              <td>
+                <div className="m-1 px-2 py-1">
+                  <Input
+                    type="number"
+                    title="嚴重"
+                    disabled={isReadOnly}
+                    className=" "
+                  />
+                </div>
               </td>
-              <td className="w-[50px]">
-                <Input
-                  type="number"
-                  title="主要"
-                  disabled={isReadOnly}
-                  className=""
-                />
+              <td>
+                <div className="m-1 px-2 py-1">
+                  <Input
+                    type="number"
+                    title="主要"
+                    disabled={isReadOnly}
+                    className=" "
+                  />
+                </div>
               </td>
-              <td className="w-[50px]">
-                <Input
-                  type="number"
-                  title="次要"
-                  disabled={isReadOnly}
-                  className=""
-                />
+              <td>
+                <div className="m-1 px-2 py-1">
+                  <Input
+                    type="number"
+                    title="次要"
+                    disabled={isReadOnly}
+                    className=" "
+                  />
+                </div>
               </td>
-              <td className="flex justify-center gap-3 text-sm">
+              <td className="flex justify-center gap-3">
                 <div className="m-1 px-2 py-1">
                   <Input
                     type="number"
@@ -120,7 +128,7 @@ export default function InspectionForm({
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }
 
