@@ -6,7 +6,6 @@ import SelectField from "../Form/SelectField";
 import { useForm, type FieldMeta } from "@tanstack/react-form";
 import axios, { isAxiosError } from "axios";
 import {
-  type CheckDocNumResponseData,
   type CheckDocNumResponse,
 } from "../types";
 import { toast } from "react-toastify";
@@ -132,14 +131,13 @@ export default function ProductRetrunForm() {
                 }
                 // check if the doc number for return is available
                 try {
-                  const response = await axios.post<CheckDocNumResponseData>(
-                    `https://192.168.123.240:9000/api/rr-inv/check-docNum-rt`,
-                    {
-                      doc_returned: value,
-                    },
-                  );
-                  console.log(response);
-                  if (response.data.result === "available") {
+                  const response = await axios.post<
+                    CheckDocNumResponse<"receive">
+                  >(`https://192.168.123.240:9000/api/rr-inv/check-docNum`, {
+                    doc_num: value,
+                    pattern: "receive",
+                  });
+                  if (response.data.data.result === "available") {
                     return undefined;
                   } else {
                     return "退貨文件編號已存在";
