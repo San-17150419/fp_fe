@@ -39,8 +39,24 @@ export default function ProductRetrunForm() {
   >(null);
   const form = useForm({
     defaultValues: defaultData,
-  });
-  console.log(form.store.state.values);
+  function resetDocReceivedRelatedFields() {
+    console.log("reset");
+    form.setFieldMeta("amt_returned", {
+      ...(form.getFieldMeta("amt_returned") as FieldMeta),
+      errorMap: { onChange: undefined },
+      errors: [],
+    });
+    form.setFieldMeta("id_rr", {
+      ...(form.getFieldMeta("id_rr") as FieldMeta),
+      errorMap: { onChange: undefined },
+      errors: [],
+    });
+    form.setFieldValue("amt_unit", "");
+    form.setFieldValue("id_rr", "");
+    form.setFieldValue("amt_unit", "");
+    form.setFieldValue("amt_returned", "");
+  }
+
   return (
     <>
 
@@ -88,6 +104,12 @@ export default function ProductRetrunForm() {
             validators={{
               onBlurListenTo: ["doc_received"],
               onChangeAsync: async ({ value }) => {
+                if (!value) {
+                  console.log("no value");
+
+                  return "退貨文件編號不可為空";
+                }
+                // check if the doc number for return is available
                 try {
                   const response = await axios.post<CheckDocNumResponseData>(
                     `https://192.168.123.240:9000/api/rr-inv/check-docNum-rt`,
@@ -133,6 +155,7 @@ export default function ProductRetrunForm() {
                 if (!value) {
                   console.log("this is enter");
                   setReceipt(null);
+                  resetDocReceivedRelatedFields();
                   return "交貨文件編碼不可為空";
                 }
                 try {
@@ -145,13 +168,19 @@ export default function ProductRetrunForm() {
 
                   const id_rr = response.data.data.receipt.id_rr;
                   if (!id_rr) {
+                    resetDocReceivedRelatedFields();
                     setReceipt(null);
                     return "交貨文件編碼不存在";
                   }
+                  const amt_unit = response.data.data.receipt.amt_unit;
+                  setReceipt(response.data.data.receipt);
+                  form.setFieldValue("amt_unit", amt_unit);
+                  form.setFieldValue("id_rr", String(id_rr));
                   setMaxReturnedAmount(
                     response.data.data.receipt.amt_delivered,
                   );
                 } catch (error) {
+                  resetDocReceivedRelatedFields();
                   if (isAxiosError(error)) {
                     const errorCode = error.response?.status;
                     if (
@@ -201,22 +230,36 @@ export default function ProductRetrunForm() {
             name="amt_returned"
             validators={{
               onChangeListenTo: ["doc_received"],
+              onChange: ({ value }) => {
+                if (!value) {
+                  return undefined;
+                }
                 if (!/^[0-9]+$/.test(value)) {
                   return "退貨數量只能為數字";
                 }
+                console.log(form.getFieldMeta("amt_returned"));
+                if (Number(value) === 0) {
+                  return undefined;
+                }
                 if (receipt === null && Number(value) !== 0) {
+                  console.log(value);
+                  console.log(Number(value) === 0);
+                  form.setFieldValue("amt_returned", "");
                   return "請先選擇交貨文件編碼";
                 }
                 if (Number(value) > maxReturnedAmount) {
                   return "退貨數量已超出該驗收單交貨數量";
                 }
+                if (receipt && receipt.amt_delivered)
+                  if (Number(value) > receipt?.amt_delivered) {
+                    return "退貨數量已超出該驗收單交貨數量";
+                  }
+
+                return undefined;
+              },
+            }}
             children={(field) => (
-              <InputField
-                type="number"
-                isRequired={true}
-                field={field}
-                span={2}
-              />
+              <InputField isRequired={true} field={field} span={2} />
             )}
           />
 
