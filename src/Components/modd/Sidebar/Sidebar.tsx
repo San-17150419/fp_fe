@@ -8,7 +8,13 @@ export default function Sidebar() {
   const linkContents: { [groupName: string]: [string, string][] } = {
     工廠日誌: [["工廠日誌", "/"]],
     工程部: [["工程部", "/EngineerDepartment"]],
-    倉庫: [["交貨驗收單", "/Warehouse"]],
+    倉庫: [
+      // ["交貨驗收單", "/Warehouse"],
+      ["交貨驗收單", "/Warehouse/product-recieve-form"],
+      ["退貨驗收單", "/Warehouse/product-return-form"],
+      ["檢索驗收單", "/Warehouse/deliver-history-query"],
+      ["圖表測試", "/Warehouse/graph-testing"],
+    ],
   };
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +42,7 @@ export default function Sidebar() {
       >
         <button
           className={cn(
-            " cursor-pointer  hover:bg-sky-600",
+            "cursor-pointer hover:bg-sky-600",
             !isOpen && "rotate-180",
             isOpen && "rotate-0",
           )}
