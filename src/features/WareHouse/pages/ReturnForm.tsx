@@ -63,9 +63,15 @@ export default function ProductRetrunForm() {
             key="cause"
             name="cause"
             children={(field) => (
-              <InputField
-                type="text"
-                isRequired={true}
+              <SelectField
+                options={(() => {
+                  const cause = ["品管驗退", "挑選", "特採"];
+                  return cause.map((item) => ({
+                    text: item,
+                    value: item,
+                    id: item,
+                  }));
+                })()}
                 field={field}
                 span={1}
               />
