@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Loading from "../../../Components/Loading";
-import { type QueryOrderHIstoryResponseData } from "../types/QueryOrderHIstoryTypes";
+import {
+  type QueryOrderHIstoryResponseData,
+  type QueryOrderHistoryType,
+  type QueryOrderHistoryParams,
+} from "../types/QueryOrderHIstoryTypes";
 import OrderDetails from "../OrderDetails";
 import clsx from "clsx";
 import Modal from "../../../Components/modd/Modal/NonDialogModal";
@@ -11,7 +15,7 @@ import Select from "../../../Components/modd/Select/Select";
 import Input from "../../../Components/modd/Input/InputBase";
 
 type HistoryQueryProps = {
-  version: "inv" | "iqc";
+  version: QueryOrderHistoryType;
 };
 
 const configuration = {
@@ -30,7 +34,7 @@ const configuration = {
       {
         key: "status_IQC",
         label: "驗收狀態",
-        options: ["全部", "已驗收", "未驗收"].map((option) => {
+        options: ["全部", "已檢驗", "未檢驗"].map((option) => {
           return {
             text: option,
             value: option === "全部" ? "" : option,
@@ -65,37 +69,45 @@ const configuration = {
       { key: "amt_returned", label: "驗退數量" },
       { key: "status_IQC", label: "驗收狀態" },
       { key: "report_IQC", label: "檢驗結果" },
+      { key: "id_order", label: "驗收單細節" },
     ],
+    apiEndpoint: "https://192.168.123.240:9000/api/rr-inv/filterData",
   },
   iqc: {
     filters: [
-      "date_start",
-      "date_end",
-      "report_IQC",
-      "doc_num",
-      "order_num",
-      "deliver_product",
+      { key: "date_start", label: "收貨日期", type: "date", element: "input" },
+      { key: "date_end", label: "驗貨日期", type: "date", element: "input" },
+      { key: "doc_num", label: "文件編號", type: "text", element: "input" },
+      { key: "order_num", label: "訂單編號", type: "text", element: "input" },
+      {
+        key: "deliver_product",
+        label: "交付產品",
+        type: "text",
+        element: "input",
+      },
     ],
     columns: [
-      "date_accepted",
-      "doc_num",
-      "supplier_code",
-      "order_num",
-      "doc_class",
-      "deliver_product",
-      "amt_delivered",
-      "date_confirm",
-      "amt_received",
-      "status_IQC",
-      "report_IQC",
+      { key: "date_accepted", label: "收貨日期" },
+      { key: "doc_num", label: "文件編碼" },
+      { key: "order_num", label: "訂單號碼" },
+      { key: "doc_class", label: "訂單類別" },
+      { key: "supplier_code", label: "交貨廠商" },
+      { key: "deliver_product", label: "交貨品名" },
+      { key: "deliver_prodNum", label: "交貨編號" },
+      { key: "amt_delivered", label: "交貨數量" },
+      { key: "status_IQC", label: "驗收狀態" },
+      { key: "id_order", label: "驗收單細節" },
     ],
+    apiEndpoint: "https://192.168.123.240:9000/api/rr-iqc/filterReceipt-tbc",
   },
 };
 
 export default function HistoryQuery({ version }: HistoryQueryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isUserEditing, setIsUserEditing] = useState(false);
-  const [filterParams, setFilterParams] = useState({
+  const [filterParams, setFilterParams] = useState<
+    QueryOrderHistoryParams<typeof version>
+  >({
     date_start: format(startOfMonth(new Date()), "yyyy-MM-dd"),
     date_end: format(new Date(), "yyyy-MM-dd"),
     doc_class: "",
@@ -105,19 +117,27 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
     status_IQC: "",
     report_IQC: "",
   });
-  const [currentOrdeId, setCurrentOrdeId] = useState<string | null>();
+  const [currentOrdeId, setCurrentOrdeId] = useState<string | null>(null);
   const { data, isFetching } = useQuery({
     queryKey: ["deliveryData", filterParams],
     queryFn: async () => {
-      console.log("start");
-      const api = "https://192.168.123.240:9000/api/rr-inv/filterData";
-      console.log(filterParams);
-      const response = await axios.post<QueryOrderHIstoryResponseData>(
-        api,
-        filterParams,
-      );
-      console.log(response.data);
-      return response.data;
+      switch (version) {
+        case "inv":
+          const response = await axios.post<
+            QueryOrderHIstoryResponseData<"inv">
+          >("https://192.168.123.240:9000/api/rr-inv/filterData", filterParams);
+          return response.data;
+        case "iqc":
+          const response2 = await axios.post<
+            QueryOrderHIstoryResponseData<"iqc">
+          >(
+            "https://192.168.123.240:9000/api/rr-iqc/filterReceipt-tbc",
+            filterParams,
+          );
+          return response2.data;
+        default:
+          return null;
+      }
     },
     enabled: !isUserEditing,
   });
@@ -125,14 +145,18 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
   return (
     <>
       <form action="" className="grid w-full grid-cols-7 gap-4">
-        {configuration.inv.filters.map((filter) => {
+        {configuration[version].filters.map((filter) => {
           switch (filter.element) {
             case "input":
               return (
                 <label
                   key={filter.key}
                   onFocus={() => setIsUserEditing(true)}
-                  onBlur={() => setIsUserEditing(false)}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setIsUserEditing(false); // Delay resetting the flag to allow date selection
+                    }, 200); // Adjust this delay if necessary
+                  }}
                 >
                   <span>{filter.label}</span>
                   <Input
@@ -151,11 +175,7 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
               );
             case "select":
               return (
-                <label
-                  key={filter.key}
-                  onFocus={() => setIsUserEditing(true)}
-                  onBlur={() => setIsUserEditing(false)}
-                >
+                <label key={filter.key}>
                   <span>{filter.label}</span>
                   <Select
                     value={
@@ -164,7 +184,7 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
                     onChange={(value) => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        [filter.key]: value,
+                        [filter.key]: value.value,
                       }));
                     }}
                     options={filter.options || []}
@@ -176,11 +196,15 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
           }
         })}
       </form>
+      <div className="w-full bg-red-200 text-right">
+        {isFetching ? "isFetching" : "isNotFetching"}
+        {data ? "有資料" : "沒資料"}
+      </div>
       <div className="h-[60vh] overflow-auto caret-transparent">
         <table className="w-full">
           <thead className="sticky top-0 z-30 bg-white">
             <tr>
-              {configuration["inv"].columns.map((column) => (
+              {configuration[version].columns.map((column) => (
                 <Th key={column.key}>{column.label}</Th>
               ))}
             </tr>
@@ -192,57 +216,31 @@ export default function HistoryQuery({ version }: HistoryQueryProps) {
                 <Td colSpan={13}>無資料</Td>
               </tr>
             ) : null}
-            {data &&
-              data.data.slice(0, 500).map((key) => (
-                <tr key={key.doc_num} className={clsx("even:bg-gray-300")}>
-                  <Td>{key.date_accepted}</Td>
-                  <Td>{key.doc_num}</Td>
-                  <Td>{key.supplier_code}</Td>
-                  <Td>{key.order_num}</Td>
-                  <Td
-                    className={clsx(
-                      key.doc_class !== "一般訂單" && "text-red-600",
-                    )}
-                  >
-                    {key.doc_class}
-                  </Td>
-                  <Td>{key.order_product}</Td>
-                  <Td>{key.amt_delivered.toLocaleString()}</Td>
-                  <Td className="text-blue-600">{key.date_confirm}</Td>
-                  <Td className="text-blue-600">
-                    {key.amt_received?.toLocaleString()}
-                  </Td>
-                  <Td className="text-red-600">
-                    {key.amt_returned?.toLocaleString()}
-                  </Td>
-                  <Td
-                    className={clsx(
-                      key.status_IQC === "未檢驗" && "text-blue-600",
-                    )}
-                  >
-                    {key.status_IQC}
-                  </Td>
-                  <Td
-                    className={clsx(
-                      key.report_IQC === "允收" && "text-green-700",
-                    )}
-                  >
-                    {key.report_IQC}
-                  </Td>
-                </tr>
-              ))}
+
+            {version === "inv" && data && (
+              <InvTbody data={data.data as InvTbodyProps["data"]} />
+            )}
+            {version === "iqc" && data && (
+              <IqcTbody
+                data={data.data as IqcTbodyProps["data"]}
+                setCurrentOrdeId={setCurrentOrdeId}
+                setOpen={setIsOpen}
+              />
+            )}
           </tbody>
         </table>
       </div>
-      {/* This is only enable when version is iqc */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        {currentOrdeId &&
-          testData.find((key) => key.doc_num === currentOrdeId) && (
-            <OrderDetails
-              data={testData.find((key) => key.doc_num === currentOrdeId)!}
-            />
-          )}
-      </Modal>
+      {version === "iqc" && (
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+          {currentOrdeId &&
+            data &&
+            data.data.find((key) => key.doc_num === currentOrdeId) && (
+              <OrderDetails
+                data={testData.find((key) => key.doc_num === currentOrdeId)!}
+              />
+            )}
+        </Modal>
+      )}
     </>
   );
 }
@@ -298,6 +296,83 @@ function Td({
 }
 
 export type Data = (typeof testData)[number];
+
+type InvTbodyProps = {
+  data: Array<QueryOrderHIstoryResponseData<"inv">["data"][number]>;
+};
+function InvTbody({ data }: InvTbodyProps) {
+  return (
+    <>
+      {data.slice(0, 500).map((key) => (
+        <tr key={key.doc_num} className={clsx("even:bg-gray-300")}>
+          <Td>{key.date_accepted}</Td>
+          <Td>{key.doc_num}</Td>
+          <Td>{key.supplier_code}</Td>
+          <Td>{key.order_num}</Td>
+          <Td className={clsx(key.doc_class !== "一般訂單" && "text-red-600")}>
+            {key.doc_class}
+          </Td>
+          <Td>{key.order_product}</Td>
+          <Td>{key.amt_delivered.toLocaleString()}</Td>
+          <Td className="text-blue-600">{key.date_confirm}</Td>
+          <Td className="text-blue-600">
+            {key.amt_received?.toLocaleString()}
+          </Td>
+          <Td className="text-red-600">{key.amt_returned?.toLocaleString()}</Td>
+          <Td className={clsx(key.status_IQC === "未檢驗" && "text-blue-600")}>
+            {key.status_IQC}
+          </Td>
+          <Td className={clsx(key.report_IQC === "允收" && "text-green-700")}>
+            {key.report_IQC}
+          </Td>
+        </tr>
+      ))}
+    </>
+  );
+}
+type IqcTbodyProps = {
+  data: Array<QueryOrderHIstoryResponseData<"iqc">["data"][number]>;
+  setCurrentOrdeId: React.Dispatch<React.SetStateAction<string | null>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+function IqcTbody({ data, setCurrentOrdeId, setOpen }: IqcTbodyProps) {
+  return (
+    <>
+      {data.slice(0, 500).map((key) => (
+        <tr key={key.doc_num} className={clsx("even:bg-gray-300")}>
+          <Td>{key.date_accepted}</Td>
+          <Td>{key.doc_num}</Td>
+          <Td>{key.order_num}</Td>
+          <Td className={clsx(key.doc_class !== "一般訂單" && "text-red-600")}>
+            {key.doc_class}
+          </Td>
+          <Td>{key.supplier_code}</Td>
+          <Td className="text-blue-600">{key.deliver_product}</Td>
+          <Td className="text-blue-600">{key.deliver_prodNum}</Td>
+          <Td>{key.amt_delivered.toLocaleString()}</Td>
+
+          <Td className={clsx(key.status_IQC === "未檢驗" && "text-blue-600")}>
+            {key.status_IQC}
+          </Td>
+          <Td
+            onClick={() => {
+              setCurrentOrdeId(key.doc_num);
+              setOpen(true);
+            }}
+          >
+            <button
+              type="button"
+              className="rounded-md bg-black p-2 text-white"
+            >
+              驗收單細節
+            </button>
+          </Td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
 const testData = [
   {
     id: 14792,
