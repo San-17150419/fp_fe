@@ -1,5 +1,3 @@
-import { useState } from "react";
-import Modal from "../../../Components/modd/Modal/NonDialogModal";
 import { LuUpload } from "react-icons/lu";
 import { useState } from "react";
 import clsx from "clsx";
@@ -11,6 +9,7 @@ import {
   type CheckDocNumResponseData,
   type CheckDocNumResponse,
 } from "../types";
+import { toast } from "react-toastify";
 import { format } from "date-fns";
 export default function ProductRetrunForm() {
   const defaultData = {
@@ -33,6 +32,31 @@ export default function ProductRetrunForm() {
   >(null);
   const form = useForm({
     defaultValues: defaultData,
+    onSubmit: async (values) => {
+      const data = {
+        ...values.value,
+        amt_returned: Number(values.value.amt_returned),
+        amt_returned_sub: Number(values.value.amt_returned_sub),
+        id_rr: Number(values.value.id_rr),
+        net_weight: Number(values.value.net_weight),
+      };
+      const api = "https://192.168.123.240:9000/api/rr-inv/insert-receipt-rt";
+      console.log(data);
+      try {
+        const response = await axios.post(api, data);
+        console.log(response);
+        toast.success("Success");
+      } catch (error) {
+        console.log(error);
+        if (isAxiosError(error)) {
+          toast.error(error.response?.data?.info_check?.messag);
+        } else {
+          toast.error(`Error ${error}`);
+        }
+      }
+    },
+  });
+
   function resetDocReceivedRelatedFields() {
     console.log("reset");
     form.setFieldMeta("amt_returned", {
@@ -53,10 +77,13 @@ export default function ProductRetrunForm() {
 
   return (
     <>
-
       <form
-        action=""
-        className="flex h-fit min-w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        autoComplete="off"
+        className="mx-auto -mt-1 flex h-fit w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
       >
         <h1 className="border-b-2 border-black py-2 text-center text-2xl font-semibold">
           輸入退貨單
@@ -205,7 +232,6 @@ export default function ProductRetrunForm() {
               />
             )}
           />
-
           <form.Field
             key="id_rr"
             name="id_rr"
@@ -218,7 +244,6 @@ export default function ProductRetrunForm() {
               />
             )}
           />
-
           <form.Field
             key="amt_returned"
             name="amt_returned"
@@ -256,7 +281,6 @@ export default function ProductRetrunForm() {
               <InputField isRequired={true} field={field} span={2} />
             )}
           />
-
           <form.Field
             key="amt_unit"
             name="amt_unit"
@@ -269,7 +293,6 @@ export default function ProductRetrunForm() {
               />
             )}
           />
-
           <form.Field
             key="net_weight"
             name="net_weight"
@@ -288,7 +311,6 @@ export default function ProductRetrunForm() {
               <InputField isRequired={true} field={field} span={2} />
             )}
           />
-
           <form.Field
             key="amt_returned_sub"
             name="amt_returned_sub"
@@ -307,7 +329,6 @@ export default function ProductRetrunForm() {
               <InputField isRequired={true} field={field} span={2} />
             )}
           />
-
           <form.Field
             key="amt_unit_sub"
             name="amt_unit_sub"
@@ -332,7 +353,6 @@ export default function ProductRetrunForm() {
               />
             )}
           />
-
           <form.Subscribe
             selector={(state) => ({
               ...state,
