@@ -11,26 +11,20 @@ import {
   type CheckDocNumResponseData,
   type CheckDocNumResponse,
 } from "../types";
+import { format } from "date-fns";
 export default function ProductRetrunForm() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [orderDetails, setOrderDetails] = useState<
-    Array<CheckOrderNumResponseData["order"][number]>
-  >([]);
-  const [orderProductOptions, setOrderProductOptions] = useState<
-    Array<Option<string>>
-  >([]);
   const defaultData = {
-    date_returned: "2024-09-25", //# 退貨日期
+    date_returned: format(new Date(), "yyyy-MM-dd"), //# 退貨日期
     cause: "品管驗退", //# 退貨原因
-    doc_returned: "TEST-RTDOC-0925", //# 退貨文件編號
-    doc_received: "TEST-DOC-0925", //# 交貨文件編號
-    id_rr: "14653", //# 驗收單id，來源於交貨文件編號成立時
-    amt_returned: 200, //# 退貨數量
-    amt_unit: "KG", //# 計數單位
-    info: "TEST-INSERT-DOCRT", //# 備註
-    net_weight: "0.01", //# 淨重
-    amt_returned_sub: "5000", //# 退貨數量(輔助)
-    amt_unit_sub: "PCS", //# 計數單位(輔助)
+    doc_returned: "", //# 退貨文件編號
+    doc_received: "", //# 交貨文件編號
+    id_rr: "", //# 驗收單id，來源於交貨文件編號成立時 number
+    amt_returned: "", //# 退貨數量 number
+    amt_unit: "", //# 計數單位
+    info: "", //# 備註
+    net_weight: "", //# 淨重
+    amt_returned_sub: "", //# 退貨數量(輔助) number
+    amt_unit_sub: "", //# 計數單位(輔助)
   };
 
   const [maxReturnedAmount, setMaxReturnedAmount] = useState(0);
