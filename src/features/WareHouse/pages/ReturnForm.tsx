@@ -1,15 +1,16 @@
 import { useState } from "react";
 import Modal from "../../../Components/modd/Modal/NonDialogModal";
 import { LuUpload } from "react-icons/lu";
+import { useState } from "react";
 import clsx from "clsx";
 import InputField from "../Form/InputField";
 import SelectField from "../Form/SelectField";
-import { type Option } from "../../../Components/modd/Select/Select";
-import { useForm } from "@tanstack/react-form";
-import axios from "axios";
-import { type CheckOrderNumResponseData } from "../types/CheckOrderNumTypes";
-import { type CheckDocNumResponse } from "../types";
-
+import { useForm, type FieldMeta } from "@tanstack/react-form";
+import axios, { isAxiosError } from "axios";
+import {
+  type CheckDocNumResponseData,
+  type CheckDocNumResponse,
+} from "../types";
 export default function ProductRetrunForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState<
@@ -32,6 +33,10 @@ export default function ProductRetrunForm() {
     amt_unit_sub: "PCS", //# 計數單位(輔助)
   };
 
+  const [maxReturnedAmount, setMaxReturnedAmount] = useState(0);
+  const [receipt, setReceipt] = useState<
+    CheckDocNumResponse<"return">["data"]["receipt"] | null
+  >(null);
   const form = useForm({
     defaultValues: defaultData,
   });
@@ -78,23 +83,38 @@ export default function ProductRetrunForm() {
             )}
           />
           <form.Field
-            validators={{
-              onChangeAsync: async ({ value }) => {
-                try {
-                  const response = await axios.post<
-                    CheckDocNumResponse<"return">
-                  >(`https://192.168.123.240:9000/api/rr-inv/check-docNum`, {
-                    doc_num: value,
-                    pattern: "return",
-                  });
-                  return undefined;
-                } catch {
-                  return "此文件編號不存在";
-                }
-              },
-            }}
             key="doc_returned"
             name="doc_returned"
+            validators={{
+              onBlurListenTo: ["doc_received"],
+              onChangeAsync: async ({ value }) => {
+                try {
+                  const response = await axios.post<CheckDocNumResponseData>(
+                    `https://192.168.123.240:9000/api/rr-inv/check-docNum-rt`,
+                    {
+                      doc_returned: value,
+                    },
+                  );
+                  console.log(response);
+                  if (response.data.result === "available") {
+                    return undefined;
+                  } else {
+                    return "退貨文件編號已存在";
+                  }
+                } catch {
+                  return "退貨文件編號已存在";
+                }
+              },
+              onBlur: ({ value, fieldApi }) => {
+                if (
+                  value &&
+                  value === fieldApi.form.getFieldValue("doc_received")
+                ) {
+                  return "退貨文件編號與交貨文件編號不能相同";
+                }
+                return undefined;
+              },
+            }}
             children={(field) => (
               <InputField
                 type="text"
@@ -107,6 +127,52 @@ export default function ProductRetrunForm() {
           <form.Field
             key="doc_received"
             name="doc_received"
+            validators={{
+              onBlurAsyncDebounceMs: 0,
+              onBlurAsync: async ({ value }) => {
+                if (!value) {
+                  console.log("this is enter");
+                  setReceipt(null);
+                  return "交貨文件編碼不可為空";
+                }
+                try {
+                  const response = await axios.post<
+                    CheckDocNumResponse<"return">
+                  >(`https://192.168.123.240:9000/api/rr-inv/check-docNum`, {
+                    doc_num: value,
+                    pattern: "return",
+                  });
+
+                  const id_rr = response.data.data.receipt.id_rr;
+                  if (!id_rr) {
+                    setReceipt(null);
+                    return "交貨文件編碼不存在";
+                  }
+                  setMaxReturnedAmount(
+                    response.data.data.receipt.amt_delivered,
+                  );
+                } catch (error) {
+                  if (isAxiosError(error)) {
+                    const errorCode = error.response?.status;
+                    if (
+                      errorCode === 400 &&
+                      error.response?.data.info_check.message.includes(
+                        "required field",
+                      )
+                    ) {
+                      return (
+                        // This scenario should not occur because if the value is empty, the request won't be sent.
+                        // The error response indicates a missing required field, which should have been prevented by the earlier validation.
+                        "請立即回報 \n" +
+                        error.response?.data.info_check.message
+                      );
+                    }
+                  }
+                  console.log(error);
+                  return "交貨文件編碼不存在";
+                }
+              },
+            }}
             children={(field) => (
               <InputField
                 type="text"
@@ -133,6 +199,17 @@ export default function ProductRetrunForm() {
           <form.Field
             key="amt_returned"
             name="amt_returned"
+            validators={{
+              onChangeListenTo: ["doc_received"],
+                if (!/^[0-9]+$/.test(value)) {
+                  return "退貨數量只能為數字";
+                }
+                if (receipt === null && Number(value) !== 0) {
+                  return "請先選擇交貨文件編碼";
+                }
+                if (Number(value) > maxReturnedAmount) {
+                  return "退貨數量已超出該驗收單交貨數量";
+                }
             children={(field) => (
               <InputField
                 type="number"
@@ -159,26 +236,38 @@ export default function ProductRetrunForm() {
           <form.Field
             key="net_weight"
             name="net_weight"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) {
+                  return undefined;
+                }
+                if (!/^[0-9]+$/.test(value)) {
+                  return "淨重只能為數字";
+                }
+                return undefined;
+              },
+            }}
             children={(field) => (
-              <InputField
-                type="number"
-                isRequired={true}
-                field={field}
-                span={2}
-              />
+              <InputField isRequired={true} field={field} span={2} />
             )}
           />
 
           <form.Field
             key="amt_returned_sub"
             name="amt_returned_sub"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) {
+                  return undefined;
+                }
+                if (!/^[0-9]+$/.test(value)) {
+                  return "退貨數量(輔助)只能為數字";
+                }
+                return undefined;
+              },
+            }}
             children={(field) => (
-              <InputField
-                type="number"
-                isRequired={true}
-                field={field}
-                span={2}
-              />
+              <InputField isRequired={true} field={field} span={2} />
             )}
           />
 
