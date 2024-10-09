@@ -4,7 +4,10 @@ import SelectField from "../Form/SelectField";
 import { useForm } from "@tanstack/react-form";
 import axios, { isAxiosError } from "axios";
 import { toast } from "react-toastify";
-import { type CheckDOrderNumResponse } from "../types";
+import {
+  type CheckDOrderNumResponse,
+  type CheckDocNumResponse,
+} from "../types";
 export default function RawMaterialReceiveFormt() {
   const [orders, setOrders] = useState<CheckDOrderNumResponse["order"]>([]);
   const form = useForm({
@@ -72,8 +75,30 @@ export default function RawMaterialReceiveFormt() {
             )}
           />
           <form.Field
-            key="id_dorder"
-            name="id_dorder"
+            key="doc_num"
+            name="doc_num"
+            validators={{
+              onChangeAsync: async ({ value }) => {
+                if (!value) return "料品交運單號不可為空";
+                try {
+                  const response = await axios.post<
+                    CheckDocNumResponse<"receive">
+                  >("https://192.168.123.240:9000/api/rr-inv/check-docNum", {
+                    doc_num: value,
+                    pattern: "receive",
+                  });
+                  if (response.data.data.doc_exist) return "料品交運單號已存在";
+                  return undefined;
+                } catch (error) {
+                  if (isAxiosError(error)) {
+                    console.log(error?.response?.data?.info_check?.message);
+                    return error?.response?.data?.info_check?.message;
+                  }
+                  console.log(error);
+                  return "料品交運單號已存在";
+                }
+              },
+            }}
             children={(field) => (
               <InputField
                 type="text"
@@ -137,18 +162,7 @@ export default function RawMaterialReceiveFormt() {
               />
             )}
           />
-          <form.Field
-            key="doc_num"
-            name="doc_num"
-            children={(field) => (
-              <InputField
-                type="text"
-                isRequired={true}
-                field={field}
-                span={2}
-              />
-            )}
-          />
+
           <form.Field
             // 交運單品名
             key="do_product"
