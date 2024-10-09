@@ -1,9 +1,9 @@
-export type ReturnRawMaterialParams = {
+export type CheckDOrderNumParams = {
   dorder_num: string;
 };
 
-export type ReturnRawMaterialResponse = {
-  post: ReturnRawMaterialParams;
+export type CheckDOrderNumResponse = {
+  post: CheckDOrderNumParams;
   order: {
     id_dorder: number;
     date: string;
