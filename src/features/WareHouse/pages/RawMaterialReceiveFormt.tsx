@@ -95,14 +95,21 @@ export default function RawMaterialReceiveFormt() {
                     "https://192.168.123.240:9000/api/rr-inv/check-orderNum-do",
                     { dorder_num: value },
                   );
-                  if (response.data.order.length === 0)
+                  if (response.data.order.length === 0) {
+                    if (orders.length !== 0) {
+                      setOrders([]);
+                    }
                     return "料品交運單不存在";
+                  }
                   // toast.success(response.data.post);
                   setOrders(response.data.order);
                   toast.success("success");
                   console.log(response);
                   return undefined;
                 } catch (error) {
+                  if (orders.length !== 0) {
+                    setOrders([]);
+                  }
                   if (isAxiosError(error)) {
                     const { message } = error.response?.data.info_check;
                     const statusCode = error.response?.status;
