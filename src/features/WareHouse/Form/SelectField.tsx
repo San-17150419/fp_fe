@@ -8,7 +8,7 @@ type FormInputFieldProps<T> = {
   field: FieldApi<any, any, any, any>;
   span: number;
   labelStyle?: string;
-  // labelStyle?: React.CSSProperties;
+  text?: string;
   isRequired?: boolean;
 } & SelectProps<T>;
 // TODO: I need to decrease the height of the select
@@ -17,6 +17,7 @@ export default function FormInputField<T>({
   span,
   labelStyle,
   isRequired = false,
+  text,
   ...selectProps
 }: FormInputFieldProps<T>) {
   return (
@@ -25,6 +26,7 @@ export default function FormInputField<T>({
       span={span}
       isRequired={isRequired}
       labelStyle={labelStyle}
+      text={text}
     >
       <Select
         value={field.state.value}
