@@ -283,6 +283,33 @@ export default function RawMaterialReceiveFormt() {
               );
             }}
           />
+          <form.Subscribe
+            selector={(state) => ({
+              currentDoProduct: state.values.do_product,
+            })}
+            children={({ currentDoProduct }) => {
+              const currentOrderDetails = orders.find(
+                (order) => order.do_product === currentDoProduct,
+              );
+              const value = currentOrderDetails?.amt_unit ?? "";
+              return (
+                <form.Field
+                  key="amt_unit"
+                  name="amt_unit"
+                  children={(field) => (
+                    <InputField
+                      type="text"
+                      isRequired={true}
+                      readOnly
+                      value={value}
+                      field={field}
+                      span={1}
+                    />
+                  )}
+                />
+              );
+            }}
+          />
         </div>
       </form>
     </>
