@@ -6,7 +6,7 @@ import clsx from "clsx";
 type FormInputFieldProps = {
   field: FieldApi<any, any, any, any>;
   span: number;
-  text?:string;
+  text?: string;
   isRequired?: boolean;
 } & InputHTMLAttributes<HTMLInputElement>;
 export default function FormInputField({
@@ -19,7 +19,12 @@ export default function FormInputField({
   return (
     // TODO: It is not connected to the form correctly. For example, the name is not restricted to the default values in the form. I can pass any name to the input field. And it won't give an error.
 
-    <FormFieldContent field={field} span={span} text={text} isRequired={isRequired}>
+    <FormFieldContent
+      field={field}
+      span={span}
+      text={text}
+      isRequired={isRequired}
+    >
       <input
         title={field.name}
         id={field.name}
