@@ -13,7 +13,10 @@ export default function Sidebar() {
       ["交貨驗收單", "/Warehouse/product-recieve-form"],
       ["退貨驗收單", "/Warehouse/product-return-form"],
       ["檢索驗收單", "/Warehouse/deliver-history-query"],
+      ["檢索驗收單IQC", "/Warehouse/deliver-history-query-iqc"],
       ["圖表測試", "/Warehouse/graph-testing"],
+      ["料品交運送出單", "/Warehouse/send-raw-material-form"],
+      ["料品交運回貨單", "/Warehouse/receive-material-form"],
     ],
   };
   const [isOpen, setIsOpen] = useState(false);

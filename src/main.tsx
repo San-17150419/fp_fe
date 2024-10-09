@@ -201,6 +201,50 @@ const router = createBrowserRouter([
               };
             },
           },
+          {
+            path: "deliver-history-query-iqc",
+            lazy: async () => {
+              let { default: HistoryQuery } = await import(
+                "./features/WareHouse/pages/HistoryQuery"
+              );
+              return {
+                Component: () => <HistoryQuery version={"iqc"} />,
+              };
+            },
+          },
+          {
+            path: "graph-testing",
+            lazy: async () => {
+              let { default: GraphTest } = await import(
+                "./features/WareHouse/pages/GraphTest"
+              );
+              return {
+                Component: GraphTest,
+              };
+            },
+          },
+          {
+            path: "receive-material-form",
+            lazy: async () => {
+              let { default: RawMaterialReceiveFormt } = await import(
+                "./features/WareHouse/pages/ReceiveMaterialForm"
+              );
+              return {
+                Component: RawMaterialReceiveFormt,
+              };
+            },
+          },
+          {
+            path: "send-raw-material-form",
+            lazy: async () => {
+              let { default: RawMaterialReturnForm } = await import(
+                "./features/WareHouse/pages/SendRawMeterialForm"
+              );
+              return {
+                Component: RawMaterialReturnForm,
+              };
+            },
+          },
         ],
       },
     ],
