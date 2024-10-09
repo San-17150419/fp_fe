@@ -149,6 +149,36 @@ export default function RawMaterialReceiveFormt() {
             // 交運單品名
             key="do_product"
             name="do_product"
+            validators={{
+              onChange: ({ value }) => {
+                // send notification if this order is full
+                const isOrderFull = (() => {
+                  const currentOrderDetails = orders.find(
+                    (order) => order.do_product === value,
+                  );
+                  // do_product is not found or selected yet, return false. This is different from `amt_def`, which return true in this case. Because you can't tell if the order is full or not when do_product is not selected.
+                  if (!currentOrderDetails) return false;
+                  // do_product is found but amt_order is not found
+                  if (!currentOrderDetails.amt_order) return true;
+                  // amt_order is found, but history is null or undefined. Which means total_sent is 0
+                  if (!currentOrderDetails.history) return false;
+                  if (!currentOrderDetails.history?.total_sent) return true;
+                  if (
+                    currentOrderDetails.history.total_sent <
+                    currentOrderDetails.amt_order
+                  )
+                    return false;
+                  return true;
+                })();
+                if (isOrderFull) {
+                  toast.info(
+                    "料品交運單{dorder_num}已達最大送出數，請回報採購單位",
+                  );
+                }
+                // always return undefined. I only use this to send notification, not to validate
+                return undefined;
+              },
+            }}
             children={(field) => (
               <SelectField
                 isRequired={true}
