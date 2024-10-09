@@ -173,7 +173,17 @@ export default function RawMaterialReceiveFormt() {
             // The values of the following fields are derived from the value of `do_product`. `supplier_code`, `do_prodModel`, `process`,`do_prodNum`,`amt_unit`,and `amt_order`. They won't be rendered in the form.
             validators={{
               onChange: ({ value }) => {
-                if (!value) return "請選擇品名";
+                if (!value) {
+                  form.setFieldValue("supplier_code", "");
+                  form.setFieldValue("do_prodModel", "");
+                  form.setFieldValue("process", "");
+                  form.setFieldValue("amt_order", "");
+                  form.setFieldValue("do_prodNum", "");
+                  form.setFieldValue("id_dorder", "");
+                  form.setFieldValue("amt_unit", "");
+                  form.setFieldValue("amt_def", "");
+                  return "請選擇品名";
+                }
                 const currentOrderDetails = orders.find(
                   (order) => order.do_product === value,
                 );
