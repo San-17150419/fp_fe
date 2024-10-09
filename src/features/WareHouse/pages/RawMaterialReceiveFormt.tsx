@@ -95,19 +95,23 @@ export default function RawMaterialReceiveFormt() {
                     "https://192.168.123.240:9000/api/rr-inv/check-orderNum-do",
                     { dorder_num: value },
                   );
+                  // if response.data.order is empty, this means dorder_num is not valid or does not exist.
                   if (response.data.order.length === 0) {
+                    // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
                     if (orders.length !== 0) {
+                      form.setFieldValue("do_product", "");
                       setOrders([]);
                     }
                     return "料品交運單不存在";
                   }
-                  // toast.success(response.data.post);
                   setOrders(response.data.order);
                   toast.success("success");
                   console.log(response);
                   return undefined;
                 } catch (error) {
+                  // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
                   if (orders.length !== 0) {
+                    form.setFieldValue("do_product", "");
                     setOrders([]);
                   }
                   if (isAxiosError(error)) {
