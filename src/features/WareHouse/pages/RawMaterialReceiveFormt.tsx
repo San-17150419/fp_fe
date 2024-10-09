@@ -162,6 +162,43 @@ export default function RawMaterialReceiveFormt() {
               />
             )}
           />
+          <form.Subscribe
+            selector={(state) => ({
+              currentDoProduct: state.values.do_product,
+            })}
+            children={({ currentDoProduct }) => {
+              const options = [{ id: "", text: "請選擇交付產品", value: "" }];
+              if (currentDoProduct && orders) {
+                const currentProductOrders = orders.find(
+                  (order) => order.do_product === currentDoProduct,
+                );
+                if (currentProductOrders) {
+                  currentProductOrders.product_option.forEach((option) => {
+                    options.push({
+                      id: option.item_code,
+                      text: option.item_name,
+                      value: option.item_code,
+                    });
+                  });
+                }
+              }
+              return (
+                <form.Field
+                  // 交付產品，after do_product is selected, polulated the options from product_option under that do_product
+                  key="deliver_product"
+                  name="deliver_product"
+                  children={(field) => (
+                    <SelectField
+                      isRequired={true}
+                      options={options}
+                      field={field}
+                      span={2}
+                    />
+                  )}
+                />
+              );
+            }}
+          />
         </div>
       </form>
     </>
