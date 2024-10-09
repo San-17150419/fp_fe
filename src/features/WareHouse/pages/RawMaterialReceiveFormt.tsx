@@ -171,8 +171,31 @@ export default function RawMaterialReceiveFormt() {
             // 交運單品名
             key="do_product"
             name="do_product"
+            // The values of the following fields are derived from the value of `do_product`. `supplier_code`, `do_prodModel`, `process`,`do_prodNum`,`amt_unit`,and `amt_order`. They won't be rendered in the form.
             validators={{
               onChange: ({ value }) => {
+                if (!value) return "請選擇品名";
+                const currentOrderDetails = orders.find(
+                  (order) => order.do_product === value,
+                );
+                if (!currentOrderDetails) return "料品交運單不存在"; // This shuold never happen. This means the states are not updated correctly.
+                const {
+                  supplier_code,
+                  do_prodModel,
+                  process,
+                  amt_order,
+                  do_prodNum,
+                  id_dorder,
+                  amt_unit,
+                } = currentOrderDetails;
+                form.setFieldValue("supplier_code", supplier_code);
+                form.setFieldValue("do_prodModel", do_prodModel);
+                form.setFieldValue("process", process);
+                form.setFieldValue("amt_order", String(amt_order));
+                form.setFieldValue("do_prodNum", do_prodNum);
+                form.setFieldValue("id_dorder", String(id_dorder));
+                form.setFieldValue("amt_unit", amt_unit);
+
                 // send notification if this order is full
                 const isOrderFull = (() => {
                   const currentOrderDetails = orders.find(
