@@ -258,9 +258,9 @@ export default function RawMaterialReceiveFormt() {
                 if (currentProductOrders) {
                   currentProductOrders.product_option.forEach((option) => {
                     options.push({
-                      id: option.item_code,
+                      id: option.item_name,
                       text: option.item_name,
-                      value: option.item_code,
+                      value: option.item_name,
                     });
                   });
                 }
@@ -270,6 +270,27 @@ export default function RawMaterialReceiveFormt() {
                   // 交付產品，after do_product is selected, polulated the options from product_option under that do_product
                   key="deliver_product"
                   name="deliver_product"
+                  validators={{
+                    onChange: ({ value }) => {
+                      if (!value) return "請選擇交付產品";
+                      if (!currentDoProduct) return undefined;
+                      if (!orders) return "請先輸入料品交運單號";
+
+                      const currentProductDetails = orders.find(
+                        (order) => order.do_product === currentDoProduct,
+                      );
+                      if (currentProductDetails) {
+                        form.setFieldValue(
+                          "deliver_prodNum",
+                          currentProductDetails.product_option.find(
+                            (option) => option.item_name === value,
+                          )?.item_code as string,
+                        );
+                      }
+
+                      return undefined;
+                    },
+                  }}
                   children={(field) => (
                     <SelectField
                       isRequired={true}
