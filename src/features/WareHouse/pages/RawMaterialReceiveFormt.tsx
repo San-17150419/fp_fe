@@ -8,6 +8,8 @@ import {
   type CheckDOrderNumResponse,
   type CheckDocNumResponse,
 } from "../types";
+import { LuUpload } from "react-icons/lu";
+import clsx from "clsx";
 export default function RawMaterialReceiveFormt() {
   const [orders, setOrders] = useState<CheckDOrderNumResponse["order"]>([]);
   const form = useForm({
@@ -329,6 +331,57 @@ export default function RawMaterialReceiveFormt() {
                     />
                   )}
                 />
+              );
+            }}
+          />
+          <form.Subscribe
+            selector={(state) => ({
+              ...state,
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+            children={({ canSubmit, isSubmitting, isDirty, ...state }) => {
+              const requiredFields = [
+                "id_dorder",
+                "doc_num",
+                "dorder_num",
+                "date_back",
+                "supplier_code",
+                "deliver_product",
+                "deliver_prodNum",
+                "do_product",
+                "do_prodModel",
+                "do_prodNum",
+                "process",
+                "amt_unit",
+                "amt_order",
+                "amt_def",
+                "unit_def",
+              ];
+              const isRequiredFieldsFilled = requiredFields.every(
+                (field) => state.values[field as keyof typeof state.values],
+              );
+              const isBTNDisabled =
+                !canSubmit ||
+                isSubmitting ||
+                !isDirty ||
+                !isRequiredFieldsFilled;
+              return (
+                <>
+                  <button
+                    type="submit"
+                    disabled={isBTNDisabled}
+                    className={clsx(
+                      "col-span-2 my-4 flex items-center justify-center gap-4 rounded-md bg-gray-600 py-4 text-lg text-white shadow-[0_10px_25px_0_rgba(0,0,0,0.2)]",
+                      {
+                        "cursor-not-allowed opacity-50": isBTNDisabled,
+                      },
+                    )}
+                  >
+                    <LuUpload size={24} />
+                    確認上傳
+                  </button>
+                </>
               );
             }}
           />
