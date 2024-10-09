@@ -7,10 +7,14 @@ import { toast } from "react-toastify";
 import {
   type CheckDOrderNumResponse,
   type CheckDocNumResponse,
+  type InsertMaterialReceiptParams,
+  type InsertMaterialReceiptResponse,
 } from "../types";
 import { LuUpload } from "react-icons/lu";
 import clsx from "clsx";
-export default function RawMaterialReceiveFormt() {
+
+// 料品經由第三方廠商加工後的收貨紀錄
+export default function ReceiveMaterialForm() {
   const [orders, setOrders] = useState<CheckDOrderNumResponse["order"]>([]);
   const form = useForm({
     defaultValues: {
@@ -27,11 +31,36 @@ export default function RawMaterialReceiveFormt() {
       process: "", // # 工序
       amt_unit: "", //
       amt_order: "", //number
-      amt_def: "", // # 實際送交數量
+      amt_def: "", // # 實際送交數量 number
       unit_def: "KG", // # 計數單位，固定為KG
       net_weight: "", // 不用
       amt_inv: "", // 不用
       unit_inv: "", // 不用
+    },
+    onSubmit: async (values) => {
+      // convert data to correct format
+      const params: InsertMaterialReceiptParams = {
+        ...values.value,
+        id_dorder: Number(values.value.id_dorder),
+        amt_order: Number(values.value.amt_order),
+        amt_def: Number(values.value.amt_def),
+      };
+      console.log(params);
+      try {
+        const response = await axios.post<InsertMaterialReceiptResponse>(
+          "https://192.168.123.240:9000/api/rr-inv/insert-epback-receipt",
+          params,
+        );
+        console.log(response);
+        toast.success(response.data.info_insert.status);
+      } catch (error) {
+        console.log(error);
+        if (isAxiosError(error)) {
+          toast.error(error.response?.data?.info_insert?.error);
+        } else {
+          toast.error(`Error ${error}`);
+        }
+      }
     },
   });
 
@@ -52,10 +81,10 @@ export default function RawMaterialReceiveFormt() {
   return (
     <>
       <form
-        action=""
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          form.handleSubmit();
         }}
         className="mx-auto flex h-fit w-[600px] flex-col rounded-md bg-white px-12 py-4 text-gray-600 shadow-[0_0px_15px_0_rgba(0,0,0,0.2)]"
       >
@@ -93,10 +122,10 @@ export default function RawMaterialReceiveFormt() {
                   return undefined;
                 } catch (error) {
                   if (isAxiosError(error)) {
-                    console.log(error?.response?.data?.info_check?.message);
+                    // console.log(error?.response?.data?.info_check?.message);
                     return error?.response?.data?.info_check?.message;
                   }
-                  console.log(error);
+                  // console.log(error);
                   return "料品交運單號已存在";
                 }
               },
@@ -115,25 +144,33 @@ export default function RawMaterialReceiveFormt() {
             name="dorder_num"
             validators={{
               onChangeAsync: async ({ value }) => {
+                // TODO: Fix this is run after form submit.
                 if (!value) return "料品交運單編號不可為空";
+                console.log("this is run");
                 try {
-                  // HP2400183-1
+                  // HP2400183-1 is full
+                  // HP2400189-1 not full
+                  // HP2400220-1 is full
                   const response = await axios.post<CheckDOrderNumResponse>(
                     "https://192.168.123.240:9000/api/rr-inv/check-orderNum-do",
                     { dorder_num: value },
                   );
-                  // if response.data.order is empty, this means dorder_num is not valid or does not exist.
+                  // check 1: if dorder_num exist. If response.data.order.length is 0, dorder_num does not exist.
                   if (response.data.order.length === 0) {
                     // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
+                    // 廠商加工完，但交運單不存在
+                    toast.error("料品交運單{dorder_num}不存在，請回報管理者");
                     if (orders.length !== 0) {
                       resetDoProductRelatedFields();
                       setOrders([]);
                     }
                     return "料品交運單不存在";
+                  } else {
+                    response.data.order;
                   }
                   setOrders(response.data.order);
                   toast.success("success");
-                  console.log(response);
+                  // console.log(response);
                   return undefined;
                 } catch (error) {
                   // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
@@ -237,7 +274,6 @@ export default function RawMaterialReceiveFormt() {
               <SelectField
                 isRequired={true}
                 options={(() => {
-                  console.log("this is from do_product");
                   const options = [{ id: "", text: "請選擇品名", value: "" }];
                   orders.forEach((order) => {
                     options.push({
@@ -379,6 +415,7 @@ export default function RawMaterialReceiveFormt() {
                 <form.Field
                   key="amt_unit"
                   name="amt_unit"
+                  // the value of amt_unit in form is not updated when do_product is changed. Even though the value variable in form.Subscribe is updated. Now, it is being manually updated in do_product field.
                   children={(field) => (
                     <InputField
                       type="text"
@@ -446,6 +483,49 @@ export default function RawMaterialReceiveFormt() {
           />
         </div>
       </form>
+      {/* Do not commit content below this line */}
+      <div className="absolute bottom-0 right-0 w-1/4 whitespace-pre bg-white">
+        {JSON.stringify(
+          {
+            post: {
+              dorder_num: "HP2400183-1",
+            },
+            order: [
+              {
+                id_dorder: 6070,
+                date: "2024-09-25",
+                dorder_num: "HP2400183-1",
+                supplier_code: "PL06",
+                process: "電鍍(电镀)",
+                do_prodModel: "铜管",
+                do_product: "KPA8H-TE",
+                amt_order: 134,
+                amt_unit: "KG",
+                do_prodNum: "BH-0202",
+                item_size: "None",
+                product_no: "KPA8H-T",
+                history: {
+                  id_dorder: 6070,
+                  total_sent: 134,
+                  total_back: null,
+                },
+                product_option: [
+                  {
+                    item_name: "KPA8H-TE",
+                    item_code: "BH-0202",
+                  },
+                ],
+              },
+            ],
+            info_check: {
+              status: "PASS",
+              message: "",
+            },
+          },
+          null,
+          4,
+        )}
+      </div>
     </>
   );
 }
