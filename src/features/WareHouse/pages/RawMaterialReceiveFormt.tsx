@@ -281,7 +281,10 @@ export default function RawMaterialReceiveFormt() {
                   name="deliver_product"
                   validators={{
                     onChange: ({ value }) => {
-                      if (!value) return "請選擇交付產品";
+                      if (!value) {
+                        form.setFieldValue("deliver_prodNum", "");
+                        return "請選擇交付產品";
+                      }
                       if (!currentDoProduct) return undefined;
                       if (!orders) return "請先輸入料品交運單號";
 
