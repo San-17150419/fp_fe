@@ -71,6 +71,7 @@ export default function RawMaterialReceiveFormt() {
                 isRequired={true}
                 field={field}
                 span={2}
+                text={"實際送回日期"}
               />
             )}
           />
@@ -159,6 +160,7 @@ export default function RawMaterialReceiveFormt() {
                 isRequired={true}
                 field={field}
                 span={2}
+                text="料品交運單號"
               />
             )}
           />
@@ -213,6 +215,7 @@ export default function RawMaterialReceiveFormt() {
                   return options;
                 })()}
                 field={field}
+                text="交運單品名"
                 span={2}
               />
             )}
@@ -294,6 +297,7 @@ export default function RawMaterialReceiveFormt() {
                       isRequired={true}
                       field={field}
                       span={1}
+                      text="實際送回數量"
                       className={`${isReadOnly ? "caret-transparent" : ""}`}
                     />
                   )}
