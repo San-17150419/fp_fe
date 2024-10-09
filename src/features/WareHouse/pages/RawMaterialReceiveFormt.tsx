@@ -1,10 +1,12 @@
 import InputField from "../Form/InputField";
+import { useState } from "react";
 import SelectField from "../Form/SelectField";
 import { useForm } from "@tanstack/react-form";
 import axios, { isAxiosError } from "axios";
 import { toast } from "react-toastify";
 import { type CheckDOrderNumResponse } from "../types";
 export default function RawMaterialReceiveFormt() {
+  const [orders, setOrders] = useState<CheckDOrderNumResponse["order"]>([]);
   const form = useForm({
     defaultValues: {
       // 'id_dorder',
@@ -96,6 +98,7 @@ export default function RawMaterialReceiveFormt() {
                   if (response.data.order.length === 0)
                     return "料品交運單不存在";
                   // toast.success(response.data.post);
+                  setOrders(response.data.order);
                   toast.success("success");
                   console.log(response);
                   return undefined;
@@ -136,12 +139,24 @@ export default function RawMaterialReceiveFormt() {
             )}
           />
           <form.Field
-            key="deliver_product"
-            name="deliver_product"
+            // 交運單品名
+            key="do_product"
+            name="do_product"
             children={(field) => (
-              <InputField
-                type="text"
+              <SelectField
                 isRequired={true}
+                options={(() => {
+                  console.log("this is from do_product");
+                  const options = [{ id: "", text: "請選擇品名", value: "" }];
+                  orders.forEach((order) => {
+                    options.push({
+                      id: order.do_product,
+                      text: order.do_product,
+                      value: order.do_product,
+                    });
+                  });
+                  return options;
+                })()}
                 field={field}
                 span={2}
               />
