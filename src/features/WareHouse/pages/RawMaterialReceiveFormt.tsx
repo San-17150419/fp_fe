@@ -14,21 +14,6 @@ export default function RawMaterialReceiveFormt() {
   const [orders, setOrders] = useState<CheckDOrderNumResponse["order"]>([]);
   const form = useForm({
     defaultValues: {
-      // 'id_dorder',
-      // 'doc_num',
-      // 'dorder_num',
-      // 'date_back',
-      // 'supplier_code',
-      // 'deliver_product',
-      // 'deliver_prodNum',
-      // 'do_product',
-      // 'do_prodModel',
-      // 'do_prodNum',
-      // 'process',
-      // "amt_unit",
-      // "amt_order",
-      // 'amt_def',
-      // 'unit_def',
       id_dorder: "", //number # 串接料品交運單
       doc_num: "", //
       dorder_num: "", // # 料品交運單號
@@ -49,6 +34,20 @@ export default function RawMaterialReceiveFormt() {
       unit_inv: "", // 不用
     },
   });
+
+  function resetDoProductRelatedFields() {
+    form.setFieldValue("id_dorder", "");
+    form.setFieldValue("supplier_code", "");
+    form.setFieldValue("deliver_prodNum", "");
+    form.setFieldValue("deliver_product", "");
+    form.setFieldValue("do_prodModel", "");
+    form.setFieldValue("do_prodNum", "");
+    form.setFieldValue("do_product", "");
+    form.setFieldValue("process", "");
+    form.setFieldValue("amt_def", "");
+    form.setFieldValue("amt_unit", "");
+    form.setFieldValue("amt_order", "");
+  }
 
   return (
     <>
@@ -127,7 +126,7 @@ export default function RawMaterialReceiveFormt() {
                   if (response.data.order.length === 0) {
                     // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
                     if (orders.length !== 0) {
-                      form.setFieldValue("do_product", "");
+                      resetDoProductRelatedFields();
                       setOrders([]);
                     }
                     return "料品交運單不存在";
@@ -139,7 +138,7 @@ export default function RawMaterialReceiveFormt() {
                 } catch (error) {
                   // case: dorder_num is changed from valid to invalid. Clears orders to prevent stale data. do_product also need to be reset.
                   if (orders.length !== 0) {
-                    form.setFieldValue("do_product", "");
+                    resetDoProductRelatedFields();
                     setOrders([]);
                   }
                   if (isAxiosError(error)) {
