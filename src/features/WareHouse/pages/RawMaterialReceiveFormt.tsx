@@ -206,6 +206,53 @@ export default function RawMaterialReceiveFormt() {
               );
             }}
           />
+          <form.Subscribe
+            selector={(state) => ({
+              currentDoProduct: state.values.do_product,
+            })}
+            children={({ currentDoProduct }) => {
+              const currentOrderDetails = orders.find(
+                (order) => order.do_product === currentDoProduct,
+              );
+              const isReadOnly = (() => {
+                // if do_product is not found or selected yet, return true.
+                if (!currentOrderDetails) return true;
+                // do_product is found but amt_order is not found, return true.
+                if (!currentOrderDetails.amt_order) return true;
+                //  amt_order is found, but history is null or undefined. Which means total_sent is 0
+                if (!currentOrderDetails.history) return false;
+                // amt_order is not undefined or null, but total_send is 0 or undefined or null, return false
+                if (!currentOrderDetails.history.total_sent) return false;
+                //  total_sent is smaller than amt_order, return false
+                if (
+                  currentOrderDetails.history.total_sent <
+                  currentOrderDetails.amt_order
+                )
+                  return false;
+                return true;
+              })();
+              return (
+                <form.Field
+                  key="amt_def"
+                  name="amt_def"
+                  validators={{
+                    onChange(value) {
+                      if (!value) return "請輸入數量";
+                    },
+                  }}
+                  children={(field) => (
+                    <InputField
+                      readOnly={isReadOnly}
+                      isRequired={true}
+                      field={field}
+                      span={1}
+                      className={`${isReadOnly ? "caret-transparent" : ""}`}
+                    />
+                  )}
+                />
+              );
+            }}
+          />
         </div>
       </form>
     </>
