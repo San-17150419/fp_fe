@@ -333,8 +333,11 @@ export default function RawMaterialReceiveFormt() {
                   key="amt_def"
                   name="amt_def"
                   validators={{
-                    onChange(value) {
+                    onChange({ value }) {
+                      // TODO: Check if an upper limit is needed
                       if (!value) return "請輸入數量";
+                      if (/^\d+$/.test(value) === false) return "請輸入數字";
+                      return undefined;
                     },
                   }}
                   children={(field) => (
